@@ -1,0 +1,714 @@
+Phương án tao chọn cho web đội netball và football này
+Kết luận nhanh
+
+Products + Collections cho merchandise và gói membership
+
+Metaobjects cho Player, Team, Sponsor, Club People, Membership Type
+
+Blog native cho News và Events, tách thành 2 blog riêng để khách dễ quản lý
+
+Tags và article metafields cho phân loại News và Events
+
+Term metaobjects cho các nhóm phân loại quan trọng cần filter ổn định
+
+Lý do tách News với Events thành 2 blog
+
+Client dễ hiểu vì vẫn là bài viết
+
+Có editor native của Shopify
+
+Mỗi blog gắn template riêng được
+
+Event vẫn có field cấu trúc bằng article metafields như thời gian, link, venue
+
+Vẫn filter theo tag được trên trang blog
+
+Cấu trúc dữ liệu đề xuất
+1) Term layer
+
+Đây là phần thay cho taxonomy
+
+Tao khuyên làm term metaobjects riêng theo domain thay vì gom hết vào 1 term chung, vì khách nhìn admin sẽ dễ hơn nhiều.
+
+A. club_sport
+
+Dùng cho football và netball
+
+Field nên có
+Name
+Handle
+Sort order
+Active
+
+B. club_division
+
+Dùng cho Men, Women
+Nếu sau này có mixed hay juniors thì thêm được
+
+Field nên có
+Name
+Handle
+Sort order
+Active
+
+C. club_grade
+
+Dùng cho Under 19, Seniors, Reserves
+
+Field nên có
+Name
+Handle
+Sort order
+Active
+
+D. sponsor_scope
+
+Dùng cho Club sponsor, Player sponsor
+
+Field nên có
+
+Name
+Handle
+Sort order
+
+E. sponsor_tier
+
+Dùng cho Gold, Silver, Jumper, Community Partner
+
+Field nên có
+
+Name
+Handle
+Sort order
+
+Badge color name hoặc text label nếu cần hiển thị style
+
+F. club_people_group
+
+Dùng cho committee personnel, support personnel, volunteers, community members
+
+Field nên có
+
+Name
+Handle
+Sort order
+
+G. membership_category
+
+Nếu muốn phân nhóm membership type theo logic nội bộ
+ví dụ social, player, premium, honorary
+
+Field nên có
+
+Name
+Handle
+Sort order
+
+Quan trọng
+Các field nào dùng để lọc trong admin thì bật option filter ở metaobject definition để khách dễ tìm record trong admin. Shopify có option này cho field của metaobject definition.
+
+2) Team layer
+
+Thay vì để player tự giữ quá nhiều field phân loại, tao tạo club_team làm trục chính.
+
+Ví dụ team entry
+
+Men Football Seniors
+Men Football Reserves
+Women Netball Seniors
+Women Netball Under 19
+
+club_team metaobject
+
+Field nên có
+
+Team name
+ví dụ Men Football Seniors
+
+Sport
+reference tới club_sport
+
+Division
+reference tới club_division
+
+Grade
+reference tới club_grade
+
+Season label
+text, ví dụ 2026
+
+PlayHQ link
+url
+
+Team image
+image
+
+Sort order
+number
+
+Featured
+boolean
+
+Active
+publishable capability hoặc boolean
+
+Vì sao cần club_team
+
+Khách chỉ cần chọn đúng 1 team khi tạo player
+
+Tránh data lỗi kiểu chọn Men nhưng lại netball team sai logic
+
+Sau này làm page team detail rất tiện
+
+Có thể dùng lại cho schedule link, ladder link, PlayHQ button đúng theo brief của mày
+
+3) Players
+player_profile metaobject
+
+Field nên có
+
+Full name
+
+Preferred name nếu cần
+
+Jersey number
+
+Profile photo
+
+Role or position
+
+Team
+reference tới club_team
+
+Bio short
+
+Bio full
+
+Height hoặc stats nếu cần
+
+PlayHQ player link nếu có
+
+Featured player
+boolean
+
+Sort order
+number
+
+Active
+publishable
+
+Filter sẽ hỗ trợ
+
+Theo sport
+
+Theo division
+
+Theo grade
+
+Theo team
+
+Theo featured
+
+Cách lọc ở theme
+
+Lấy metaobjects.player_profile.values
+
+paginate
+
+đọc field player.team rồi lọc theo handle của team hoặc term trong team
+
+Shopify Liquid có object cho metaobject definition và values, có hỗ trợ paginate, rất hợp cho directory kiểu này. Khi bật publishable thì draft sẽ không hiện ra trên loop.
+
+4) Sponsors
+club_sponsor metaobject
+
+Field nên có
+
+Sponsor name
+Logo
+Website URL
+Scope
+reference tới sponsor_scope
+Club sponsor hoặc Player sponsor
+
+Tier
+reference tới sponsor_tier
+
+Sponsored player
+optional reference tới player_profile nếu là player sponsor
+
+Short description
+
+CTA label nếu cần
+
+Sort order
+
+Featured
+
+Active
+
+Filter sẽ hỗ trợ
+
+Theo scope
+
+Theo tier
+
+Theo sport hoặc team gián tiếp nếu sponsor gắn player
+
+Tip quản trị
+
+Nếu số sponsor nhiều, cho thêm field
+
+Sponsor since
+
+Expiry date
+
+Priority rank
+
+để khách quản lý hợp đồng hiển thị tốt hơn
+
+5) People in the Club
+club_person metaobject
+
+Field nên có
+
+Full name
+
+Photo
+
+Role title
+ví dụ Team Manager, Physio, Volunteer Coordinator
+
+Group
+reference tới club_people_group
+
+Sub group
+optional text hoặc term riêng nếu cần
+
+Bio short
+
+Contact note
+không khuyên public email nếu không cần
+
+Sort order
+
+Featured
+
+Active
+
+Filter sẽ hỗ trợ
+
+Theo group
+
+Theo role title search
+
+Theo featured
+
+6) Members và Memberships
+
+Ở đây tao tách rõ để khách không rối
+
+A. Membership products
+
+Dùng Product native cho gói bán được
+
+Ví dụ
+
+Sharks General Membership
+
+Domenerians Membership
+
+Junior Membership
+
+Family Membership
+
+Nên dùng
+
+Product type là Membership
+Shopify cho mỗi product một product type và một product category, product type dùng như custom category.
+
+Collections cho nhóm membership
+
+Product metafields cho info riêng của membership như season, eligibility, benefit summary, renewal note
+
+B. Membership type directory
+
+Dùng metaobject membership_type cho phần nội dung giới thiệu và phân loại, bao gồm cả loại không bán như Life Member
+
+Field nên có
+
+Title
+
+Category
+optional reference tới membership_category
+
+Description
+
+Benefits rich text
+
+Eligibility
+
+Linked product
+optional product reference
+
+Badge
+
+Sort order
+
+Active
+
+Lợi ích của cách này
+
+Life Member không cần ép thành product
+
+Membership bán được vẫn link thẳng tới product
+
+Client quản lý section Members và Products tách bạch, dễ hiểu
+
+7) Products và Collections
+Product native
+
+Dùng cho
+
+Merchandise
+
+Membership packages
+
+Product setup khuyên dùng
+
+Product category theo chuẩn Shopify khi phù hợp
+
+Product type theo logic store của mày như Merchandise và Membership
+
+Tags cho các label linh hoạt
+
+Product metafields cho thuộc tính riêng của club
+
+Shopify collections có manual và smart collections. Smart collections rất hợp để tự gom sản phẩm theo điều kiện trong tương lai.
+
+Collection đề xuất
+
+All Merchandise
+
+All Memberships
+
+Featured Merch
+
+Team Merch Football
+
+Team Merch Netball
+
+Sale
+
+New Arrivals
+
+Filter sản phẩm
+
+Dùng app Search and Discovery của Shopify
+Nó hỗ trợ storefront filters và có thể dùng custom filters từ product metafields, gồm cả một số loại reference như metaobject reference.
+
+8) News và Events
+
+Tao chọn 2 blog native thay vì 1 blog gộp chung, vì bàn giao cho khách sẽ dễ hơn.
+
+Blog 1
+
+News
+
+Blog 2
+
+Events
+
+Shopify cho tạo nhiều blog và gán template riêng cho từng blog.
+
+Event dùng Article cộng metafields
+
+Article native đã có title, content, image, tags, publish date và có hỗ trợ article metafields trong Liquid.
+
+Article metafields cho Events
+
+Event start datetime
+
+Event end datetime
+
+Venue
+
+External link
+
+Button label
+
+Registration deadline
+
+Event type
+
+Featured event
+
+Related team
+optional reference tới club_team
+
+Dùng tags cho filter nhanh
+
+Ví dụ
+
+football
+
+netball
+
+fundraiser
+
+community
+
+juniors
+
+seniors
+
+Shopify blog pages hỗ trợ article tags và current_tags để làm trang lọc theo tag.
+
+Nếu sau này cần lịch phức tạp hơn
+
+Khi cần recurring events, calendar month view, ticket status, kết quả event riêng
+thì lúc đó migrate Events sang metaobject club_event
+Còn hiện tại bài toán của mày đang vừa đẹp với Article cộng metafields
+
+Kiến trúc page và view để filter
+A. Trang Player Directory
+
+Filter bar
+
+Division
+
+Sport
+
+Grade
+
+Team
+
+Search theo tên
+
+Data source
+player_profile metaobjects
+
+Query param đề xuất
+
+division
+
+sport
+
+grade
+
+team
+
+Ví dụ logic
+
+Chọn Men
+
+Chọn Football
+
+Chọn Seniors
+
+List ra đúng team và player tương ứng
+
+B. Trang Sponsors
+
+Filter bar
+
+Scope
+
+Tier
+
+Optional sport or team
+
+Data source
+club_sponsor metaobjects
+
+C. Trang People in the Club
+
+Filter bar
+
+Group
+
+Search theo tên hoặc vai trò
+
+Data source
+club_person metaobjects
+
+D. Members page
+
+Tabs hoặc filter
+
+Membership types
+
+Life members
+
+Buy membership
+
+Data source
+
+membership_type metaobjects
+
+membership products collection
+
+E. News page và Events page
+
+Filter
+
+Tag chips
+
+Search nếu theme có hỗ trợ
+
+Event page có thể thêm Upcoming và Past bằng article metafield datetime
+
+Cách setup admin để khách dễ quản lý nhất
+1) Chuẩn tên definition và field ngay từ đầu
+
+Dùng label thân thiện trong admin
+Ví dụ
+
+Player Profiles
+
+Club Teams
+
+Club Sponsors
+
+Club People
+
+Membership Types
+
+Không nên đặt tên kỹ thuật khó hiểu cho client
+
+2) Mọi thứ dùng để filter thì ưu tiên reference
+
+Không để client gõ text tự do cho các field như tier, scope, division, grade
+vì sẽ sinh lỗi kiểu viết sai chính tả
+
+3) Thêm sort_order gần như cho mọi metaobject
+
+Rất đáng tiền khi client muốn đổi thứ tự hiển thị mà không cần sửa code
+
+4) Dùng publishable cho directory metaobjects
+
+Client có thể tạo draft trước rồi publish sau
+và Liquid loop chỉ lấy active khi bật publishable.
+
+5) Bật filter trong metaobject admin index cho các field quan trọng
+
+Ví dụ Team, Tier, Group, Active
+để client tìm record nhanh trong admin.
+
+6) Tạo sẵn term entries trước khi nhập content
+
+Tức là tạo hết
+
+sports
+
+divisions
+
+grades
+
+sponsor tiers
+
+sponsor scopes
+
+people groups
+
+rồi mới nhập player sponsor people
+làm vậy data sạch từ đầu
+
+7) Hướng dẫn client một quy trình nhập liệu cố định
+
+Ví dụ player
+
+Tạo team trước nếu chưa có
+
+Tạo player
+
+Chọn team
+
+Upload ảnh
+
+Set active
+
+Kiểm tra trang list
+
+Thứ tự triển khai thực chiến tao khuyên làm
+Phase 1
+
+Khung dữ liệu
+
+Tạo term metaobjects
+
+Tạo club_team
+
+Tạo player_profile
+
+Tạo club_sponsor
+
+Tạo club_person
+
+Tạo membership_type
+
+Phase 2
+
+Commerce
+
+Setup product type
+
+Setup collections
+
+Setup product metafields cho merch và membership
+
+Setup Search and Discovery filters cho products
+
+Phase 3
+
+Content
+
+Tạo blog News
+
+Tạo blog Events
+
+Tạo article metafields cho event fields
+
+Tạo templates riêng cho blog và article
+
+Phase 4
+
+Storefront views
+
+Players directory với filter
+
+Sponsors directory với filter
+
+Club People directory với filter
+
+Members page hybrid
+
+News page
+
+Events page upcoming và past
+
+Phase 5
+
+Handoff
+
+Tài liệu nhập liệu
+
+Quy tắc đặt tên
+
+Checklist publish
+
+Video ngắn hướng dẫn admin
+
+Tóm lại cho bài này
+
+Nếu mục tiêu là giống CPT plus taxonomy của WP nhưng vẫn native và dễ bàn giao trong Shopify, thì combo tối ưu là
+
+Metaobjects cho custom directories
+
+Reference fields tới term metaobjects cho phân loại
+
+Products plus Collections cho phần bán hàng
+
+Blogs plus Articles plus article metafields cho News và Events
+
+Cấu trúc này rất hợp với site câu lạc bộ vì dữ liệu có nhiều nhóm nhưng mỗi nhóm lại có logic hiển thị riêng.

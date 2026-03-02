@@ -1,0 +1,348 @@
+{%- comment -%}
+  Sponsor Slider Section — Infinite auto-scroll loop
+  
+  Modes:
+  1. "manual"  — Merchant picks sponsors via section blocks
+  2. "featured" — Auto-pulls club_sponsor metaobjects where featured == true
+  
+  Uses pure CSS @keyframes for the infinite marquee — zero JS dependencies.
+  The track is duplicated in HTML to create the seamless loop illusion.
+{%- endcomment -%}
+
+{%- liquid
+  assign heading = section.settings.heading
+  assign speed = section.settings.speed
+  assign logo_height = section.settings.logo_height
+  assign bg_color = section.settings.bg_color
+  assign text_color = section.settings.text_color
+  assign mode = section.settings.source_mode
+  assign pause_on_hover = section.settings.pause_on_hover
+
+  assign sponsors = ''
+  assign sponsor_count = 0
+  assign logo_height_2x = logo_height | times: 2
+-%}
+
+{%- comment -%} ── Build sponsor list based on mode ── {%- endcomment -%}
+
+{%- if mode == 'featured' -%}
+  {%- comment -%} Pull from club_sponsor metaobjects where featured is true {%- endcomment -%}
+  {%- assign all_sponsors = shop.metaobjects.club_sponsor.values -%}
+  {%- assign sponsor_items = '' -%}
+  {%- for sponsor in all_sponsors -%}
+    {%- assign is_featured = sponsor.featured.value -%}
+    {%- if is_featured == true or is_featured == 'true' -%}
+      {%- assign sponsor_count = sponsor_count | plus: 1 -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- else -%}
+  {%- comment -%} Manual mode: use section blocks {%- endcomment -%}
+  {%- assign sponsor_count = section.blocks.size -%}
+{%- endif -%}
+
+{%- if sponsor_count > 0 -%}
+<section
+  id="sponsor-slider-{{ section.id }}"
+  class="sponsor-slider"
+  style="
+    --sponsor-bg: {{ bg_color }};
+    --sponsor-text: {{ text_color }};
+    --sponsor-logo-h: {{ logo_height }}px;
+    --sponsor-speed: {{ speed }}s;
+  "
+>
+  {%- if heading != blank -%}
+    <h2 class="sponsor-slider__heading">{{ heading }}</h2>
+  {%- endif -%}
+
+  <div class="sponsor-slider__track-wrapper"{% if pause_on_hover %} data-pause-hover{% endif %}>
+    {%- comment -%} Track rendered 2x — each copy fills viewport width for seamless infinite loop {%- endcomment -%}
+    {%- for copy in (1..2) -%}
+      <div class="sponsor-slider__track" aria-hidden="{% if copy == 1 %}false{% else %}true{% endif %}">
+
+        {%- if mode == 'featured' -%}
+          {%- for sponsor in all_sponsors -%}
+            {%- assign is_featured = sponsor.featured.value -%}
+            {%- if is_featured == true or is_featured == 'true' -%}
+              {%- assign s_name = sponsor.sponsor_name.value | default: sponsor.display_name -%}
+              {%- assign s_logo = sponsor.logo.value -%}
+              {%- assign s_url  = sponsor.website_url.value -%}
+
+              <div class="sponsor-slider__item">
+                {%- if s_url != blank -%}<a href="{{ s_url }}" target="_blank" rel="noopener" aria-label="{{ s_name }}">{%- endif -%}
+                  {%- if s_logo != blank -%}
+                    <img
+                      src="{{ s_logo | image_url: height: logo_height_2x }}"
+                      alt="{{ s_name }}"
+                      height="{{ logo_height }}"
+                      width="auto"
+                      loading="lazy"
+                      class="sponsor-slider__logo"
+                    >
+                  {%- else -%}
+                    <span class="sponsor-slider__name">{{ s_name }}</span>
+                  {%- endif -%}
+                {%- if s_url != blank -%}</a>{%- endif -%}
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+
+        {%- else -%}
+          {%- comment -%} Manual blocks {%- endcomment -%}
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'sponsor' -%}
+              {%- assign b_name = block.settings.sponsor_name -%}
+              {%- assign b_logo = block.settings.sponsor_logo -%}
+              {%- assign b_url  = block.settings.sponsor_url -%}
+
+              <div class="sponsor-slider__item" {{ block.shopify_attributes }}>
+                {%- if b_url != blank -%}<a href="{{ b_url }}" target="_blank" rel="noopener" aria-label="{{ b_name }}">{%- endif -%}
+                  {%- if b_logo != blank -%}
+                    <img
+                      src="{{ b_logo | image_url: height: logo_height_2x }}"
+                      alt="{{ b_name | default: 'Sponsor logo' }}"
+                      height="{{ logo_height }}"
+                      width="auto"
+                      loading="lazy"
+                      class="sponsor-slider__logo"
+                    >
+                  {%- else -%}
+                    <span class="sponsor-slider__name">{{ b_name }}</span>
+                  {%- endif -%}
+                {%- if b_url != blank -%}</a>{%- endif -%}
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+
+        {%- endif -%}
+
+      </div>
+    {%- endfor -%}
+  </div>
+</section>
+{%- endif -%}
+
+{% style %}
+  /* ═══════════════════════════════════════════
+     SPONSOR SLIDER
+  ═══════════════════════════════════════════ */
+
+  #sponsor-slider-{{ section.id }} {
+    background: var(--sponsor-bg);
+    padding: 3rem 0;
+    overflow: hidden;
+  }
+
+  /* ─── Heading ─── */
+  #sponsor-slider-{{ section.id }} .sponsor-slider__heading {
+    text-align: center;
+    font-family: 'AnekGurmukhi', 'Oswald', 'Impact', 'Arial Black', sans-serif;
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--sponsor-text);
+    margin: 0 0 2rem 0;
+    padding: 0 2rem;
+  }
+
+  /* ─── Track wrapper ─── */
+  #sponsor-slider-{{ section.id }} .sponsor-slider__track-wrapper {
+    display: flex;
+    width: max-content;
+    animation: sponsor-scroll-{{ section.id }} var(--sponsor-speed) linear infinite;
+  }
+
+  /* Pause on hover */
+  #sponsor-slider-{{ section.id }} .sponsor-slider__track-wrapper[data-pause-hover]:hover {
+    animation-play-state: paused;
+  }
+
+  /* ─── Single track copy ─── */
+  #sponsor-slider-{{ section.id }} .sponsor-slider__track {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: clamp(2rem, 5vw, 4rem);
+    padding: 0 clamp(1rem, 2.5vw, 2rem);
+    flex-shrink: 0;
+    min-width: 100vw;
+  }
+
+  /* ─── Individual item ─── */
+  #sponsor-slider-{{ section.id }} .sponsor-slider__item {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #sponsor-slider-{{ section.id }} .sponsor-slider__item a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  #sponsor-slider-{{ section.id }} .sponsor-slider__item a:hover {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+
+  /* ─── Logo ─── */
+  #sponsor-slider-{{ section.id }} .sponsor-slider__logo {
+    height: var(--sponsor-logo-h);
+    width: auto;
+    object-fit: contain;
+    display: block;
+  }
+
+  /* ─── Text fallback ─── */
+  #sponsor-slider-{{ section.id }} .sponsor-slider__name {
+    font-family: 'Oswald', 'Impact', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--sponsor-text);
+    white-space: nowrap;
+  }
+
+  /* ─── Keyframes ─── */
+  @keyframes sponsor-scroll-{{ section.id }} {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 768px) {
+    #sponsor-slider-{{ section.id }} {
+      padding: 2rem 0;
+    }
+
+    #sponsor-slider-{{ section.id }} .sponsor-slider__heading {
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  /* Reduce motion accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    #sponsor-slider-{{ section.id }} .sponsor-slider__track-wrapper {
+      animation-duration: calc(var(--sponsor-speed) * 3);
+    }
+  }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Sponsor Slider",
+  "tag": "section",
+  "class": "sponsor-slider-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "PROUDLY SPONSORED BY"
+    },
+    {
+      "type": "header",
+      "content": "Source"
+    },
+    {
+      "type": "select",
+      "id": "source_mode",
+      "label": "Sponsor Source",
+      "options": [
+        { "value": "manual", "label": "Manual (select individually)" },
+        { "value": "featured", "label": "Featured sponsors (from metaobjects)" }
+      ],
+      "default": "manual",
+      "info": "\"Featured\" pulls all Club Sponsors with the Featured flag turned on."
+    },
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "range",
+      "id": "logo_height",
+      "label": "Logo Height (px)",
+      "min": 30,
+      "max": 200,
+      "step": 5,
+      "default": 80,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "Scroll Speed",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "default": 25,
+      "unit": "s",
+      "info": "Lower = faster. Time in seconds for one full loop."
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause on Hover",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text / Heading Color",
+      "default": "#111111"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "sponsor",
+      "name": "Sponsor",
+      "settings": [
+        {
+          "type": "text",
+          "id": "sponsor_name",
+          "label": "Sponsor Name"
+        },
+        {
+          "type": "image_picker",
+          "id": "sponsor_logo",
+          "label": "Logo"
+        },
+        {
+          "type": "url",
+          "id": "sponsor_url",
+          "label": "Website URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Sponsor Slider",
+      "blocks": [
+        { "type": "sponsor" },
+        { "type": "sponsor" },
+        { "type": "sponsor" }
+      ]
+    }
+  ]
+}
+{% endschema %}
