@@ -1,0 +1,383 @@
+{%- comment -%}
+  Two-Column Feature Section
+  
+  - Large title with text alignment option
+  - Two equal-width cards via blocks
+  - Each card: text with fill/outline/faded effects, CTA button, 3:4 feature image
+{%- endcomment -%}
+
+{%- liquid
+  assign heading = section.settings.heading
+  assign heading_align = section.settings.heading_align
+  assign bg_color = section.settings.bg_color
+  assign text_color = section.settings.text_color
+  assign accent_color = section.settings.accent_color
+-%}
+
+<section
+  id="two-col-feature-{{ section.id }}"
+  class="two-col-feature"
+  style="
+    --tcf-bg: {{ bg_color }};
+    --tcf-text: {{ text_color }};
+    --tcf-accent: {{ accent_color }};
+  "
+>
+  {%- if heading != blank -%}
+    <h2 class="two-col-feature__heading two-col-feature__heading--{{ heading_align }}">
+      {{ heading }}
+    </h2>
+  {%- endif -%}
+
+  <div class="two-col-feature__grid">
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'column' -%}
+        {%- liquid
+          assign col_text = block.settings.column_text
+          assign col_image = block.settings.column_image
+          assign btn_label = block.settings.button_label
+          assign btn_url = block.settings.button_url
+          assign card_bg = block.settings.card_bg_color
+          assign card_gradient = block.settings.card_gradient_color
+        -%}
+
+        <div class="two-col-feature__card" {{ block.shopify_attributes }} style="--tcf-card-bg: {{ card_bg }}; --tcf-card-gradient: {{ card_gradient }};">
+          {%- comment -%} Text side {%- endcomment -%}
+          <div class="two-col-feature__text-side">
+            {%- if col_text != blank -%}
+              <div class="two-col-feature__text-stack">
+                <span class="two-col-feature__text-fill">{{ col_text }}</span>
+                <span class="two-col-feature__text-outline">{{ col_text }}</span>
+                <span class="two-col-feature__text-faded">{{ col_text }}</span>
+              </div>
+            {%- endif -%}
+
+            {%- if btn_label != blank -%}
+              <a
+                href="{{ btn_url | default: '#' }}"
+                class="two-col-feature__btn"
+              >
+                {{ btn_label }}
+              </a>
+            {%- endif -%}
+          </div>
+
+          {%- comment -%} Image side {%- endcomment -%}
+          <div class="two-col-feature__image-side">
+            {%- if col_image != blank -%}
+              <img
+                src="{{ col_image | image_url: width: 800 }}"
+                alt="{{ col_text | default: 'Feature image' }}"
+                width="600"
+                height="800"
+                loading="lazy"
+                class="two-col-feature__img"
+              >
+            {%- else -%}
+              <div class="two-col-feature__img-placeholder"></div>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</section>
+
+<style>
+  @font-face {
+    font-family: 'Antonio';
+    src: url('{{ "Antonio-Bold.woff2" | asset_url }}') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+</style>
+
+{% style %}
+  /* ═══════════════════════════════════════════
+     TWO-COLUMN FEATURE
+  ═══════════════════════════════════════════ */
+
+  #two-col-feature-{{ section.id }} {
+    background: var(--tcf-bg);
+    padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 3vw, 3rem);
+  }
+
+  /* ─── Heading ─── */
+  #two-col-feature-{{ section.id }} .two-col-feature__heading {
+    font-family: 'Antonio', 'AnekGurmukhi', 'Oswald', 'Impact', 'Arial Black', sans-serif;
+    font-size: clamp(2.5rem, 7vw, 6rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8em;
+    color: var(--tcf-accent);
+    margin: 0 0 clamp(1.5rem, 3vw, 3rem) 0;
+    line-height: 1;
+  }
+
+  #two-col-feature-{{ section.id }} .two-col-feature__heading--left {
+    text-align: left;
+  }
+  #two-col-feature-{{ section.id }} .two-col-feature__heading--center {
+    text-align: center;
+  }
+  #two-col-feature-{{ section.id }} .two-col-feature__heading--right {
+    text-align: right;
+  }
+
+  /* ─── Outer grid — equal-height columns ─── */
+  #two-col-feature-{{ section.id }} .two-col-feature__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(1rem, 3vw, 2rem);
+    align-items: stretch;
+  }
+
+  /* ─── Card — CSS Grid overlay so image drives height ─── */
+  #two-col-feature-{{ section.id }} .two-col-feature__card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    overflow: visible;
+    position: relative;
+  }
+
+  /* ─── Text side — shorter than image, vertically centered ─── */
+  #two-col-feature-{{ section.id }} .two-col-feature__text-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(1.2rem, 3vw, 2.5rem);
+    gap: 1.2rem;
+    z-index: 2;
+    background: linear-gradient(
+      135deg,
+      var(--tcf-card-bg, #1a0a0a) 0%,
+      var(--tcf-card-gradient, #5a1a1a) 100%
+    );
+    align-self: center;
+    height: 85%;
+    box-shadow: 10px 10px 0 0 var(--tcf-accent, #5a1a1a);
+  }
+
+  /* ─── Text stack: fill / outline / faded ─── */
+  #two-col-feature-{{ section.id }} .two-col-feature__text-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    line-height: 1.1;
+  }
+
+  #two-col-feature-{{ section.id }} .two-col-feature__text-fill,
+  #two-col-feature-{{ section.id }} .two-col-feature__text-outline,
+  #two-col-feature-{{ section.id }} .two-col-feature__text-faded {
+    font-family: 'AnekGurmukhi', 'Oswald', 'Impact', 'Arial Black', sans-serif;
+    font-size: clamp(1.6rem, 3.5vw, 3rem);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.15;
+  }
+
+  /* Filled — solid white */
+  #two-col-feature-{{ section.id }} .two-col-feature__text-fill {
+    color: #ffffff;
+  }
+
+  /* Outline — transparent fill, white stroke */
+  #two-col-feature-{{ section.id }} .two-col-feature__text-outline {
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.7);
+    text-stroke: 1.5px rgba(255, 255, 255, 0.7);
+  }
+
+  /* Faded — low opacity */
+  #two-col-feature-{{ section.id }} .two-col-feature__text-faded {
+    color: rgba(255, 255, 255, 0.15);
+  }
+
+  /* ─── CTA Button ─── */
+  #two-col-feature-{{ section.id }} .two-col-feature__btn {
+    display: inline-block;
+    align-self: flex-start;
+    padding: 0.55rem 1.6rem;
+    border: 1.5px solid rgba(255, 255, 255, 0.7);
+    color: #fff;
+    font-family: 'AnekGurmukhi', 'Oswald', sans-serif;
+    font-size: clamp(0.75rem, 1.2vw, 0.95rem);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+
+  #two-col-feature-{{ section.id }} .two-col-feature__btn:hover {
+    background: #fff;
+    color: var(--tcf-card-bg, #1a0a0a);
+    border-color: #fff;
+  }
+
+  /* ─── Image side — drives card height via 3:4 ratio ─── */
+  #two-col-feature-{{ section.id }} .two-col-feature__image-side {
+    position: relative;
+    overflow: hidden;
+    box-shadow: 10px 10px 0 0 var(--tcf-accent, #5a1a1a);
+    z-index: 3;
+  }
+
+  #two-col-feature-{{ section.id }} .two-col-feature__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    aspect-ratio: 3 / 4;
+    display: block;
+  }
+
+  #two-col-feature-{{ section.id }} .two-col-feature__img-placeholder {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 900px) {
+    #two-col-feature-{{ section.id }} .two-col-feature__grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    #two-col-feature-{{ section.id }} .two-col-feature__heading {
+      text-align: center !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #two-col-feature-{{ section.id }} .two-col-feature__text-side {
+      height: 80%;
+      padding: 1rem;
+    }
+
+    #two-col-feature-{{ section.id }} .two-col-feature__text-fill,
+    #two-col-feature-{{ section.id }} .two-col-feature__text-outline,
+    #two-col-feature-{{ section.id }} .two-col-feature__text-faded {
+      font-size: 1.4rem;
+    }
+  }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Two-Column Feature",
+  "tag": "section",
+  "class": "two-col-feature-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "FOOTBALL"
+    },
+    {
+      "type": "select",
+      "id": "heading_align",
+      "label": "Heading Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Heading Color",
+      "default": "#5a1a1a"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "column",
+      "name": "Column",
+      "limit": 2,
+      "settings": [
+        {
+          "type": "text",
+          "id": "column_text",
+          "label": "Display Text",
+          "default": "MEN'S",
+          "info": "Shown 3 times with fill, outline, and faded effects."
+        },
+        {
+          "type": "image_picker",
+          "id": "column_image",
+          "label": "Feature Image",
+          "info": "Portrait orientation recommended (3:4 ratio)."
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button Label",
+          "default": "Read More"
+        },
+        {
+          "type": "url",
+          "id": "button_url",
+          "label": "Button URL"
+        },
+        {
+          "type": "color",
+          "id": "card_bg_color",
+          "label": "Card Background (dark end)",
+          "default": "#1a0a0a"
+        },
+        {
+          "type": "color",
+          "id": "card_gradient_color",
+          "label": "Card Gradient (accent end)",
+          "default": "#5a1a1a"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Two-Column Feature",
+      "blocks": [
+        {
+          "type": "column",
+          "settings": {
+            "column_text": "MEN'S",
+            "button_label": "Read More"
+          }
+        },
+        {
+          "type": "column",
+          "settings": {
+            "column_text": "WMN'S",
+            "button_label": "Read More"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

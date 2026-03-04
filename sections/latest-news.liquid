@@ -1,0 +1,362 @@
+{%- comment -%}
+  Latest News Section
+  
+  - Left: Featured (latest) article — large card with glassmorphism overlay
+  - Right: List of other articles in descending date order
+  - Each item: feature image, title, date, arrow icon, glassmorphism background
+  - Data from a Shopify blog (configurable handle)
+{%- endcomment -%}
+
+{%- liquid
+  assign heading = section.settings.heading
+  assign blog_handle = section.settings.blog_handle | default: 'news'
+  assign article_count = section.settings.article_count
+  assign bg_color = section.settings.bg_color
+  assign accent_color = section.settings.accent_color
+  assign text_color = section.settings.text_color
+
+  assign source_blog = blogs[blog_handle]
+  assign articles = source_blog.articles
+-%}
+
+{%- if source_blog != blank and articles.size > 0 -%}
+{%- assign featured = articles.first -%}
+
+<section
+  id="latest-news-{{ section.id }}"
+  class="latest-news"
+  style="
+    --ln-bg: {{ bg_color }};
+    --ln-accent: {{ accent_color }};
+    --ln-text: {{ text_color }};
+  "
+>Tanya Mcnamara
+  {%- if heading != blank -%}
+    <h2 class="latest-news__heading">{{ heading }}</h2>
+  {%- endif -%}
+
+  <div class="latest-news__grid">
+
+    {%- comment -%} ── LEFT: Featured article (latest) ── {%- endcomment -%}
+    <a href="{{ featured.url }}" class="latest-news__featured">
+      <div class="latest-news__featured-img-wrap">
+        {%- if featured.image != blank -%}
+          <img
+            src="{{ featured.image | image_url: width: 1200 }}"
+            alt="{{ featured.title }}"
+            width="1200"
+            height="800"
+            loading="lazy"
+            class="latest-news__featured-img"
+          >
+        {%- endif -%}
+      </div>
+      <div class="latest-news__featured-overlay">
+        <span class="latest-news__date">{{ featured.published_at | date: '%B %Y' }}</span>
+        <h3 class="latest-news__featured-title">{{ featured.title | truncate: 60 }}</h3>
+      </div>
+    </a>
+
+    {%- comment -%} ── RIGHT: Article list ── {%- endcomment -%}
+    <div class="latest-news__list">
+      {%- for article in articles limit: article_count offset: 1 -%}
+        <a href="{{ article.url }}" class="latest-news__item">
+          <div class="latest-news__item-img-wrap">
+            {%- if article.image != blank -%}
+              <img
+                src="{{ article.image | image_url: width: 400 }}"
+                alt="{{ article.title }}"
+                width="400"
+                height="267"
+                loading="lazy"
+                class="latest-news__item-img"
+              >
+            {%- endif -%}
+          </div>
+          <div class="latest-news__item-info">
+            <span class="latest-news__date">{{ article.published_at | date: '%B %Y' }}</span>
+            <h4 class="latest-news__item-title">{{ article.title | truncate: 50 }}</h4>
+            <span class="latest-news__arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </span>
+          </div>
+        </a>
+      {%- endfor -%}
+    </div>
+
+  </div>
+</section>
+{%- endif -%}
+
+<style>
+  @font-face {
+    font-family: 'Antonio';
+    src: url('{{ "Antonio-Bold.woff2" | asset_url }}') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+</style>
+
+{% style %}
+  /* ═══════════════════════════════════════════
+     LATEST NEWS
+  ═══════════════════════════════════════════ */
+
+  #latest-news-{{ section.id }} {
+    background: var(--ln-bg);
+    padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 3vw, 3rem);
+  }
+
+  /* ─── Heading ─── */
+  #latest-news-{{ section.id }} .latest-news__heading {
+    font-family: 'Antonio', 'AnekGurmukhi', 'Oswald', 'Impact', sans-serif;
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ln-text);
+    text-align: center;
+    margin: 0 0 clamp(1.5rem, 3vw, 2.5rem) 0;
+    line-height: 1;
+  }
+
+  /* ─── Grid: 60/40 split ─── */
+  #latest-news-{{ section.id }} .latest-news__grid {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: clamp(1rem, 2vw, 1.5rem);
+    align-items: stretch;
+  }
+
+  /* ─── Date label ─── */
+  #latest-news-{{ section.id }} .latest-news__date {
+    font-family: 'Antonio', 'Oswald', sans-serif;
+    font-size: clamp(0.7rem, 1vw, 0.85rem);
+    font-weight: 400;
+    text-transform: capitalize;
+    color: rgba(255, 255, 255, 0.8);
+    letter-spacing: 0.04em;
+  }
+
+  /* ═══════════════════════════════════════════
+     FEATURED (LEFT)
+  ═══════════════════════════════════════════ */
+
+  #latest-news-{{ section.id }} .latest-news__featured {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    text-decoration: none;
+    color: #fff;
+  }
+
+  #latest-news-{{ section.id }} .latest-news__featured-img-wrap {
+    width: 100%;
+    height: 100%;
+    min-height: 350px;
+  }
+
+  #latest-news-{{ section.id }} .latest-news__featured-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+  }
+
+  #latest-news-{{ section.id }} .latest-news__featured:hover .latest-news__featured-img {
+    transform: scale(1.04);
+  }
+
+  /* Glassmorphism overlay — bottom */
+  #latest-news-{{ section.id }} .latest-news__featured-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: clamp(1rem, 2.5vw, 2rem);
+    background: rgba(30, 10, 10, 0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  #latest-news-{{ section.id }} .latest-news__featured-title {
+    font-family: 'Antonio', 'AnekGurmukhi', 'Oswald', sans-serif;
+    font-size: clamp(1.3rem, 2.5vw, 2rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #fff;
+    margin: 0.3rem 0 0 0;
+    line-height: 1.15;
+  }
+
+  /* ═══════════════════════════════════════════
+     ARTICLE LIST (RIGHT)
+  ═══════════════════════════════════════════ */
+
+  #latest-news-{{ section.id }} .latest-news__list {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.6rem, 1.2vw, 1rem);
+  }
+
+  /* ─── Single item ─── */
+  #latest-news-{{ section.id }} .latest-news__item {
+    display: grid;
+    grid-template-columns: 2fr 3fr;
+    gap: 0;
+    text-decoration: none;
+    color: #fff;
+    overflow: hidden;
+    position: relative;
+    flex: 1;
+  }
+
+  /* Item image */
+  #latest-news-{{ section.id }} .latest-news__item-img-wrap {
+    overflow: hidden;
+    position: relative;
+  }
+
+  #latest-news-{{ section.id }} .latest-news__item-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+
+  #latest-news-{{ section.id }} .latest-news__item:hover .latest-news__item-img {
+    transform: scale(1.06);
+  }
+
+  /* Item info — glassmorphism */
+  #latest-news-{{ section.id }} .latest-news__item-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(0.6rem, 1.2vw, 1rem);
+    background: rgba(30, 10, 10, 0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    gap: 0.2rem;
+    position: relative;
+  }
+
+  #latest-news-{{ section.id }} .latest-news__item-title {
+    font-family: 'Antonio', 'AnekGurmukhi', 'Oswald', sans-serif;
+    font-size: clamp(0.8rem, 1.3vw, 1rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: #fff;
+    margin: 0;
+    line-height: 1.25;
+  }
+
+  /* Arrow icon */
+  #latest-news-{{ section.id }} .latest-news__arrow {
+    display: inline-flex;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 0.3rem;
+    transition: transform 0.3s ease, color 0.3s ease;
+  }
+
+  #latest-news-{{ section.id }} .latest-news__item:hover .latest-news__arrow {
+    transform: translateX(4px);
+    color: #fff;
+  }
+
+  /* ═══════════════════════════════════════════
+     RESPONSIVE
+  ═══════════════════════════════════════════ */
+
+  @media (max-width: 900px) {
+    #latest-news-{{ section.id }} .latest-news__grid {
+      grid-template-columns: 1fr;
+    }
+
+    #latest-news-{{ section.id }} .latest-news__featured-img-wrap {
+      min-height: 260px;
+    }
+
+    #latest-news-{{ section.id }} .latest-news__list {
+      gap: 0.8rem;
+    }
+
+    #latest-news-{{ section.id }} .latest-news__item {
+      min-height: 100px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #latest-news-{{ section.id }} .latest-news__item {
+      grid-template-columns: 1fr 2fr;
+    }
+  }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Latest News",
+  "tag": "section",
+  "class": "latest-news-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "LATEST NEWS"
+    },
+    {
+      "type": "blog",
+      "id": "blog_handle",
+      "label": "Blog Source"
+    },
+    {
+      "type": "range",
+      "id": "article_count",
+      "label": "Number of Articles (right side)",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4,
+      "info": "Excludes the featured (left) article."
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background",
+      "default": "#1a0a0a"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#8b1a1a"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Heading Color",
+      "default": "#ffffff"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Latest News"
+    }
+  ]
+}
+{% endschema %}

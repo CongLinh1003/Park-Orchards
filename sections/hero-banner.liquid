@@ -1,0 +1,810 @@
+{%- comment -%}
+  Hero Banner Section — Park Orchards Football & Netball Club
+  
+  Layout: LAYERED
+  - Title "PARK ORCHARDS" centered, sits BEHIND the player image
+  - Player image absolutely positioned center, in FRONT of title
+  - Subtitle row + intro text + socials at the bottom
+  - Event bar with red double-border effect at very bottom
+{%- endcomment -%}
+
+{%- liquid
+  assign club_line1 = section.settings.club_name_line1
+  assign club_line2 = section.settings.club_name_line2
+  assign subtitle_left = section.settings.subtitle_left
+  assign subtitle_right = section.settings.subtitle_right
+  assign hero_image = section.settings.hero_image
+  assign mobile_bg_image = section.settings.mobile_bg_image
+  assign intro_text = section.settings.intro_text
+  assign fb_url = section.settings.facebook_url
+  assign ig_url = section.settings.instagram_url
+  assign show_event_bar = section.settings.show_event_bar
+  assign event_blog_handle = section.settings.event_blog_handle
+  assign cta_fallback = section.settings.event_cta_label_fallback
+  assign team_logo_fallback = section.settings.team_logo
+  assign bg_dark = section.settings.bg_color_dark
+  assign bg_accent = section.settings.bg_color_accent
+-%}
+
+{%- comment -%} ── Dynamic Event ── {%- endcomment -%}
+{%- liquid
+  assign featured_event = nil
+  assign event_found = false
+
+  if show_event_bar
+    assign events_blog = blogs[event_blog_handle]
+    if events_blog != blank
+      for article in events_blog.articles limit: 10
+        assign ev_start = article.metafields.event.start_datetime.value
+        if ev_start != blank
+          assign ev_epoch = ev_start | date: '%s' | plus: 0
+          assign now_epoch = 'now' | date: '%s' | plus: 0
+          if ev_epoch >= now_epoch
+            unless event_found
+              assign featured_event = article
+              assign event_found = true
+            endunless
+          endif
+        endif
+      endfor
+      if event_found == false and events_blog.articles_count > 0
+        assign featured_event = events_blog.articles.first
+      endif
+    endif
+  endif
+-%}
+
+{%- liquid
+  if featured_event != nil
+    assign ev_start_dt = featured_event.metafields.event.start_datetime.value
+    assign ev_venue = featured_event.metafields.event.venue.value
+    assign ev_type = featured_event.metafields.event.event_type.value
+    assign ev_ext_link = featured_event.metafields.event.external_link.value
+    assign ev_btn_label = featured_event.metafields.event.button_label.value
+    assign ev_related_team = featured_event.metafields.event.related_team.value
+
+    if ev_btn_label == blank
+      assign ev_btn_label = cta_fallback
+    endif
+
+    assign ev_month = ev_start_dt | date: '%b' | upcase
+    assign ev_day = ev_start_dt | date: '%d' | plus: 0
+    assign ev_time = ev_start_dt | date: '%H:%M'
+    assign ev_date_display = ev_month | append: ' ' | append: ev_day | append: '  –  ' | append: ev_time
+
+    if ev_related_team != blank
+      assign team_name = ev_related_team.team_name.value
+      assign team_image = ev_related_team.team_image.value
+      if team_name == blank
+        assign team_name = ev_related_team.display_name
+      endif
+    endif
+  endif
+-%}
+
+<section
+  id="hero-banner-{{ section.id }}"
+  class="hero-banner"
+  style="
+    --hero-bg-dark: {{ bg_dark }};
+    --hero-bg-accent: {{ bg_accent }};
+  "
+>
+  {%- comment -%} Background {%- endcomment -%}
+  <div class="hero-banner__bg" aria-hidden="true">
+    <div class="hero-banner__gradient"></div>
+    <div class="hero-banner__glow"></div>
+    {%- liquid
+      assign mob_bg = mobile_bg_image
+      if mob_bg == blank
+        assign mob_bg = hero_image
+      endif
+    -%}
+    {%- if mob_bg != blank -%}
+      <div class="hero-banner__bg-player" style="background-image: url('{{ mob_bg | image_url: width: 800 }}');"></div>
+    {%- endif -%}
+  </div>
+
+  {%- comment -%} Player Image — absolute center, IN FRONT of title {%- endcomment -%}
+  {%- if hero_image != blank -%}
+    <div class="hero-banner__player">
+      <img
+        src="{{ hero_image | image_url: width: 900 }}"
+        srcset="
+          {{ hero_image | image_url: width: 500 }} 500w,
+          {{ hero_image | image_url: width: 700 }} 700w,
+          {{ hero_image | image_url: width: 900 }} 900w,
+          {{ hero_image | image_url: width: 1200 }} 1200w
+        "
+        sizes="(max-width: 768px) 70vw, (max-width: 1200px) 45vw, 520px"
+        alt="{{ hero_image.alt | default: 'Park Orchards player' }}"
+        loading="eager"
+        fetchpriority="high"
+        width="{{ hero_image.width }}"
+        height="{{ hero_image.height }}"
+        class="hero-banner__player-img"
+      >
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} Content {%- endcomment -%}
+  <div class="hero-banner__content">
+
+    {%- comment -%} Title — centered, BEHIND the player {%- endcomment -%}
+    <h1 class="hero-banner__title">
+      <span class="hero-banner__title-line">{{ club_line1 }}</span>
+      <span class="hero-banner__title-line">{{ club_line2 }}</span>
+    </h1>
+
+    {%- comment -%} Bottom block: subtitle + intro + socials {%- endcomment -%}
+    <div class="hero-banner__bottom">
+
+      {%- comment -%} Subtitle row {%- endcomment -%}
+      <div class="hero-banner__subtitle">
+        <span class="hero-banner__subtitle-text hero-banner__subtitle-left">{{ subtitle_left }}</span>
+        <span class="hero-banner__subtitle-text hero-banner__subtitle-right">{{ subtitle_right }}</span>
+      </div>
+
+      {%- comment -%} Socials {%- endcomment -%}
+      {%- if fb_url != blank or ig_url != blank -%}
+        <div class="hero-banner__socials">
+          {%- if fb_url != blank -%}
+            <a href="{{ fb_url }}" class="hero-banner__social-link" target="_blank" rel="noopener" aria-label="Facebook">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2.04C6.5 2.04 2 6.53 2 12.06c0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v7a10 10 0 0 0 8.44-9.9c0-5.53-4.5-10.02-10-10.02z"/>
+              </svg>
+            </a>
+          {%- endif -%}
+          {%- if ig_url != blank -%}
+            <a href="{{ ig_url }}" class="hero-banner__social-link" target="_blank" rel="noopener" aria-label="Instagram">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/>
+              </svg>
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- comment -%} Intro text {%- endcomment -%}
+      {%- if intro_text != blank -%}
+        <div class="hero-banner__intro">
+          {{ intro_text }}
+        </div>
+      {%- endif -%}
+
+    </div>
+  </div>
+
+  {%- comment -%} Event Bar {%- endcomment -%}
+  {%- if show_event_bar and featured_event != nil -%}
+    <div class="hero-banner__event-bar">
+      <div class="hero-banner__event-border">
+        <div class="hero-banner__event-inner">
+
+          {%- if ev_type != blank -%}
+            <div class="hero-banner__event-badge">
+              <span>{{ ev_type }}</span>
+            </div>
+          {%- endif -%}
+
+          <div class="hero-banner__event-team">
+            {%- if team_image != blank -%}
+              <img src="{{ team_image | image_url: width: 60 }}" alt="{{ team_name | default: 'Team logo' }}" width="40" height="40" class="hero-banner__event-team-logo" loading="lazy">
+            {%- elsif team_logo_fallback != blank -%}
+              <img src="{{ team_logo_fallback | image_url: width: 60 }}" alt="{{ team_name | default: 'Team logo' }}" width="40" height="40" class="hero-banner__event-team-logo" loading="lazy">
+            {%- endif -%}
+            {%- if team_name != blank -%}
+              <span class="hero-banner__event-team-name">{{ team_name }}</span>
+            {%- endif -%}
+          </div>
+
+          <div class="hero-banner__event-details">
+            {%- if ev_date_display != blank -%}
+              <span class="hero-banner__event-datetime">{{ ev_date_display }}</span>
+            {%- endif -%}
+            {%- if ev_venue != blank -%}
+              <span class="hero-banner__event-venue">{{ ev_venue }}</span>
+            {%- endif -%}
+          </div>
+
+          {%- if ev_ext_link != blank -%}
+            <a href="{{ ev_ext_link }}" class="hero-banner__event-cta" target="_blank" rel="noopener">{{ ev_btn_label }}</a>
+          {%- else -%}
+            <a href="{{ featured_event.url }}" class="hero-banner__event-cta">{{ ev_btn_label }}</a>
+          {%- endif -%}
+
+        </div>
+      </div>
+    </div>
+  {%- endif -%}
+
+</section>
+
+{%- comment -%} @font-face must be outside {% style %} because Shopify scopes that tag per-section {%- endcomment -%}
+<style>
+  @font-face {
+    font-family: 'AnekGurmukhi';
+    src: url({{ 'AnekGurmukhi-ExtraBold.woff2' | asset_url }}) format('truetype');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+  }
+</style>
+
+{% style %}
+  /* ═══════════════════════════════════════════
+     HERO BANNER
+  ═══════════════════════════════════════════ */
+
+  #hero-banner-{{ section.id }} {
+    --hero-title-size: clamp(5rem, 12vw, 17rem);
+    --hero-subtitle-size: clamp(1.1rem, 2.5vw, 2rem);
+    --hero-font-title: 'AnekGurmukhi', 'Oswald', 'Impact', 'Arial Black', sans-serif;
+    --hero-font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --hero-event-bg: rgba(120, 0, 0, 0.92);
+    --hero-event-border-color: rgba(180, 30, 30, 0.7);
+  }
+
+  /* Section */
+  #hero-banner-{{ section.id }} {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    min-height: 640px;
+    max-height: 940px;
+    overflow: hidden;
+    color: #fff;
+    font-family: var(--hero-font-body);
+  }
+
+  /* ─── Background ─── */
+  #hero-banner-{{ section.id }} .hero-banner__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  #hero-banner-{{ section.id }} .hero-banner__gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      var(--hero-bg-dark) 0%,
+      color-mix(in srgb, var(--hero-bg-dark) 60%, var(--hero-bg-accent)) 35%,
+      color-mix(in srgb, var(--hero-bg-dark) 35%, var(--hero-bg-accent)) 60%,
+      var(--hero-bg-dark) 100%
+    );
+  }
+
+  #hero-banner-{{ section.id }} .hero-banner__glow {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    top: 40%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse at center,
+      color-mix(in srgb, var(--hero-bg-accent) 55%, transparent) 0%,
+      transparent 70%
+    );
+    filter: blur(80px);
+    pointer-events: none;
+  }
+
+  /* ═══════════════════════════════════════════
+     PLAYER — absolute center, IN FRONT of title (z-index: 3)
+  ═══════════════════════════════════════════ */
+  #hero-banner-{{ section.id }} .hero-banner__player {
+    position: absolute;
+    z-index: 3;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    height: 95%;
+    align-items: flex-end;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  #hero-banner-{{ section.id }} .hero-banner__player-img {
+    display: block;
+    width: auto;
+    height: 95%;
+    object-fit: contain;
+    object-position: bottom center;
+    filter: drop-shadow(0 8px 40px rgba(0, 0, 0, 0.6));
+  }
+
+  /* ═══════════════════════════════════════════
+     CONTENT — z-index: 2 (title BEHIND player)
+  ═══════════════════════════════════════════ */
+  #hero-banner-{{ section.id }} .hero-banner__content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 3rem 2.5rem;
+    padding-bottom: 100px;
+  }
+
+  /* ─── Title — CENTERED, BEHIND player ─── */
+  #hero-banner-{{ section.id }} .hero-banner__title {
+    font-family: var(--hero-font-title);
+    font-size: var(--hero-title-size);
+    font-weight: 900;
+    line-height: 0.85;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    margin: 0 0 0.5rem 0;
+    color: #fff;
+    text-shadow: 2px 4px 30px rgba(0, 0, 0, 0.7);
+    text-align: center;
+    width: 100%;
+    /* z-index: 1 keeps it behind the player at z-index: 3 */
+    position: relative;
+    z-index: 1;
+  }
+
+  #hero-banner-{{ section.id }} .hero-banner__title-line {
+    display: block;
+  }
+
+  /* ─── Bottom: subtitle row with left/right columns ─── */
+  #hero-banner-{{ section.id }} .hero-banner__bottom {
+    position: relative;
+    z-index: 4;
+    width: 100%;
+    padding-bottom: 1rem;
+  }
+
+  #hero-banner-{{ section.id }} .hero-banner__subtitle {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    width: 100%;
+    gap: 2rem;
+  }
+
+  #hero-banner-{{ section.id }} .hero-banner__subtitle-text {
+    font-family: var(--hero-font-title);
+    font-size: var(--hero-subtitle-size);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #fff;
+  }
+
+  /* ─── Intro text — right-aligned on desktop ─── */
+  #hero-banner-{{ section.id }} .hero-banner__intro {
+    margin-top: 0.8rem;
+    text-align: right;
+  }
+
+  #hero-banner-{{ section.id }} .hero-banner__intro p {
+    font-size: clamp(0.82rem, 1vw, 0.95rem);
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+    max-width: 340px;
+    margin-left: auto;
+  }
+
+  /* ─── Socials ─── */
+  #hero-banner-{{ section.id }} .hero-banner__socials {
+    display: flex;
+    gap: 0.7rem;
+    margin-top: 0.8rem;
+  }
+
+  #hero-banner-{{ section.id }} .hero-banner__social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    opacity: 0.85;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    text-decoration: none;
+  }
+
+  #hero-banner-{{ section.id }} .hero-banner__social-link:hover {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+
+  /* ═══════════════════════════════════════════
+     EVENT BAR — with red border outline + gap
+  ═══════════════════════════════════════════ */
+  #hero-banner-{{ section.id }} .hero-banner__event-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 5;
+    padding: 0 2.5rem 1.2rem;
+  }
+
+  /* Outer border wrapper — creates the red border with gap */
+  #hero-banner-{{ section.id }} .hero-banner__event-border {
+    max-width: 1400px;
+    margin: 0 auto;
+    border: 1.5px solid var(--hero-event-border-color);
+    padding: 8px;
+  }
+
+  /* Inner content */
+  #hero-banner-{{ section.id }} .hero-banner__event-inner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.9rem 1.6rem;
+    background: var(--hero-event-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  /* Badge */
+  #hero-banner-{{ section.id }} .hero-banner__event-badge {
+    flex-shrink: 0;
+    padding: 0.5rem 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    text-align: center;
+  }
+
+  #hero-banner-{{ section.id }} .hero-banner__event-badge span {
+    font-family: var(--hero-font-title);
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    line-height: 1.2;
+    color: #fff;
+  }
+
+  /* Team */
+  #hero-banner-{{ section.id }} .hero-banner__event-team {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-shrink: 0;
+    border-left: 1px solid rgba(255,255,255,0.15);
+    padding-left: 1.5rem;
+  }
+
+  #hero-banner-{{ section.id }} .hero-banner__event-team-logo {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  #hero-banner-{{ section.id }} .hero-banner__event-team-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: #fff;
+    max-width: 130px;
+  }
+
+  /* Details */
+  #hero-banner-{{ section.id }} .hero-banner__event-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    border-left: 1px solid rgba(255,255,255,0.15);
+    padding-left: 1.5rem;
+    flex: 1;
+  }
+
+  #hero-banner-{{ section.id }} .hero-banner__event-datetime {
+    font-family: var(--hero-font-title);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #fff;
+  }
+
+  #hero-banner-{{ section.id }} .hero-banner__event-venue {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.65);
+    line-height: 1.3;
+  }
+
+  /* CTA */
+  #hero-banner-{{ section.id }} .hero-banner__event-cta {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.55rem 1.3rem;
+    border: 1.5px solid rgba(255, 255, 255, 0.5);
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    transition: background 0.25s ease, border-color 0.25s ease;
+    white-space: nowrap;
+  }
+
+  #hero-banner-{{ section.id }} .hero-banner__event-cta:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.8);
+  }
+
+  /* ═══════════════════════════════════════════
+     RESPONSIVE
+  ═══════════════════════════════════════════ */
+
+  @media (max-width: 1100px) {
+    #hero-banner-{{ section.id }} .hero-banner__content {
+      padding: 2rem;
+      padding-bottom: 100px;
+    }
+
+    #hero-banner-{{ section.id }} .hero-banner__player-img {
+      height: clamp(350px, 55vh, 520px);
+    }
+
+    #hero-banner-{{ section.id }} .hero-banner__intro p {
+      max-width: 260px;
+    }
+
+    #hero-banner-{{ section.id }} .hero-banner__event-bar {
+      padding: 0 2rem 1rem;
+    }
+  }
+
+  /* ── Mobile BG player: hidden on desktop ── */
+  #hero-banner-{{ section.id }} .hero-banner__bg-player {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    /* Section: fixed viewport height on mobile */
+    #hero-banner-{{ section.id }} {
+      height: 100vh;
+      height: 100dvh;
+      min-height: 560px;
+      max-height: none;
+      overflow: hidden;
+    }
+
+    /* Show player image as faded background */
+    #hero-banner-{{ section.id }} .hero-banner__bg-player {
+      display: block;
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center top;
+      background-repeat: no-repeat;
+      opacity: 0.15;
+      z-index: 1;
+    }
+
+    /* Hide the foreground player image */
+    #hero-banner-{{ section.id }} .hero-banner__player {
+      display: none;
+    }
+
+    /* Content: full height, centered vertically */
+    #hero-banner-{{ section.id }} .hero-banner__content {
+      padding: 3rem 1.5rem;
+      padding-bottom: 0;
+      min-height: auto;
+      height: 100%;
+      justify-content: center;
+    }
+
+    /* Title */
+    #hero-banner-{{ section.id }} .hero-banner__title {
+      font-size: clamp(3rem, 14vw, 5rem);
+    }
+
+    /* Bottom block: centered */
+    #hero-banner-{{ section.id }} .hero-banner__bottom {
+      text-align: center;
+      padding-bottom: 0;
+    }
+
+    /* Subtitle: centered row */
+    #hero-banner-{{ section.id }} .hero-banner__subtitle {
+      justify-content: center;
+      gap: 1.5rem;
+    }
+
+    /* Intro text: centered with padding on mobile */
+    #hero-banner-{{ section.id }} .hero-banner__intro {
+      text-align: center;
+      margin-top: 0.8rem;
+    }
+
+    #hero-banner-{{ section.id }} .hero-banner__intro p {
+      max-width: none;
+      margin: 0 auto;
+      text-align: center;
+      font-size: 0.85rem;
+      padding: 0 0.5rem;
+    }
+
+    /* Socials: center */
+    #hero-banner-{{ section.id }} .hero-banner__socials {
+      justify-content: center;
+    }
+
+    /* Event bar: bottom, centered content */
+    #hero-banner-{{ section.id }} .hero-banner__event-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 0 1.2rem 0.8rem;
+    }
+
+    #hero-banner-{{ section.id }} .hero-banner__event-border {
+      padding: 5px;
+    }
+
+    #hero-banner-{{ section.id }} .hero-banner__event-inner {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 0.6rem;
+      padding: 0.7rem 1rem;
+    }
+
+    #hero-banner-{{ section.id }} .hero-banner__event-team {
+      border-left: none;
+      padding-left: 0;
+      justify-content: center;
+    }
+
+    #hero-banner-{{ section.id }} .hero-banner__event-details {
+      border-left: none;
+      padding-left: 0;
+      align-items: center;
+    }
+
+    #hero-banner-{{ section.id }} .hero-banner__event-cta {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Hero Banner",
+  "tag": "section",
+  "class": "hero-banner-section",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Club Title"
+    },
+    {
+      "type": "text",
+      "id": "club_name_line1",
+      "label": "Club Name — Line 1",
+      "default": "PARK"
+    },
+    {
+      "type": "text",
+      "id": "club_name_line2",
+      "label": "Club Name — Line 2",
+      "default": "ORCHARDS"
+    },
+    {
+      "type": "text",
+      "id": "subtitle_left",
+      "label": "Subtitle Left",
+      "default": "FOOTBALL"
+    },
+    {
+      "type": "text",
+      "id": "subtitle_right",
+      "label": "Subtitle Right",
+      "default": "NETBALL CLUB"
+    },
+    {
+      "type": "header",
+      "content": "Hero Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Player Hero Image",
+      "info": "Recommended: transparent PNG, portrait orientation, at least 900px wide."
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_bg_image",
+      "label": "Background on Mobile",
+      "info": "Shown as a faded background on mobile screens. Falls back to Player Hero Image if empty."
+    },
+    {
+      "type": "header",
+      "content": "Introduction"
+    },
+    {
+      "type": "richtext",
+      "id": "intro_text",
+      "label": "Introduction Text",
+      "default": "<p>The original Park Orchards Junior Football Club was established in 1969 and was based at its current home ground of Domeney Reserve in Knees Road, Park Orchards...</p>"
+    },
+    {
+      "type": "header",
+      "content": "Social Media"
+    },
+    {
+      "type": "url",
+      "id": "facebook_url",
+      "label": "Facebook URL"
+    },
+    {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram URL"
+    },
+    {
+      "type": "header",
+      "content": "Event Bar"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_event_bar",
+      "label": "Show Event Bar",
+      "default": true,
+      "info": "Automatically displays the nearest upcoming event from your Events blog."
+    },
+    {
+      "type": "text",
+      "id": "event_blog_handle",
+      "label": "Events Blog Handle",
+      "default": "events",
+      "info": "The URL handle of your Events blog (e.g. 'events')."
+    },
+    {
+      "type": "text",
+      "id": "event_cta_label_fallback",
+      "label": "Fallback CTA Label",
+      "default": "Watch On HQ",
+      "info": "Used when the event article has no button_label metafield."
+    },
+    {
+      "type": "image_picker",
+      "id": "team_logo",
+      "label": "Team Logo (fallback)",
+      "info": "Shown if the related team metaobject has no team_image."
+    },
+    {
+      "type": "header",
+      "content": "Background Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color_dark",
+      "label": "Dark Background Color",
+      "default": "#0a0000"
+    },
+    {
+      "type": "color",
+      "id": "bg_color_accent",
+      "label": "Accent Glow Color",
+      "default": "#8b0000"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Banner"
+    }
+  ]
+}
+{% endschema %}

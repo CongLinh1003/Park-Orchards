@@ -1,0 +1,474 @@
+{%- comment -%}
+  Netball Hero Section — Park Orchards Football & Netball Club
+
+  Section đầu tiên của trang Netball.
+  - Không map metaobjects / metafields (hardcode qua section settings)
+  - Nền: radial gradient đỏ đậm → đen (bắt từ ảnh mẫu)
+  - Heading lớn uppercase (2 dòng tuỳ chỉnh)
+  - Subtitle dưới heading
+  - Icon social: Facebook, Instagram (có thể bật/tắt từng cái)
+  - Tuỳ chỉnh: màu nền, màu text, padding, text-align, min-height
+{%- endcomment -%}
+
+{%- liquid
+  assign heading_line1  = section.settings.heading_line1
+  assign heading_line2  = section.settings.heading_line2
+  assign subtitle       = section.settings.subtitle
+  assign text_align     = section.settings.text_align
+  assign show_fb        = section.settings.show_facebook
+  assign fb_url         = section.settings.facebook_url
+  assign show_ig        = section.settings.show_instagram
+  assign ig_url         = section.settings.instagram_url
+  assign social_size    = section.settings.social_icon_size
+  assign bg_center      = section.settings.bg_color_center
+  assign bg_outer       = section.settings.bg_color_outer
+  assign heading_color  = section.settings.heading_color
+  assign subtitle_color = section.settings.subtitle_color
+  assign social_color   = section.settings.social_color
+  assign section_height = section.settings.section_height
+  assign pt             = section.settings.padding_top
+  assign pb             = section.settings.padding_bottom
+-%}
+
+<section
+  id="netball-hero-{{ section.id }}"
+  class="nh"
+  style="
+    --nh-bg-center: {{ bg_center }};
+    --nh-bg-outer: {{ bg_outer }};
+    --nh-heading-color: {{ heading_color }};
+    --nh-subtitle-color: {{ subtitle_color }};
+    --nh-social-color: {{ social_color }};
+    --nh-min-height: {{ section_height }}px;
+    --nh-pt: {{ pt }}px;
+    --nh-pb: {{ pb }}px;
+    --nh-social-size: {{ social_size }}px;
+    --nh-text-align: {{ text_align }};
+  "
+>
+  {%- comment -%} Background radial gradient {%- endcomment -%}
+  <div class="nh__bg" aria-hidden="true"></div>
+
+  {%- comment -%} Content wrapper {%- endcomment -%}
+  <div class="nh__inner">
+
+    {%- comment -%} Heading {%- endcomment -%}
+    {%- if heading_line1 != blank or heading_line2 != blank -%}
+      <h1 class="nh__heading" aria-label="{{ heading_line1 }} {{ heading_line2 }}">
+        {%- if heading_line1 != blank -%}
+          <span class="nh__heading-line">{{ heading_line1 }}</span>
+        {%- endif -%}
+        {%- if heading_line2 != blank -%}
+          <span class="nh__heading-line">{{ heading_line2 }}</span>
+        {%- endif -%}
+      </h1>
+    {%- endif -%}
+
+    {%- comment -%} Subtitle {%- endcomment -%}
+    {%- if subtitle != blank -%}
+      <p class="nh__subtitle">{{ subtitle }}</p>
+    {%- endif -%}
+
+    {%- comment -%} Social Icons {%- endcomment -%}
+    {%- if show_fb or show_ig -%}
+      <div class="nh__socials" role="list" aria-label="Social media links">
+
+        {%- if show_fb and fb_url != blank -%}
+          <a
+            href="{{ fb_url }}"
+            class="nh__social-link"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Follow us on Facebook"
+            role="listitem"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              width="{{ social_size }}"
+              height="{{ social_size }}"
+              aria-hidden="true"
+            >
+              <path d="M12 2.04C6.5 2.04 2 6.53 2 12.06c0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v7a10 10 0 0 0 8.44-9.9c0-5.53-4.5-10.02-10-10.02z"/>
+            </svg>
+          </a>
+        {%- elsif show_fb -%}
+          {%- comment -%} Shown but no URL — render non-linked icon as placeholder {%- endcomment -%}
+          <span class="nh__social-link nh__social-link--placeholder" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="{{ social_size }}" height="{{ social_size }}">
+              <path d="M12 2.04C6.5 2.04 2 6.53 2 12.06c0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v7a10 10 0 0 0 8.44-9.9c0-5.53-4.5-10.02-10-10.02z"/>
+            </svg>
+          </span>
+        {%- endif -%}
+
+        {%- if show_ig and ig_url != blank -%}
+          <a
+            href="{{ ig_url }}"
+            class="nh__social-link"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Follow us on Instagram"
+            role="listitem"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              width="{{ social_size }}"
+              height="{{ social_size }}"
+              aria-hidden="true"
+            >
+              <path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/>
+            </svg>
+          </a>
+        {%- elsif show_ig -%}
+          <span class="nh__social-link nh__social-link--placeholder" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="{{ social_size }}" height="{{ social_size }}">
+              <path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/>
+            </svg>
+          </span>
+        {%- endif -%}
+
+      </div>
+    {%- endif -%}
+
+  </div>
+</section>
+
+{% style %}
+  /* ═════════════════════════════════════════════
+     NETBALL HERO — scoped to section.id
+  ═════════════════════════════════════════════ */
+
+  #netball-hero-{{ section.id }} {
+    /* Font variables */
+    --nh-font-display: 'Antonio', 'Impact', 'Arial Black', 'Oswald', sans-serif;
+    --nh-font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  /* ── Section wrapper ── */
+  #netball-hero-{{ section.id }}.nh {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: var(--nh-min-height, 400px);
+    padding-top: var(--nh-pt, 80px);
+    padding-bottom: var(--nh-pb, 80px);
+    overflow: hidden;
+    font-family: var(--nh-font-body);
+  }
+
+  /* ── Background radial gradient (red-center → dark outer) ── */
+  #netball-hero-{{ section.id }} .nh__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: radial-gradient(
+      ellipse 80% 70% at 50% 50%,
+      var(--nh-bg-center, #9b0000) 0%,
+      color-mix(in srgb, var(--nh-bg-center, #9b0000) 55%, var(--nh-bg-outer, #0a0000)) 45%,
+      var(--nh-bg-outer, #0a0000) 100%
+    );
+  }
+
+  /* ── Inner content ── */
+  #netball-hero-{{ section.id }} .nh__inner {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    text-align: var(--nh-text-align, center);
+    display: flex;
+    flex-direction: column;
+    align-items: {{ section.settings.text_align == 'left' ? 'flex-start' : section.settings.text_align == 'right' ? 'flex-end' : 'center' }};
+    gap: 1rem;
+  }
+
+  /* ── Heading ── */
+  #netball-hero-{{ section.id }} .nh__heading {
+    font-family: var(--nh-font-display);
+    font-size: clamp(3.5rem, 10vw, 9.5rem);
+    font-weight: 900;
+    line-height: 0.88;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    color: var(--nh-heading-color, #ffffff);
+    margin: 0;
+    /* Subtle stroke for extra punch (like the reference image) */
+    -webkit-text-stroke: {{ section.settings.heading_stroke }}px {{ section.settings.heading_stroke_color }};
+    text-stroke: {{ section.settings.heading_stroke }}px {{ section.settings.heading_stroke_color }};
+    /* Drop shadow */
+    text-shadow:
+      0 2px 0 rgba(0,0,0,0.4),
+      0 4px 30px rgba(0,0,0,0.5);
+  }
+
+  #netball-hero-{{ section.id }} .nh__heading-line {
+    display: block;
+  }
+
+  /* ── Subtitle ── */
+  #netball-hero-{{ section.id }} .nh__subtitle {
+    font-family: var(--nh-font-display);
+    font-size: clamp(1rem, 2.5vw, 1.75rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--nh-subtitle-color, #ffffff);
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  /* ── Social Icons ── */
+  #netball-hero-{{ section.id }} .nh__socials {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  #netball-hero-{{ section.id }} .nh__social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--nh-social-color, #ffffff);
+    opacity: 0.9;
+    text-decoration: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    border-radius: 50%;
+  }
+
+  #netball-hero-{{ section.id }} .nh__social-link:hover {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+
+  #netball-hero-{{ section.id }} .nh__social-link--placeholder {
+    cursor: default;
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    #netball-hero-{{ section.id }}.nh {
+      padding-top: calc(var(--nh-pt, 80px) * 0.65);
+      padding-bottom: calc(var(--nh-pb, 80px) * 0.65);
+    }
+
+    #netball-hero-{{ section.id }} .nh__inner {
+      padding: 0 1.25rem;
+    }
+
+    #netball-hero-{{ section.id }} .nh__heading {
+      font-size: clamp(2.8rem, 14vw, 5rem);
+    }
+  }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Netball Hero",
+  "tag": "section",
+  "class": "netball-hero-section",
+  "settings": [
+
+    {
+      "type": "header",
+      "content": "── Heading ──"
+    },
+    {
+      "type": "text",
+      "id": "heading_line1",
+      "label": "Heading — Line 1",
+      "default": "READY TO",
+      "info": "First line of the big heading."
+    },
+    {
+      "type": "text",
+      "id": "heading_line2",
+      "label": "Heading — Line 2",
+      "default": "NETBALL?",
+      "info": "Second line of the big heading. Leave blank to show only one line."
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "heading_stroke",
+      "label": "Heading Outline Thickness",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 0,
+      "info": "Add an outline stroke to the heading text. Set to 0 to disable."
+    },
+    {
+      "type": "color",
+      "id": "heading_stroke_color",
+      "label": "Heading Outline Color",
+      "default": "#ffffff"
+    },
+
+    {
+      "type": "header",
+      "content": "── Subtitle ──"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle Text",
+      "default": "WELCOME YOU TO THE FAMILY!",
+      "info": "Shown below the heading."
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Subtitle Color",
+      "default": "#ffffff"
+    },
+
+    {
+      "type": "header",
+      "content": "── Social Media ──"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_facebook",
+      "label": "Show Facebook Icon",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "facebook_url",
+      "label": "Facebook URL"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_instagram",
+      "label": "Show Instagram Icon",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram URL"
+    },
+    {
+      "type": "color",
+      "id": "social_color",
+      "label": "Social Icon Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "social_icon_size",
+      "label": "Social Icon Size",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+
+    {
+      "type": "header",
+      "content": "── Background ──"
+    },
+    {
+      "type": "color",
+      "id": "bg_color_center",
+      "label": "Background — Center Color",
+      "default": "#9b0000",
+      "info": "The bright red / inner glow colour at the centre of the radial gradient."
+    },
+    {
+      "type": "color",
+      "id": "bg_color_outer",
+      "label": "Background — Outer / Dark Color",
+      "default": "#0a0000",
+      "info": "The very dark colour at the corners and edges."
+    },
+
+    {
+      "type": "header",
+      "content": "── Layout ──"
+    },
+    {
+      "type": "select",
+      "id": "text_align",
+      "label": "Text Alignment",
+      "default": "center",
+      "options": [
+        { "value": "left",   "label": "Left"   },
+        { "value": "center", "label": "Centre" },
+        { "value": "right",  "label": "Right"  }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "section_height",
+      "label": "Minimum Section Height",
+      "min": 200,
+      "max": 800,
+      "step": 20,
+      "unit": "px",
+      "default": 380
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding Top",
+      "min": 0,
+      "max": 200,
+      "step": 8,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding Bottom",
+      "min": 0,
+      "max": 200,
+      "step": 8,
+      "unit": "px",
+      "default": 80
+    }
+
+  ],
+  "presets": [
+    {
+      "name": "Netball Hero",
+      "settings": {
+        "heading_line1": "READY TO",
+        "heading_line2": "NETBALL?",
+        "subtitle": "WELCOME YOU TO THE FAMILY!",
+        "bg_color_center": "#9b0000",
+        "bg_color_outer": "#0a0000",
+        "heading_color": "#ffffff",
+        "subtitle_color": "#ffffff",
+        "social_color": "#ffffff",
+        "show_facebook": true,
+        "show_instagram": true,
+        "text_align": "center",
+        "section_height": 380,
+        "padding_top": 80,
+        "padding_bottom": 80,
+        "social_icon_size": 36,
+        "heading_stroke": 0
+      }
+    }
+  ]
+}
+{% endschema %}
