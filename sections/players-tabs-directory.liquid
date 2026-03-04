@@ -1,0 +1,596 @@
+{%- liquid
+  assign accent = section.settings.accent_color
+  assign sport_handle = section.settings.sport_handle
+  assign division_handle = section.settings.division_handle
+
+  assign players_all = metaobjects.player_profile.values
+  if section.settings.sort_mode == 'sort_order'
+    assign players_all = players_all | sort: 'sort_order'
+  elsif section.settings.sort_mode == 'jersey_number'
+    assign players_all = players_all | sort: 'jersey_number'
+  else
+    assign players_all = players_all | sort: 'full_name'
+  endif
+
+  assign active_index = 0
+  assign found_active = false
+  for b in section.blocks
+    if found_active == false and b.settings.default_active
+      assign active_index = forloop.index0
+      assign found_active = true
+    endif
+  endfor
+-%}
+
+<section
+  class="po-players-tabs po-players-tabs--{{ section.id }}"
+  style="
+    --po-accent: {{ accent }};
+    --po-cols-desktop: {{ section.settings.columns_desktop }};
+    --po-cols-tablet: {{ section.settings.columns_tablet }};
+    --po-cols-mobile: {{ section.settings.columns_mobile }};
+  "
+  id="PlayersTabs-{{ section.id }}"
+>
+  <div class="po-players-tabs__inner page-width">
+    {% if section.settings.show_tabs and section.blocks.size > 0 %}
+      <div class="po-players-tabs__tabs" role="tablist" aria-label="{{ section.settings.tabs_aria_label | escape }}">
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign is_active = false
+            if forloop.index0 == active_index
+              assign is_active = true
+            endif
+            assign tab_id = 'PlayersTab-' | append: section.id | append: '-' | append: forloop.index0
+            assign panel_id = 'PlayersPanel-' | append: section.id | append: '-' | append: forloop.index0
+          -%}
+
+          <button
+            class="po-players-tabs__tab{% if is_active %} is-active{% endif %}"
+            type="button"
+            role="tab"
+            id="{{ tab_id }}"
+            aria-controls="{{ panel_id }}"
+            aria-selected="{% if is_active %}true{% else %}false{% endif %}"
+            data-tab-index="{{ forloop.index0 }}"
+            {{ block.shopify_attributes }}
+          >
+            {{ block.settings.tab_label | escape }}
+          </button>
+        {%- endfor -%}
+      </div>
+    {% endif %}
+
+    {% if section.settings.show_heading %}
+      <h2 class="po-players-tabs__heading" data-tabs-heading>
+        {% if section.blocks.size > 0 %}
+          {{ section.blocks[active_index].settings.heading_override | default: section.blocks[active_index].settings.tab_label | escape }}
+        {% else %}
+          {{ section.settings.heading | escape }}
+        {% endif %}
+      </h2>
+    {% endif %}
+
+    {% if section.settings.subheading != blank %}
+      <div class="po-players-tabs__subheading">{{ section.settings.subheading }}</div>
+    {% endif %}
+
+    <div class="po-players-tabs__panels">
+      {%- if section.blocks.size == 0 -%}
+        <div class="po-players-tabs__empty">{{ section.settings.no_tabs_message }}</div>
+      {%- endif -%}
+
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign is_active = false
+          if forloop.index0 == active_index
+            assign is_active = true
+          endif
+          assign panel_id = 'PlayersPanel-' | append: section.id | append: '-' | append: forloop.index0
+          assign tab_id = 'PlayersTab-' | append: section.id | append: '-' | append: forloop.index0
+
+          assign grade_handle = block.settings.grade_handle | default: ''
+          assign limit = block.settings.players_limit | default: section.settings.players_limit
+          assign shown = 0
+        -%}
+
+        <div
+          class="po-players-tabs__panel{% if is_active %} is-active{% endif %}"
+          id="{{ panel_id }}"
+          role="tabpanel"
+          aria-labelledby="{{ tab_id }}"
+          {% unless is_active %}hidden{% endunless %}
+          data-panel-index="{{ forloop.index0 }}"
+        >
+          <div class="po-players-tabs__grid">
+            {%- for player in players_all -%}
+              {%- liquid
+                if limit != blank and shown >= limit
+                  break
+                endif
+
+                assign team_obj = player.team.value
+                if team_obj == blank
+                  continue
+                endif
+
+                assign sport_obj = team_obj.sport.value
+                assign division_obj = team_obj.division.value
+                assign grade_obj = team_obj.grade.value
+
+                assign sport_h = ''
+                assign division_h = ''
+                assign grade_h = ''
+
+                if sport_obj != blank
+                  assign sport_h = sport_obj.handle
+                endif
+                if division_obj != blank
+                  assign division_h = division_obj.handle
+                endif
+                if grade_obj != blank
+                  assign grade_h = grade_obj.handle
+                endif
+
+                if sport_h != sport_handle
+                  continue
+                endif
+                if division_h != division_handle
+                  continue
+                endif
+                if grade_handle != blank and grade_h != grade_handle
+                  continue
+                endif
+
+                assign shown = shown | plus: 1
+              -%}
+
+              {% render 'player-card',
+                player: player,
+                accent_color: accent,
+                show_jersey_number: section.settings.show_jersey_number,
+                show_position: section.settings.show_position,
+                show_team_name: section.settings.show_team_name,
+                open_in_new_tab: section.settings.open_in_new_tab,
+                placeholder_image: section.settings.placeholder_image
+              %}
+            {%- endfor -%}
+          </div>
+
+          {% if shown == 0 %}
+            <div class="po-players-tabs__no-results">
+              {{ block.settings.empty_message | default: section.settings.empty_message }}
+            </div>
+          {% endif %}
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+
+  <style>
+    .po-players-tabs--{{ section.id }}{
+      --po-accent: {{ accent }};
+      padding: clamp(28px, 4vw, 56px) 0;
+      background: {{ section.settings.background_color }};
+    }
+
+    .po-players-tabs--{{ section.id }} .po-players-tabs__tabs{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom: 18px;
+    }
+
+    .po-players-tabs--{{ section.id }} .po-players-tabs__tab{
+      border: 2px solid var(--po-accent);
+      background: transparent;
+      color: var(--po-accent);
+      padding: 10px 14px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 0;
+      line-height: 1;
+    }
+
+    .po-players-tabs--{{ section.id }} .po-players-tabs__tab.is-active{
+      background: var(--po-accent);
+      color: #fff;
+    }
+
+    .po-players-tabs--{{ section.id }} .po-players-tabs__heading{
+      margin: 0 0 16px;
+      text-align:center;
+      color: var(--po-accent);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .28em;
+      font-size: clamp(40px, 7vw, 92px);
+      line-height: 1.05;
+    }
+
+    .po-players-tabs--{{ section.id }} .po-players-tabs__subheading{
+      text-align:center;
+      max-width: 900px;
+      margin: 0 auto 22px;
+    }
+
+    .po-players-tabs--{{ section.id }} .po-players-tabs__panel{
+      margin-top: 10px;
+    }
+
+    .po-players-tabs--{{ section.id }} .po-players-tabs__grid{
+      display:grid;
+      gap: 14px;
+      grid-template-columns: repeat(var(--po-cols-mobile), minmax(0, 1fr));
+    }
+
+    @media (min-width: 750px){
+      .po-players-tabs--{{ section.id }} .po-players-tabs__grid{
+        grid-template-columns: repeat(var(--po-cols-tablet), minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 990px){
+      .po-players-tabs--{{ section.id }} .po-players-tabs__grid{
+        grid-template-columns: repeat(var(--po-cols-desktop), minmax(0, 1fr));
+      }
+    }
+
+    .po-players-tabs--{{ section.id }} .po-player-card{
+      position: relative;
+      display:block;
+      text-decoration:none;
+      color: inherit;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,.08);
+      overflow:hidden;
+      aspect-ratio: 3 / 4;
+    }
+
+    .po-players-tabs--{{ section.id }} .po-player-card__media{
+      position:absolute;
+      inset:0;
+    }
+
+    .po-players-tabs--{{ section.id }} .po-player-card__img,
+    .po-players-tabs--{{ section.id }} .po-player-card__placeholder{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      background: #f2f2f2;
+    }
+
+    .po-players-tabs--{{ section.id }} .po-player-card__number{
+      position:absolute;
+      top: 12px;
+      left: 12px;
+      background: var(--po-accent);
+      color:#fff;
+      font-weight:900;
+      font-size: 34px;
+      line-height: 1;
+      padding: 10px 12px;
+      z-index: 2;
+    }
+
+    .po-players-tabs--{{ section.id }} .po-player-card__overlay{
+      position:absolute;
+      inset:0;
+      background: linear-gradient(to top, rgba(176,18,27,.98) 0%, rgba(176,18,27,.92) 34%, rgba(176,18,27,0) 64%);
+      z-index: 1;
+    }
+
+    .po-players-tabs--{{ section.id }} .po-player-card__text{
+      position:absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 14px;
+      z-index: 2;
+      color:#fff;
+      text-transform: uppercase;
+    }
+
+    .po-players-tabs--{{ section.id }} .po-player-card__team{
+      font-weight: 800;
+      opacity: .92;
+      letter-spacing: .06em;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .po-players-tabs--{{ section.id }} .po-player-card__name{
+      font-weight: 900;
+      letter-spacing: .05em;
+      font-size: clamp(18px, 2.1vw, 26px);
+      line-height: 1.05;
+    }
+
+    .po-players-tabs--{{ section.id }} .po-player-card__pos{
+      margin-top: 6px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      font-size: 13px;
+      opacity: .95;
+    }
+
+    .po-players-tabs--{{ section.id }} .po-players-tabs__no-results,
+    .po-players-tabs--{{ section.id }} .po-players-tabs__empty{
+      text-align:center;
+      margin-top: 18px;
+      opacity: .8;
+    }
+  </style>
+
+  <script>
+    (function(){
+      function initPlayersTabs(root){
+        if(!root) return;
+
+        var tabs = root.querySelectorAll('[role="tab"]');
+        var panels = root.querySelectorAll('[role="tabpanel"]');
+        var heading = root.querySelector('[data-tabs-heading]');
+
+        function setActive(index){
+          tabs.forEach(function(tab, i){
+            var active = i === index;
+            tab.classList.toggle('is-active', active);
+            tab.setAttribute('aria-selected', active ? 'true' : 'false');
+          });
+
+          panels.forEach(function(panel, i){
+            var active = i === index;
+            panel.classList.toggle('is-active', active);
+            if(active){
+              panel.removeAttribute('hidden');
+            } else {
+              panel.setAttribute('hidden', 'hidden');
+            }
+          });
+
+          if(heading){
+            var tab = tabs[index];
+            if(tab){
+              heading.textContent = tab.textContent;
+            }
+          }
+        }
+
+        tabs.forEach(function(tab){
+          tab.addEventListener('click', function(){
+            var index = parseInt(tab.getAttribute('data-tab-index'), 10);
+            if(!isNaN(index)) setActive(index);
+          });
+        });
+      }
+
+      var root = document.getElementById('PlayersTabs-{{ section.id }}');
+      initPlayersTabs(root);
+
+      document.addEventListener('shopify:section:load', function(e){
+        var container = e.target && e.target.querySelector && e.target.querySelector('#PlayersTabs-{{ section.id }}');
+        initPlayersTabs(container);
+      });
+    })();
+  </script>
+
+  {% schema %}
+  {
+    "name": "Players Tabs Directory",
+    "tag": "section",
+    "class": "section",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "show_tabs",
+        "label": "Show tabs",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "tabs_aria_label",
+        "label": "Tabs aria-label",
+        "default": "Player categories"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_heading",
+        "label": "Show large heading",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Fallback heading (when no blocks)",
+        "default": "PLAYERS"
+      },
+      {
+        "type": "richtext",
+        "id": "subheading",
+        "label": "Subheading",
+        "default": "<p>&nbsp;</p>"
+      },
+      {
+        "type": "select",
+        "id": "sport_handle",
+        "label": "Sport (club_sport handle)",
+        "default": "football",
+        "options": [
+          { "value": "football", "label": "Football" },
+          { "value": "netball", "label": "Netball" }
+        ]
+      },
+      {
+        "type": "select",
+        "id": "division_handle",
+        "label": "Division (club_division handle)",
+        "default": "men",
+        "options": [
+          { "value": "men", "label": "Men" },
+          { "value": "women", "label": "Women" }
+        ]
+      },
+      {
+        "type": "select",
+        "id": "sort_mode",
+        "label": "Sort players by",
+        "default": "sort_order",
+        "options": [
+          { "value": "sort_order", "label": "Sort Order" },
+          { "value": "jersey_number", "label": "Jersey Number" },
+          { "value": "full_name", "label": "Full Name" }
+        ]
+      },
+      {
+        "type": "range",
+        "id": "players_limit",
+        "label": "Players limit per tab (fallback)",
+        "min": 4,
+        "max": 100,
+        "step": 1,
+        "default": 30
+      },
+      {
+        "type": "checkbox",
+        "id": "show_jersey_number",
+        "label": "Show jersey number",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_position",
+        "label": "Show role/position",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_team_name",
+        "label": "Show team name",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "open_in_new_tab",
+        "label": "Open PlayHQ link in new tab",
+        "default": true
+      },
+      {
+        "type": "image_picker",
+        "id": "placeholder_image",
+        "label": "Placeholder image (when player has no profile photo)"
+      },
+      {
+        "type": "color",
+        "id": "accent_color",
+        "label": "Accent color",
+        "default": "#b0121b"
+      },
+      {
+        "type": "color",
+        "id": "background_color",
+        "label": "Background color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "range",
+        "id": "columns_desktop",
+        "label": "Grid columns (desktop)",
+        "min": 2,
+        "max": 6,
+        "step": 1,
+        "default": 5
+      },
+      {
+        "type": "range",
+        "id": "columns_tablet",
+        "label": "Grid columns (tablet)",
+        "min": 2,
+        "max": 5,
+        "step": 1,
+        "default": 3
+      },
+      {
+        "type": "range",
+        "id": "columns_mobile",
+        "label": "Grid columns (mobile)",
+        "min": 1,
+        "max": 3,
+        "step": 1,
+        "default": 2
+      },
+      {
+        "type": "text",
+        "id": "empty_message",
+        "label": "Empty message (fallback)",
+        "default": "No players found."
+      },
+      {
+        "type": "text",
+        "id": "no_tabs_message",
+        "label": "Message when no tab blocks",
+        "default": "Please add tab blocks to show players."
+      }
+    ],
+    "blocks": [
+      {
+        "type": "tab",
+        "name": "Tab",
+        "settings": [
+          {
+            "type": "text",
+            "id": "tab_label",
+            "label": "Tab label",
+            "default": "Seniors"
+          },
+          {
+            "type": "text",
+            "id": "heading_override",
+            "label": "Heading override (optional)",
+            "default": "<p>&nbsp;</p>"
+          },
+          {
+            "type": "text",
+            "id": "grade_handle",
+            "label": "Grade handle (club_grade handle)",
+            "default": "seniors"
+          },
+          {
+            "type": "range",
+            "id": "players_limit",
+            "label": "Players limit for this tab (override)",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "default": 0
+          },
+          {
+            "type": "text",
+            "id": "empty_message",
+            "label": "Empty message for this tab (override)",
+            "default": "<p>&nbsp;</p>"
+          },
+          {
+            "type": "checkbox",
+            "id": "default_active",
+            "label": "Set as default active tab",
+            "default": false
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Players Tabs Directory",
+        "blocks": [
+          { "type": "tab", "settings": { "tab_label": "Under 19s", "grade_handle": "under-19", "default_active": true } },
+          { "type": "tab", "settings": { "tab_label": "Reserves", "grade_handle": "reserves" } },
+          { "type": "tab", "settings": { "tab_label": "Seniors", "grade_handle": "seniors" } }
+        ]
+      }
+    ]
+  }
+  {% endschema %}
+</section>

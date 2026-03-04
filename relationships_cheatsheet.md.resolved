@@ -1,0 +1,258 @@
+# 🏈 Park Orchards FC & NC — Relationship Cheatsheet
+
+> Tổng hợp tất cả relationships giữa Metaobjects, Metafields, Products, Blogs trong Shopify store.
+
+---
+
+## Relationship Diagram
+
+```mermaid
+graph TD
+    subgraph "Term Metaobjects (Taxonomy)"
+        CS["club_sport"]
+        CD["club_division"]
+        CG["club_grade"]
+        SS["sponsor_scope"]
+        ST["sponsor_tier"]
+        CPG["club_people_group"]
+        MC["membership_category"]
+    end
+
+    subgraph "Main Metaobjects"
+        CT["club_team"]
+        PP["player_profile"]
+        CSP["club_sponsor"]
+        CP["club_person"]
+        MT["membership_type"]
+    end
+
+    subgraph "Shopify Native"
+        PROD["Product (Membership/Merch)"]
+        ART["Article (Events blog)"]
+        BLOG_N["Blog: News"]
+        BLOG_E["Blog: Events"]
+        COLL["Collections"]
+    end
+
+    CT -->|sport| CS
+    CT -->|division| CD
+    CT -->|grade| CG
+
+    PP -->|team| CT
+
+    CSP -->|scope| SS
+    CSP -->|tier| ST
+    CSP -->|sponsored_player| PP
+
+    CP -->|group| CPG
+
+    MT -->|category| MC
+    MT -->|linked_product| PROD
+
+    ART -->|event.related_team| CT
+
+    PROD -.->|membership.* metafields| PROD
+    BLOG_E -->|contains| ART
+```
+
+---
+
+## 1. Term Metaobjects (Taxonomy Layer)
+
+Các metaobject dùng như taxonomy/terms — được reference bởi các metaobject chính.
+
+| # | Metaobject Type | Fields | Entries | Được dùng bởi |
+|---|---|---|---|---|
+| 1 | `club_sport` | name, sort_order | Football, Netball | `club_team.sport` |
+| 2 | `club_division` | name, sort_order | Men, Women | `club_team.division` |
+| 3 | `club_grade` | name, sort_order | Seniors, Reserves, Under 19 | `club_team.grade` |
+| 4 | `sponsor_scope` | name, sort_order | Club Sponsor, Player Sponsor | `club_sponsor.scope` |
+| 5 | `sponsor_tier` | name, sort_order, badge_label | Gold, Silver, Jumper, Community Partner | `club_sponsor.tier` |
+| 6 | `club_people_group` | name, sort_order | Committee, Support, Volunteers, Community | `club_person.group` |
+| 7 | `membership_category` | name, sort_order | Player, Social, Premium, Honorary | `membership_type.category` |
+
+---
+
+## 2. Main Metaobjects & Their References
+
+### 🏟️ `club_team` — Trục chính, kết nối 3 terms
+
+| Field | Type | References → |
+|---|---|---|
+| team_name | `single_line_text_field` | — |
+| **sport** | `metaobject_reference` | → **`club_sport`** |
+| **division** | `metaobject_reference` | → **`club_division`** |
+| **grade** | `metaobject_reference` | → **`club_grade`** |
+| season_label | `single_line_text_field` | — |
+| playhq_link | `url` | — |
+| team_image | `file_reference` | — |
+| sort_order | `number_integer` | — |
+| featured | `boolean` | — |
+
+> [!IMPORTANT]
+> `club_team` là hub trung tâm — Player, Sponsor (gián tiếp), và Event đều reference qua đây.
+
+---
+
+### 👤 `player_profile` — Reference team
+
+| Field | Type | References → |
+|---|---|---|
+| full_name | `single_line_text_field` | — |
+| preferred_name | `single_line_text_field` | — |
+| jersey_number | `number_integer` | — |
+| profile_photo | `file_reference` | — |
+| role_position | `single_line_text_field` | — |
+| **team** | `metaobject_reference` | → **`club_team`** |
+| bio_short | `multi_line_text_field` | — |
+| bio_full | `rich_text_field` | — |
+| height | `single_line_text_field` | — |
+| playhq_player_link | `url` | — |
+| featured_player | `boolean` | — |
+| sort_order | `number_integer` | — |
+
+---
+
+### 🤝 `club_sponsor` — Reference 3 metaobjects
+
+| Field | Type | References → |
+|---|---|---|
+| sponsor_name | `single_line_text_field` | — |
+| logo | `file_reference` | — |
+| website_url | `url` | — |
+| **scope** | `metaobject_reference` | → **`sponsor_scope`** |
+| **tier** | `metaobject_reference` | → **`sponsor_tier`** |
+| **sponsored_player** | `metaobject_reference` | → **`player_profile`** *(optional)* |
+| short_description | `multi_line_text_field` | — |
+| cta_label | `single_line_text_field` | — |
+| sponsor_since | `date` | — |
+| expiry_date | `date` | — |
+| sort_order | `number_integer` | — |
+| featured | `boolean` | — |
+
+---
+
+### 👥 `club_person` — Reference 1 term
+
+| Field | Type | References → |
+|---|---|---|
+| full_name | `single_line_text_field` | — |
+| photo | `file_reference` | — |
+| role_title | `single_line_text_field` | — |
+| **group** | `metaobject_reference` | → **`club_people_group`** |
+| sub_group | `single_line_text_field` | — |
+| bio_short | `multi_line_text_field` | — |
+| contact_note | `single_line_text_field` | — |
+| sort_order | `number_integer` | — |
+| featured | `boolean` | — |
+
+---
+
+### 🎫 `membership_type` — Reference term + Product
+
+| Field | Type | References → |
+|---|---|---|
+| title | `single_line_text_field` | — |
+| **category** | `metaobject_reference` | → **`membership_category`** |
+| description | `multi_line_text_field` | — |
+| benefits | `rich_text_field` | — |
+| eligibility | `multi_line_text_field` | — |
+| **linked_product** | `product_reference` | → **Shopify Product** |
+| badge | `file_reference` | — |
+| sort_order | `number_integer` | — |
+
+> [!TIP]
+> `membership_type` kết nối metaobject ↔ product. Các loại như Life Member không cần product, chỉ dùng metaobject.
+
+---
+
+## 3. Article Metafields (Events Blog)
+
+Namespace: `event` — Owner: `ARTICLE`
+
+| Field | Key | Type | References → |
+|---|---|---|---|
+| Event Start | `event.start_datetime` | `date_time` | — |
+| Event End | `event.end_datetime` | `date_time` | — |
+| Venue | `event.venue` | `single_line_text_field` | — |
+| External Link | `event.external_link` | `url` | — |
+| Button Label | `event.button_label` | `single_line_text_field` | — |
+| Registration Deadline | `event.registration_deadline` | `date_time` | — |
+| Event Type | `event.event_type` | `single_line_text_field` | — |
+| Featured Event | `event.featured` | `boolean` | — |
+| **Related Team** | `event.related_team` | `metaobject_reference` | → **`club_team`** |
+
+---
+
+## 4. Product Metafields (Membership Products)
+
+Namespace: `membership` — Owner: `PRODUCT`
+
+| Field | Key | Type |
+|---|---|---|
+| Season | `membership.season` | `single_line_text_field` |
+| Eligibility | `membership.eligibility` | `multi_line_text_field` |
+| Benefit Summary | `membership.benefit_summary` | `rich_text_field` |
+| Renewal Note | `membership.renewal_note` | `multi_line_text_field` |
+
+---
+
+## 5. Tóm tắt tất cả References
+
+Bảng tổng hợp mọi relationship trong hệ thống:
+
+| Từ (Source) | Field | → Tới (Target) | Loại |
+|---|---|---|---|
+| `club_team` | sport | → `club_sport` | metaobject_reference |
+| `club_team` | division | → `club_division` | metaobject_reference |
+| `club_team` | grade | → `club_grade` | metaobject_reference |
+| `player_profile` | team | → `club_team` | metaobject_reference |
+| `club_sponsor` | scope | → `sponsor_scope` | metaobject_reference |
+| `club_sponsor` | tier | → `sponsor_tier` | metaobject_reference |
+| `club_sponsor` | sponsored_player | → `player_profile` | metaobject_reference |
+| `club_person` | group | → `club_people_group` | metaobject_reference |
+| `membership_type` | category | → `membership_category` | metaobject_reference |
+| `membership_type` | linked_product | → **Product** | product_reference |
+| Article (Events) | event.related_team | → `club_team` | metaobject_reference |
+
+---
+
+## 6. Chuỗi Reference (Reference Chains)
+
+Các chuỗi relationship gián tiếp quan trọng:
+
+```
+🏈 Filter Player theo Sport:
+   player_profile → club_team → club_sport
+
+🏅 Filter Sponsor theo Sport (gián tiếp qua player):
+   club_sponsor → player_profile → club_team → club_sport
+
+📅 Filter Event theo Sport:
+   Article (Event) → club_team → club_sport
+
+🎫 Membership → Product:
+   membership_type → Product (via linked_product)
+   Product → membership.* metafields (season, eligibility, etc.)
+```
+
+---
+
+## 7. Blogs & Collections
+
+### Blogs
+| Blog | Dùng cho | Template riêng | Metafields |
+|---|---|---|---|
+| **News** | Tin tức CLB | ✅ | Không |
+| **Events** | Sự kiện | ✅ | 9 article metafields (`event.*`) |
+
+### Collections đề xuất
+| Collection | Loại | Mục đích |
+|---|---|---|
+| All Merchandise | Smart/Manual | Tất cả merch |
+| All Memberships | Smart/Manual | Tất cả gói membership |
+| Featured Merch | Smart | Sản phẩm nổi bật |
+| Team Merch Football | Smart | Merch bóng đá |
+| Team Merch Netball | Smart | Merch netball |
+| Sale | Smart | Đang giảm giá |
+| New Arrivals | Smart | Mới ra |

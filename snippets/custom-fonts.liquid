@@ -1,0 +1,31 @@
+{%- comment -%}
+  Global Custom Fonts
+  
+  Include this snippet in theme.liquid (inside <head>):
+    {% render 'custom-fonts' %}
+  
+  This loads Antonio-Bold and applies it to all headings globally.
+{%- endcomment -%}
+
+<style>
+  /* ── Font Face ── */
+  @font-face {
+    font-family: 'Antonio';
+    src: url('{{ "Antonio-Bold.woff2" | asset_url }}') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* ── Apply globally to all headings ── */
+  :root {
+    --font-heading--family: 'Antonio', 'Oswald', 'Impact', 'Arial Black', sans-serif;
+    --font-heading--weight: 700;
+  }
+
+  h1, h2, h3, h4, h5, h6,
+  .h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: 'Antonio', 'Oswald', 'Impact', 'Arial Black', sans-serif !important;
+    font-weight: 700;
+  }
+</style>
