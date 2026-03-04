@@ -1,0 +1,21 @@
+# Node scripts with API tokens — DO NOT commit
+create-sample-events.js
+create-sample-fixtures.js
+create-sample-merchandise.js
+create-sample-teams-players.js
+debug-players.js
+fix-publish-status.js
+fix-final.js
+fix-related-team.js
+fix-sponsor-tier.js
+setup-metaobjects.js
+setup-metaobject-entries.js
+setup-article-metafields.js
+setup-remaining.js
+
+# Node
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,103 @@
+{%- liquid
+  assign player_obj = player
+  assign accent = accent_color | default: '#b0121b'
+  assign show_number = show_jersey_number
+  assign show_pos = show_position
+  assign show_team = show_team_name
+  assign open_new = open_in_new_tab
+
+  assign full_name = player_obj.full_name.value | default: ''
+  assign preferred = player_obj.preferred_name.value | default: ''
+  assign display_name = preferred
+  if display_name == blank
+    assign display_name = full_name
+  endif
+
+  assign role_position = player_obj.role_position.value | default: ''
+  assign jersey_raw = player_obj.jersey_number.value
+  assign jersey_num = jersey_raw | default: blank
+  if jersey_num != blank
+    assign jersey_num = jersey_num | plus: 0
+  endif
+
+  capture jersey_display
+    if jersey_num != blank
+      if jersey_num < 10
+        echo '0' | append: jersey_num
+      else
+        echo jersey_num
+      endif
+    endif
+  endcapture
+
+  assign photo = player_obj.profile_photo.value
+  assign link = player_obj.playhq_player_link.value | default: blank
+
+  assign team_obj = player_obj.team.value
+  assign team_name = ''
+  if team_obj != blank
+    assign team_name = team_obj.team_name.value | default: ''
+  endif
+
+  assign tag_name = 'div'
+  if link != blank
+    assign tag_name = 'a'
+  endif
+
+  assign rel_attr = ''
+  assign target_attr = ''
+  if link != blank and open_new
+    assign target_attr = ' target="_blank"'
+    assign rel_attr = ' rel="noopener noreferrer"'
+  endif
+-%}
+
+<{{ tag_name }}
+  class="po-player-card"
+  {% if link != blank %}href="{{ link | escape }}"{% endif %}
+  style="--po-accent: {{ accent }};"
+  {% if link != blank %}{{ target_attr }}{{ rel_attr }}{% endif %}
+  aria-label="{{ display_name | escape }}"
+>
+  <div class="po-player-card__media">
+    {% if show_number and jersey_display != blank %}
+      <div class="po-player-card__number" aria-hidden="true">{{ jersey_display }}</div>
+    {% endif %}
+
+    {% if photo != blank %}
+      <img
+        class="po-player-card__img"
+        src="{{ photo | image_url: width: 900 }}"
+        alt="{{ display_name | escape }}"
+        loading="lazy"
+        width="900"
+        height="1200"
+      >
+    {% elsif placeholder_image != blank %}
+      <img
+        class="po-player-card__img"
+        src="{{ placeholder_image | image_url: width: 900 }}"
+        alt="{{ display_name | escape }}"
+        loading="lazy"
+        width="900"
+        height="1200"
+      >
+    {% else %}
+      <div class="po-player-card__placeholder" aria-hidden="true"></div>
+    {% endif %}
+
+    <div class="po-player-card__overlay" aria-hidden="true"></div>
+
+    <div class="po-player-card__text">
+      {% if show_team and team_name != blank %}
+        <div class="po-player-card__team">{{ team_name }}</div>
+      {% endif %}
+
+      <div class="po-player-card__name">{{ display_name }}</div>
+
+      {% if show_pos and role_position != blank %}
+        <div class="po-player-card__pos">{{ role_position }}</div>
+      {% endif %}
+    </div>
+  </div>
+</{{ tag_name }}>

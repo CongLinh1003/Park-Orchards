@@ -1,95 +1,219 @@
 {%- comment -%}
-  Latest News Section
+  Latest News Section — Tabbed
   
+  - Tabs: News / Events / Fixtures (each sourcing from a different blog)
   - Left: Featured (latest) article — large card with glassmorphism overlay
   - Right: List of other articles in descending date order
-  - Each item: feature image, title, date, arrow icon, glassmorphism background
-  - Data from a Shopify blog (configurable handle)
+  - Theme: Light (white→red gradient) or Dark (black→red gradient)
+  - Background watermark logo
 {%- endcomment -%}
 
 {%- liquid
   assign heading = section.settings.heading
-  assign blog_handle = section.settings.blog_handle | default: 'news'
-  assign article_count = section.settings.article_count
-  assign bg_color = section.settings.bg_color
+  assign theme_mode = section.settings.theme_mode
   assign accent_color = section.settings.accent_color
-  assign text_color = section.settings.text_color
+  assign article_count = section.settings.article_count
 
-  assign source_blog = blogs[blog_handle]
-  assign articles = source_blog.articles
+  assign tab1_label = section.settings.tab1_label
+  assign tab1_blog  = section.settings.tab1_blog
+  assign tab2_label = section.settings.tab2_label
+  assign tab2_blog  = section.settings.tab2_blog
+  assign tab3_label = section.settings.tab3_label
+  assign tab3_blog  = section.settings.tab3_blog
 -%}
-
-{%- if source_blog != blank and articles.size > 0 -%}
-{%- assign featured = articles.first -%}
 
 <section
   id="latest-news-{{ section.id }}"
-  class="latest-news"
-  style="
-    --ln-bg: {{ bg_color }};
-    --ln-accent: {{ accent_color }};
-    --ln-text: {{ text_color }};
-  "
->Tanya Mcnamara
+  class="latest-news latest-news--{{ theme_mode }}"
+  style="--ln-accent: {{ accent_color }};"
+>
+  {%- comment -%} Background logo watermark {%- endcomment -%}
+  <div class="latest-news__bg-logo" aria-hidden="true">
+    <img src="{{ 'pofnc-logo-opacity.png' | asset_url }}" alt="" width="400" height="400" loading="lazy">
+  </div>
+
   {%- if heading != blank -%}
     <h2 class="latest-news__heading">{{ heading }}</h2>
   {%- endif -%}
 
-  <div class="latest-news__grid">
-
-    {%- comment -%} ── LEFT: Featured article (latest) ── {%- endcomment -%}
-    <a href="{{ featured.url }}" class="latest-news__featured">
-      <div class="latest-news__featured-img-wrap">
-        {%- if featured.image != blank -%}
-          <img
-            src="{{ featured.image | image_url: width: 1200 }}"
-            alt="{{ featured.title }}"
-            width="1200"
-            height="800"
-            loading="lazy"
-            class="latest-news__featured-img"
-          >
-        {%- endif -%}
-      </div>
-      <div class="latest-news__featured-overlay">
-        <span class="latest-news__date">{{ featured.published_at | date: '%B %Y' }}</span>
-        <h3 class="latest-news__featured-title">{{ featured.title | truncate: 60 }}</h3>
-      </div>
-    </a>
-
-    {%- comment -%} ── RIGHT: Article list ── {%- endcomment -%}
-    <div class="latest-news__list">
-      {%- for article in articles limit: article_count offset: 1 -%}
-        <a href="{{ article.url }}" class="latest-news__item">
-          <div class="latest-news__item-img-wrap">
-            {%- if article.image != blank -%}
-              <img
-                src="{{ article.image | image_url: width: 400 }}"
-                alt="{{ article.title }}"
-                width="400"
-                height="267"
-                loading="lazy"
-                class="latest-news__item-img"
-              >
-            {%- endif -%}
-          </div>
-          <div class="latest-news__item-info">
-            <span class="latest-news__date">{{ article.published_at | date: '%B %Y' }}</span>
-            <h4 class="latest-news__item-title">{{ article.title | truncate: 50 }}</h4>
-            <span class="latest-news__arrow">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-              </svg>
-            </span>
-          </div>
-        </a>
-      {%- endfor -%}
-    </div>
-
+  {%- comment -%} ── Tabs ── {%- endcomment -%}
+  <div class="latest-news__tabs" role="tablist">
+    {%- if tab1_blog != blank -%}
+      <button class="latest-news__tab latest-news__tab--active" role="tab" data-tab="tab1-{{ section.id }}" aria-selected="true">
+        {{ tab1_label | default: 'News' }}
+      </button>
+    {%- endif -%}
+    {%- if tab2_blog != blank -%}
+      <button class="latest-news__tab" role="tab" data-tab="tab2-{{ section.id }}" aria-selected="false">
+        {{ tab2_label | default: 'Events' }}
+      </button>
+    {%- endif -%}
+    {%- if tab3_blog != blank -%}
+      <button class="latest-news__tab" role="tab" data-tab="tab3-{{ section.id }}" aria-selected="false">
+        {{ tab3_label | default: 'Fixtures' }}
+      </button>
+    {%- endif -%}
   </div>
+
+  {%- comment -%} Red divider line under tabs {%- endcomment -%}
+  <div class="latest-news__tab-divider"></div>
+
+  {%- comment -%} ── Tab Panels ── {%- endcomment -%}
+
+  {%- comment -%} Tab 1 {%- endcomment -%}
+  {%- if tab1_blog != blank -%}
+    {%- assign blog1 = blogs[tab1_blog] -%}
+    {%- if blog1 != blank and blog1.articles.size > 0 -%}
+      <div class="latest-news__panel latest-news__panel--active" id="tab1-{{ section.id }}" role="tabpanel">
+        <div class="latest-news__grid">
+          {%- assign feat1 = blog1.articles.first -%}
+          <a href="{{ feat1.url }}" class="latest-news__featured">
+            <div class="latest-news__featured-img-wrap">
+              {%- if feat1.image != blank -%}
+                <img src="{{ feat1.image | image_url: width: 1200 }}" alt="{{ feat1.title }}" width="1200" height="800" loading="lazy" class="latest-news__featured-img">
+              {%- endif -%}
+            </div>
+            <div class="latest-news__featured-overlay">
+              <span class="latest-news__date">{{ feat1.published_at | date: '%B %Y' }}</span>
+              <h3 class="latest-news__featured-title">{{ feat1.title | truncate: 60 }}</h3>
+            </div>
+          </a>
+          <div class="latest-news__list">
+            {%- for article in blog1.articles limit: article_count offset: 1 -%}
+              <a href="{{ article.url }}" class="latest-news__item">
+                <div class="latest-news__item-img-wrap">
+                  {%- if article.image != blank -%}
+                    <img src="{{ article.image | image_url: width: 400 }}" alt="{{ article.title }}" width="400" height="267" loading="lazy" class="latest-news__item-img">
+                  {%- endif -%}
+                </div>
+                <div class="latest-news__item-info">
+                  <span class="latest-news__date">{{ article.published_at | date: '%B %Y' }}</span>
+                  <h4 class="latest-news__item-title">{{ article.title | truncate: 50 }}</h4>
+                  <span class="latest-news__arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                  </span>
+                </div>
+              </a>
+            {%- endfor -%}
+          </div>
+        </div>
+      </div>
+    {%- endif -%}
+  {%- endif -%}
+
+  {%- comment -%} Tab 2 {%- endcomment -%}
+  {%- if tab2_blog != blank -%}
+    {%- assign blog2 = blogs[tab2_blog] -%}
+    {%- if blog2 != blank and blog2.articles.size > 0 -%}
+      <div class="latest-news__panel" id="tab2-{{ section.id }}" role="tabpanel">
+        <div class="latest-news__grid">
+          {%- assign feat2 = blog2.articles.first -%}
+          <a href="{{ feat2.url }}" class="latest-news__featured">
+            <div class="latest-news__featured-img-wrap">
+              {%- if feat2.image != blank -%}
+                <img src="{{ feat2.image | image_url: width: 1200 }}" alt="{{ feat2.title }}" width="1200" height="800" loading="lazy" class="latest-news__featured-img">
+              {%- endif -%}
+            </div>
+            <div class="latest-news__featured-overlay">
+              <span class="latest-news__date">{{ feat2.published_at | date: '%B %Y' }}</span>
+              <h3 class="latest-news__featured-title">{{ feat2.title | truncate: 60 }}</h3>
+            </div>
+          </a>
+          <div class="latest-news__list">
+            {%- for article in blog2.articles limit: article_count offset: 1 -%}
+              <a href="{{ article.url }}" class="latest-news__item">
+                <div class="latest-news__item-img-wrap">
+                  {%- if article.image != blank -%}
+                    <img src="{{ article.image | image_url: width: 400 }}" alt="{{ article.title }}" width="400" height="267" loading="lazy" class="latest-news__item-img">
+                  {%- endif -%}
+                </div>
+                <div class="latest-news__item-info">
+                  <span class="latest-news__date">{{ article.published_at | date: '%B %Y' }}</span>
+                  <h4 class="latest-news__item-title">{{ article.title | truncate: 50 }}</h4>
+                  <span class="latest-news__arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                  </span>
+                </div>
+              </a>
+            {%- endfor -%}
+          </div>
+        </div>
+      </div>
+    {%- endif -%}
+  {%- endif -%}
+
+  {%- comment -%} Tab 3 {%- endcomment -%}
+  {%- if tab3_blog != blank -%}
+    {%- assign blog3 = blogs[tab3_blog] -%}
+    {%- if blog3 != blank and blog3.articles.size > 0 -%}
+      <div class="latest-news__panel" id="tab3-{{ section.id }}" role="tabpanel">
+        <div class="latest-news__grid">
+          {%- assign feat3 = blog3.articles.first -%}
+          <a href="{{ feat3.url }}" class="latest-news__featured">
+            <div class="latest-news__featured-img-wrap">
+              {%- if feat3.image != blank -%}
+                <img src="{{ feat3.image | image_url: width: 1200 }}" alt="{{ feat3.title }}" width="1200" height="800" loading="lazy" class="latest-news__featured-img">
+              {%- endif -%}
+            </div>
+            <div class="latest-news__featured-overlay">
+              <span class="latest-news__date">{{ feat3.published_at | date: '%B %Y' }}</span>
+              <h3 class="latest-news__featured-title">{{ feat3.title | truncate: 60 }}</h3>
+            </div>
+          </a>
+          <div class="latest-news__list">
+            {%- for article in blog3.articles limit: article_count offset: 1 -%}
+              <a href="{{ article.url }}" class="latest-news__item">
+                <div class="latest-news__item-img-wrap">
+                  {%- if article.image != blank -%}
+                    <img src="{{ article.image | image_url: width: 400 }}" alt="{{ article.title }}" width="400" height="267" loading="lazy" class="latest-news__item-img">
+                  {%- endif -%}
+                </div>
+                <div class="latest-news__item-info">
+                  <span class="latest-news__date">{{ article.published_at | date: '%B %Y' }}</span>
+                  <h4 class="latest-news__item-title">{{ article.title | truncate: 50 }}</h4>
+                  <span class="latest-news__arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                  </span>
+                </div>
+              </a>
+            {%- endfor -%}
+          </div>
+        </div>
+      </div>
+    {%- endif -%}
+  {%- endif -%}
+
 </section>
-{%- endif -%}
+
+{%- comment -%} ── Tab Switching JS ── {%- endcomment -%}
+<script>
+  (function() {
+    const section = document.getElementById('latest-news-{{ section.id }}');
+    if (!section) return;
+
+    const tabs = section.querySelectorAll('.latest-news__tab');
+    const panels = section.querySelectorAll('.latest-news__panel');
+
+    tabs.forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        // Deactivate all
+        tabs.forEach(function(t) {
+          t.classList.remove('latest-news__tab--active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        panels.forEach(function(p) {
+          p.classList.remove('latest-news__panel--active');
+        });
+
+        // Activate clicked
+        tab.classList.add('latest-news__tab--active');
+        tab.setAttribute('aria-selected', 'true');
+        var target = document.getElementById(tab.getAttribute('data-tab'));
+        if (target) target.classList.add('latest-news__panel--active');
+      });
+    });
+  })();
+</script>
 
 <style>
   @font-face {
@@ -103,12 +227,51 @@
 
 {% style %}
   /* ═══════════════════════════════════════════
-     LATEST NEWS
+     LATEST NEWS — TABBED
   ═══════════════════════════════════════════ */
 
   #latest-news-{{ section.id }} {
-    background: var(--ln-bg);
     padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 3vw, 3rem);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ─── Theme: Dark (black → red) ─── */
+  #latest-news-{{ section.id }}.latest-news--dark {
+    background: linear-gradient(135deg, #0a0a0a 0%, var(--ln-accent, #8b1a1a) 50%, #0a0a0a 100%);
+    color: #fff;
+  }
+
+  /* ─── Theme: Light (white → red) ─── */
+  #latest-news-{{ section.id }}.latest-news--light {
+    background: linear-gradient(135deg, #ffffff 0%, var(--ln-accent, #8b1a1a) 50%, #ffffff 100%);
+    color: #1a1a1a;
+  }
+
+  /* ─── Background logo watermark ─── */
+  #latest-news-{{ section.id }} .latest-news__bg-logo {
+    position: absolute;
+    bottom: -2%;
+    right: -2%;
+    width: clamp(200px, 30vw, 400px);
+    height: auto;
+    opacity: 1;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  #latest-news-{{ section.id }} .latest-news__bg-logo img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* Content above logo */
+  #latest-news-{{ section.id }} .latest-news__heading,
+  #latest-news-{{ section.id }} .latest-news__tabs,
+  #latest-news-{{ section.id }} .latest-news__panel {
+    position: relative;
+    z-index: 1;
   }
 
   /* ─── Heading ─── */
@@ -118,18 +281,119 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: var(--ln-text);
     text-align: center;
-    margin: 0 0 clamp(1.5rem, 3vw, 2.5rem) 0;
+    margin: 0 0 clamp(1rem, 2vw, 1.5rem) 0;
     line-height: 1;
   }
 
-  /* ─── Grid: 60/40 split ─── */
+  #latest-news-{{ section.id }}.latest-news--dark .latest-news__heading { color: #fff; }
+  #latest-news-{{ section.id }}.latest-news--light .latest-news__heading { color: #1a1a1a; }
+
+  /* ═══════════════════════════════════════════
+     TABS
+  ═══════════════════════════════════════════ */
+
+  #latest-news-{{ section.id }} .latest-news__tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 0;
+  }
+
+  #latest-news-{{ section.id }} .latest-news__tab {
+    font-family: 'Antonio', 'Oswald', sans-serif;
+    font-size: clamp(0.85rem, 1.3vw, 1.1rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.65rem 2rem;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease;
+    position: relative;
+    border: 2px solid var(--ln-accent, #8b1a1a);
+    border-right: none;
+    background: transparent;
+    color: var(--ln-accent, #8b1a1a);
+  }
+
+  #latest-news-{{ section.id }} .latest-news__tab:last-child {
+    border-right: 2px solid var(--ln-accent, #8b1a1a);
+  }
+
+  /* Active tab — solid red */
+  #latest-news-{{ section.id }} .latest-news__tab--active {
+    background: var(--ln-accent, #8b1a1a);
+    color: #fff;
+  }
+
+  #latest-news-{{ section.id }} .latest-news__tab:hover:not(.latest-news__tab--active) {
+    background: rgba(139, 26, 26, 0.15);
+  }
+
+  /* Dark theme overrides for inactive tabs */
+  #latest-news-{{ section.id }}.latest-news--dark .latest-news__tab:not(.latest-news__tab--active) {
+    color: rgba(255, 255, 255, 0.85);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  #latest-news-{{ section.id }}.latest-news--dark .latest-news__tab:last-child:not(.latest-news__tab--active) {
+    border-right-color: rgba(255, 255, 255, 0.3);
+  }
+
+  #latest-news-{{ section.id }}.latest-news--dark .latest-news__tab--active {
+    border-color: var(--ln-accent, #8b1a1a);
+  }
+
+  #latest-news-{{ section.id }}.latest-news--dark .latest-news__tab:last-child.latest-news__tab--active {
+    border-right-color: var(--ln-accent, #8b1a1a);
+  }
+
+  /* Divider line under tabs */
+  #latest-news-{{ section.id }} .latest-news__tabs::after {
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 0;
+  }
+
+  /* Tab divider — colored line between tabs and content */
+  #latest-news-{{ section.id }} .latest-news__tab-divider {
+    width: 100%;
+    height: 3px;
+    background: var(--ln-accent, #8b1a1a);
+    margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ═══════════════════════════════════════════
+     PANELS
+  ═══════════════════════════════════════════ */
+
+  #latest-news-{{ section.id }} .latest-news__panel {
+    display: none;
+  }
+
+  #latest-news-{{ section.id }} .latest-news__panel--active {
+    display: block;
+    animation: ln-fade-in-{{ section.id }} 0.35s ease;
+  }
+
+  @keyframes ln-fade-in-{{ section.id }} {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── Grid: 60/40 split with max-height ─── */
   #latest-news-{{ section.id }} .latest-news__grid {
     display: grid;
     grid-template-columns: 3fr 2fr;
     gap: clamp(1rem, 2vw, 1.5rem);
-    align-items: stretch;
+    align-items: start;
+    max-height: 550px;
   }
 
   /* ─── Date label ─── */
@@ -157,7 +421,8 @@
   #latest-news-{{ section.id }} .latest-news__featured-img-wrap {
     width: 100%;
     height: 100%;
-    min-height: 350px;
+    min-height: 300px;
+    max-height: 550px;
   }
 
   #latest-news-{{ section.id }} .latest-news__featured-img {
@@ -204,6 +469,8 @@
     display: flex;
     flex-direction: column;
     gap: clamp(0.6rem, 1.2vw, 1rem);
+    max-height: 550px;
+    overflow-y: auto;
   }
 
   /* ─── Single item ─── */
@@ -242,10 +509,11 @@
     flex-direction: column;
     justify-content: center;
     padding: clamp(0.6rem, 1.2vw, 1rem);
-    background: rgba(30, 10, 10, 0.55);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(30, 10, 10, 0.45);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
     gap: 0.2rem;
     position: relative;
   }
@@ -294,18 +562,27 @@
     #latest-news-{{ section.id }} .latest-news__item {
       min-height: 100px;
     }
+
+    #latest-news-{{ section.id }} .latest-news__tabs {
+      flex-wrap: wrap;
+    }
   }
 
   @media (max-width: 480px) {
     #latest-news-{{ section.id }} .latest-news__item {
       grid-template-columns: 1fr 2fr;
     }
+
+    #latest-news-{{ section.id }} .latest-news__tab {
+      padding: 0.5rem 1.2rem;
+      font-size: 0.8rem;
+    }
   }
 {% endstyle %}
 
 {% schema %}
 {
-  "name": "Latest News",
+  "name": "Latest News (Tabbed)",
   "tag": "section",
   "class": "latest-news-section",
   "settings": [
@@ -316,14 +593,25 @@
       "default": "LATEST NEWS"
     },
     {
-      "type": "blog",
-      "id": "blog_handle",
-      "label": "Blog Source"
+      "type": "select",
+      "id": "theme_mode",
+      "label": "Theme",
+      "options": [
+        { "value": "dark", "label": "Dark (Black → Red)" },
+        { "value": "light", "label": "Light (White → Red)" }
+      ],
+      "default": "dark"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color (gradient midpoint)",
+      "default": "#8b1a1a"
     },
     {
       "type": "range",
       "id": "article_count",
-      "label": "Number of Articles (right side)",
+      "label": "Articles per tab (right side)",
       "min": 2,
       "max": 6,
       "step": 1,
@@ -332,30 +620,53 @@
     },
     {
       "type": "header",
-      "content": "Colors"
+      "content": "Tab 1"
     },
     {
-      "type": "color",
-      "id": "bg_color",
-      "label": "Section Background",
-      "default": "#1a0a0a"
+      "type": "text",
+      "id": "tab1_label",
+      "label": "Tab 1 Label",
+      "default": "News"
     },
     {
-      "type": "color",
-      "id": "accent_color",
-      "label": "Accent Color",
-      "default": "#8b1a1a"
+      "type": "blog",
+      "id": "tab1_blog",
+      "label": "Tab 1 Blog Source"
     },
     {
-      "type": "color",
-      "id": "text_color",
-      "label": "Heading Color",
-      "default": "#ffffff"
+      "type": "header",
+      "content": "Tab 2"
+    },
+    {
+      "type": "text",
+      "id": "tab2_label",
+      "label": "Tab 2 Label",
+      "default": "Events"
+    },
+    {
+      "type": "blog",
+      "id": "tab2_blog",
+      "label": "Tab 2 Blog Source"
+    },
+    {
+      "type": "header",
+      "content": "Tab 3"
+    },
+    {
+      "type": "text",
+      "id": "tab3_label",
+      "label": "Tab 3 Label",
+      "default": "Fixtures"
+    },
+    {
+      "type": "blog",
+      "id": "tab3_blog",
+      "label": "Tab 3 Blog Source"
     }
   ],
   "presets": [
     {
-      "name": "Latest News"
+      "name": "Latest News (Tabbed)"
     }
   ]
 }
