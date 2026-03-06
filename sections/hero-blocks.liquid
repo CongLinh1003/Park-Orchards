@@ -1,0 +1,779 @@
+{%- liquid
+  assign bg_center      = section.settings.bg_color_center
+  assign bg_outer       = section.settings.bg_color_outer
+  assign text_align     = section.settings.text_align
+  assign section_height = section.settings.section_height
+  assign pt             = section.settings.padding_top
+  assign pb             = section.settings.padding_bottom
+
+  assign align_items = 'center'
+  if text_align == 'left'
+    assign align_items = 'flex-start'
+  elsif text_align == 'right'
+    assign align_items = 'flex-end'
+  endif
+-%}
+
+<section
+  id="hero-blocks-{{ section.id }}"
+  class="hb"
+  style="
+    --hb-bg-center: {{ bg_center }};
+    --hb-bg-outer: {{ bg_outer }};
+    --hb-min-height: {{ section_height }}px;
+    --hb-pt: {{ pt }}px;
+    --hb-pb: {{ pb }}px;
+    --hb-text-align: {{ text_align }};
+    --hb-align-items: {{ align_items }};
+  "
+>
+  {%- comment -%} Background radial gradient {%- endcomment -%}
+  <div class="hb__bg" aria-hidden="true"></div>
+
+  {%- comment -%} Content wrapper {%- endcomment -%}
+  <div class="hb__inner">
+
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+
+        {%- comment -%} ══ HEADING ══ {%- endcomment -%}
+        {%- when 'heading' -%}
+          {%- liquid
+            assign line1 = block.settings.line1
+            assign line2 = block.settings.line2
+            assign h_color = block.settings.color
+            assign h_stroke = block.settings.stroke
+            assign h_stroke_color = block.settings.stroke_color
+            assign h_size_desktop = block.settings.font_size_desktop
+            assign h_size_mobile = block.settings.font_size_mobile
+          -%}
+          {%- if line1 != blank or line2 != blank -%}
+            <h2
+              class="hb__heading"
+              style="
+                --hb-h-color: {{ h_color }};
+                --hb-h-stroke: {{ h_stroke }}px;
+                --hb-h-stroke-color: {{ h_stroke_color }};
+                --hb-h-size-desktop: {{ h_size_desktop }}rem;
+                --hb-h-size-mobile: {{ h_size_mobile }}rem;
+              "
+              {{ block.shopify_attributes }}
+            >
+              {%- if line1 != blank -%}
+                <span class="hb__heading-line">{{ line1 }}</span>
+              {%- endif -%}
+              {%- if line2 != blank -%}
+                <span class="hb__heading-line">{{ line2 }}</span>
+              {%- endif -%}
+            </h2>
+          {%- endif -%}
+
+        {%- comment -%} ══ SUBHEADING ══ {%- endcomment -%}
+        {%- when 'subheading' -%}
+          {%- liquid
+            assign sh_text = block.settings.text
+            assign sh_color = block.settings.color
+            assign sh_size_desktop = block.settings.font_size_desktop
+            assign sh_size_mobile = block.settings.font_size_mobile
+          -%}
+          {%- if sh_text != blank -%}
+            <p
+              class="hb__subheading"
+              style="
+                --hb-sh-color: {{ sh_color }};
+                --hb-sh-size-desktop: {{ sh_size_desktop }}rem;
+                --hb-sh-size-mobile: {{ sh_size_mobile }}rem;
+              "
+              {{ block.shopify_attributes }}
+            >
+              {{ sh_text }}
+            </p>
+          {%- endif -%}
+
+        {%- comment -%} ══ TEXT ══ {%- endcomment -%}
+        {%- when 'text' -%}
+          {%- liquid
+            assign t_text = block.settings.text
+            assign t_color = block.settings.color
+            assign t_size = block.settings.font_size
+          -%}
+          {%- if t_text != blank -%}
+            <p
+              class="hb__text"
+              style="
+                --hb-t-color: {{ t_color }};
+                --hb-t-size: {{ t_size }}rem;
+              "
+              {{ block.shopify_attributes }}
+            >
+              {{ t_text }}
+            </p>
+          {%- endif -%}
+
+        {%- comment -%} ══ BUTTON ══ {%- endcomment -%}
+        {%- when 'button' -%}
+          {%- liquid
+            assign btn_label = block.settings.label
+            assign btn_url   = block.settings.url
+            assign btn_style = block.settings.style
+            assign btn_color = block.settings.color
+            assign btn_bg    = block.settings.bg_color
+          -%}
+
+          {%- comment -%}
+            Check if this is the first button in a consecutive group.
+            If so, open a flex wrapper.
+          {%- endcomment -%}
+          {%- assign prev_index = forloop.index0 | minus: 1 -%}
+          {%- assign is_first_button = true -%}
+          {%- if prev_index >= 0 -%}
+            {%- assign prev_block = section.blocks[prev_index] -%}
+            {%- if prev_block.type == 'button' -%}
+              {%- assign is_first_button = false -%}
+            {%- endif -%}
+          {%- endif -%}
+
+          {%- if is_first_button -%}
+            <div class="hb__buttons">
+          {%- endif -%}
+
+          {%- if btn_label != blank -%}
+            <a
+              href="{{ btn_url | default: '#' }}"
+              class="hb__btn hb__btn--{{ btn_style }}"
+              style="
+                --hb-btn-color: {{ btn_color }};
+                --hb-btn-bg: {{ btn_bg }};
+              "
+              {{ block.shopify_attributes }}
+            >
+              {{ btn_label }}
+            </a>
+          {%- endif -%}
+
+          {%- comment -%}
+            Check if this is the last button in a consecutive group.
+            If so, close the flex wrapper.
+          {%- endcomment -%}
+          {%- assign next_index = forloop.index -%}
+          {%- assign is_last_button = true -%}
+          {%- if next_index < section.blocks.size -%}
+            {%- assign next_block = section.blocks[next_index] -%}
+            {%- if next_block.type == 'button' -%}
+              {%- assign is_last_button = false -%}
+            {%- endif -%}
+          {%- endif -%}
+
+          {%- if is_last_button -%}
+            </div>
+          {%- endif -%}
+
+        {%- comment -%} ══ SOCIAL ══ {%- endcomment -%}
+        {%- when 'social' -%}
+          {%- liquid
+            assign show_fb   = block.settings.show_facebook
+            assign fb_url    = block.settings.facebook_url
+            assign show_ig   = block.settings.show_instagram
+            assign ig_url    = block.settings.instagram_url
+            assign s_color   = block.settings.icon_color
+            assign s_size    = block.settings.icon_size
+          -%}
+
+          {%- if show_fb or show_ig -%}
+            <div
+              class="hb__socials"
+              style="--hb-s-color: {{ s_color }}; --hb-s-size: {{ s_size }}px;"
+              {{ block.shopify_attributes }}
+            >
+              {%- if show_fb -%}
+                <a
+                  href="{{ fb_url | default: '#' }}"
+                  class="hb__social-link{% if fb_url == blank %} hb__social-link--placeholder{% endif %}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Follow us on Facebook"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="{{ s_size }}" height="{{ s_size }}" aria-hidden="true">
+                    <path d="M12 2.04C6.5 2.04 2 6.53 2 12.06c0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v7a10 10 0 0 0 8.44-9.9c0-5.53-4.5-10.02-10-10.02z"/>
+                  </svg>
+                </a>
+              {%- endif -%}
+
+              {%- if show_ig -%}
+                <a
+                  href="{{ ig_url | default: '#' }}"
+                  class="hb__social-link{% if ig_url == blank %} hb__social-link--placeholder{% endif %}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Follow us on Instagram"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="{{ s_size }}" height="{{ s_size }}" aria-hidden="true">
+                    <path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/>
+                  </svg>
+                </a>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+
+      {%- endcase -%}
+    {%- endfor -%}
+
+  </div>
+</section>
+
+{% style %}
+  /* ═════════════════════════════════════════════
+     HERO BLOCKS — scoped to section.id
+  ═════════════════════════════════════════════ */
+
+  /* ── Section wrapper ── */
+  #hero-blocks-{{ section.id }}.hb {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: var(--hb-min-height, 400px);
+    padding-top: var(--hb-pt, 80px);
+    padding-bottom: var(--hb-pb, 80px);
+    overflow: hidden;
+    font-family: 'AnekGurmukhi', sans-serif;
+  }
+
+  /* ── Background radial gradient ── */
+  #hero-blocks-{{ section.id }} .hb__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: radial-gradient(
+      ellipse 80% 70% at 50% 85%,
+      var(--hb-bg-center, #A10E13) 0%,
+      color-mix(in srgb, var(--hb-bg-center, #A10E13) 55%, var(--hb-bg-outer, #000000)) 45%,
+      var(--hb-bg-outer, #000000) 100%
+    );
+  }
+
+  /* ── Inner content ── */
+  #hero-blocks-{{ section.id }} .hb__inner {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    padding: 0 2rem;
+    text-align: var(--hb-text-align, center);
+    display: flex;
+    flex-direction: column;
+    align-items: var(--hb-align-items, center);
+    gap: 1rem;
+  }
+
+  /* ── Heading ── */
+  #hero-blocks-{{ section.id }} .hb__heading {
+    font-family: 'AnekGurmukhi', sans-serif !important;
+    font-size: clamp(3rem, 12vw, var(--hb-h-size-desktop, 12rem));
+    font-weight: 900;
+    line-height: 0.95;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    color: var(--hb-h-color, #ffffff);
+    margin: 0;
+    -webkit-text-stroke: var(--hb-h-stroke, 0px) var(--hb-h-stroke-color, #ffffff);
+    text-stroke: var(--hb-h-stroke, 0px) var(--hb-h-stroke-color, #ffffff);
+    text-shadow:
+      0 2px 0 rgba(0,0,0,0.4),
+      0 4px 30px rgba(0,0,0,0.5);
+  }
+
+  #hero-blocks-{{ section.id }} .hb__heading-line {
+    display: block;
+  }
+
+  /* ── Subheading ── */
+  #hero-blocks-{{ section.id }} .hb__subheading {
+    font-family: 'AnekGurmukhi', sans-serif !important;
+    font-size: clamp(1.2rem, 4vw, var(--hb-sh-size-desktop, 3rem));
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--hb-sh-color, #ffffff);
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  /* ── Text ── */
+  #hero-blocks-{{ section.id }} .hb__text {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: var(--hb-t-size, 1rem);
+    font-weight: 400;
+    color: var(--hb-t-color, #ffffff);
+    margin: 0;
+    line-height: 1.6;
+    max-width: 600px;
+    opacity: 0.9;
+  }
+
+  /* ── Buttons wrapper ── */
+  #hero-blocks-{{ section.id }} .hb__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  /* ── Button ── */
+  #hero-blocks-{{ section.id }} .hb__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 2rem;
+    font-family: 'AnekGurmukhi', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.25s ease;
+    cursor: pointer;
+  }
+
+  #hero-blocks-{{ section.id }} .hb__btn--outline {
+    background: transparent;
+    color: var(--hb-btn-color, #ffffff);
+    border: 2px solid var(--hb-btn-color, #ffffff);
+  }
+
+  #hero-blocks-{{ section.id }} .hb__btn--outline:hover {
+    background: var(--hb-btn-color, #ffffff);
+    color: var(--hb-btn-bg, #000000);
+  }
+
+  #hero-blocks-{{ section.id }} .hb__btn--filled {
+    background: var(--hb-btn-bg, #ffffff);
+    color: var(--hb-btn-color, #000000);
+    border: 2px solid var(--hb-btn-bg, #ffffff);
+  }
+
+  #hero-blocks-{{ section.id }} .hb__btn--filled:hover {
+    opacity: 0.85;
+  }
+
+  /* ── Social Icons ── */
+  #hero-blocks-{{ section.id }} .hb__socials {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  #hero-blocks-{{ section.id }} .hb__social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--hb-s-color, #ffffff);
+    opacity: 0.9;
+    text-decoration: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    border-radius: 50%;
+  }
+
+  #hero-blocks-{{ section.id }} .hb__social-link:hover {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+
+  #hero-blocks-{{ section.id }} .hb__social-link--placeholder {
+    cursor: default;
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    #hero-blocks-{{ section.id }}.hb {
+      padding-top: calc(var(--hb-pt, 80px) * 0.65);
+      padding-bottom: calc(var(--hb-pb, 80px) * 0.65);
+    }
+
+    #hero-blocks-{{ section.id }} .hb__inner {
+      padding: 0 1.25rem;
+    }
+
+    #hero-blocks-{{ section.id }} .hb__heading {
+      font-size: clamp(2.5rem, 14vw, var(--hb-h-size-mobile, 4rem));
+    }
+
+    #hero-blocks-{{ section.id }} .hb__subheading {
+      font-size: clamp(1rem, 5vw, var(--hb-sh-size-mobile, 1.8rem));
+    }
+
+    #hero-blocks-{{ section.id }} .hb__buttons {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    #hero-blocks-{{ section.id }} .hb__btn {
+      text-align: center;
+    }
+  }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Hero Blocks",
+  "tag": "section",
+  "class": "hero-blocks-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "── Background ──"
+    },
+    {
+      "type": "color",
+      "id": "bg_color_center",
+      "label": "Background — Center Color",
+      "default": "#A10E13",
+      "info": "The bright inner glow colour at the centre of the radial gradient."
+    },
+    {
+      "type": "color",
+      "id": "bg_color_outer",
+      "label": "Background — Outer / Dark Color",
+      "default": "#000000",
+      "info": "The very dark colour at the corners and edges."
+    },
+
+    {
+      "type": "header",
+      "content": "── Layout ──"
+    },
+    {
+      "type": "select",
+      "id": "text_align",
+      "label": "Text Alignment",
+      "default": "center",
+      "options": [
+        { "value": "left",   "label": "Left"   },
+        { "value": "center", "label": "Centre" },
+        { "value": "right",  "label": "Right"  }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "section_height",
+      "label": "Minimum Section Height",
+      "min": 200,
+      "max": 800,
+      "step": 20,
+      "unit": "px",
+      "default": 380
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding Top",
+      "min": 0,
+      "max": 200,
+      "step": 8,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding Bottom",
+      "min": 0,
+      "max": 200,
+      "step": 8,
+      "unit": "px",
+      "default": 80
+    }
+  ],
+
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "Heading",
+      "settings": [
+        {
+          "type": "text",
+          "id": "line1",
+          "label": "Line 1",
+          "default": "JOIN THE"
+        },
+        {
+          "type": "text",
+          "id": "line2",
+          "label": "Line 2",
+          "default": "SHARKS FAMILY"
+        },
+        {
+          "type": "color",
+          "id": "color",
+          "label": "Color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "range",
+          "id": "font_size_desktop",
+          "label": "Font Size — Desktop",
+          "min": 3,
+          "max": 20,
+          "step": 1,
+          "unit": "rem",
+          "default": 12,
+          "info": "Max font size on large screens."
+        },
+        {
+          "type": "range",
+          "id": "font_size_mobile",
+          "label": "Font Size — Mobile",
+          "min": 2,
+          "max": 8,
+          "step": 1,
+          "unit": "rem",
+          "default": 4,
+          "info": "Max font size on mobile screens."
+        },
+        {
+          "type": "range",
+          "id": "stroke",
+          "label": "Outline Thickness",
+          "min": 0,
+          "max": 4,
+          "step": 1,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "color",
+          "id": "stroke_color",
+          "label": "Outline Color",
+          "default": "#ffffff"
+        }
+      ]
+    },
+    {
+      "type": "subheading",
+      "name": "Subheading",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "2025 MEMBERSHIP NOW OPEN"
+        },
+        {
+          "type": "color",
+          "id": "color",
+          "label": "Color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "range",
+          "id": "font_size_desktop",
+          "label": "Font Size — Desktop",
+          "min": 1,
+          "max": 8,
+          "step": 1,
+          "unit": "rem",
+          "default": 3
+        },
+        {
+          "type": "range",
+          "id": "font_size_mobile",
+          "label": "Font Size — Mobile",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "unit": "rem",
+          "default": 2
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Be part of one of the fastest growing membership bases in the Eastern..."
+        },
+        {
+          "type": "color",
+          "id": "color",
+          "label": "Color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "range",
+          "id": "font_size",
+          "label": "Font Size",
+          "min": 1,
+          "max": 3,
+          "step": 1,
+          "unit": "rem",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Button",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Learn More"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "URL"
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Style",
+          "default": "outline",
+          "options": [
+            { "value": "outline", "label": "Outline" },
+            { "value": "filled",  "label": "Filled"  }
+          ]
+        },
+        {
+          "type": "color",
+          "id": "color",
+          "label": "Text / Border Color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "color",
+          "id": "bg_color",
+          "label": "Background Color (filled style)",
+          "default": "#ffffff"
+        }
+      ]
+    },
+    {
+      "type": "social",
+      "name": "Social Icons",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_facebook",
+          "label": "Show Facebook",
+          "default": true
+        },
+        {
+          "type": "url",
+          "id": "facebook_url",
+          "label": "Facebook URL"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_instagram",
+          "label": "Show Instagram",
+          "default": true
+        },
+        {
+          "type": "url",
+          "id": "instagram_url",
+          "label": "Instagram URL"
+        },
+        {
+          "type": "color",
+          "id": "icon_color",
+          "label": "Icon Color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "range",
+          "id": "icon_size",
+          "label": "Icon Size",
+          "min": 20,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "default": 36
+        }
+      ]
+    }
+  ],
+
+  "presets": [
+    {
+      "name": "Hero Blocks",
+      "settings": {
+        "bg_color_center": "#A10E13",
+        "bg_color_outer": "#000000",
+        "text_align": "center",
+        "section_height": 380,
+        "padding_top": 80,
+        "padding_bottom": 80
+      },
+      "blocks": [
+        {
+          "type": "heading",
+          "settings": {
+            "line1": "JOIN THE",
+            "line2": "SHARKS FAMILY",
+            "color": "#ffffff",
+            "font_size_desktop": 12,
+            "font_size_mobile": 4,
+            "stroke": 0,
+            "stroke_color": "#ffffff"
+          }
+        },
+        {
+          "type": "subheading",
+          "settings": {
+            "text": "2025 MEMBERSHIP NOW OPEN",
+            "color": "#ffffff",
+            "font_size_desktop": 3,
+            "font_size_mobile": 2
+          }
+        },
+        {
+          "type": "text",
+          "settings": {
+            "text": "Be part of one of the fastest growing membership bases in the Eastern...",
+            "color": "#ffffff",
+            "font_size": 1
+          }
+        },
+        {
+          "type": "button",
+          "settings": {
+            "label": "Life Member",
+            "style": "outline",
+            "color": "#ffffff",
+            "bg_color": "#ffffff"
+          }
+        },
+        {
+          "type": "button",
+          "settings": {
+            "label": "Foundation Member",
+            "style": "outline",
+            "color": "#ffffff",
+            "bg_color": "#ffffff"
+          }
+        },
+        {
+          "type": "social",
+          "settings": {
+            "show_facebook": true,
+            "show_instagram": true,
+            "icon_color": "#ffffff",
+            "icon_size": 36
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

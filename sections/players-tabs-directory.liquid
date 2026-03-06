@@ -64,7 +64,15 @@
     {% if section.settings.show_heading %}
       <h2 class="po-players-tabs__heading" data-tabs-heading>
         {% if section.blocks.size > 0 %}
-          {{ section.blocks[active_index].settings.heading_override | default: section.blocks[active_index].settings.tab_label | escape }}
+          {%- liquid
+            assign _ho = section.blocks[active_index].settings.heading_override | strip_html | strip | strip_newlines
+            if _ho != blank and _ho != '&nbsp;' and _ho != '\u00a0'
+              assign _heading_text = section.blocks[active_index].settings.heading_override
+            else
+              assign _heading_text = section.blocks[active_index].settings.tab_label
+            endif
+          -%}
+          {{ _heading_text | escape }}
         {% else %}
           {{ section.settings.heading | escape }}
         {% endif %}
@@ -105,7 +113,7 @@
           <div class="po-players-tabs__grid">
             {%- for player in players_all -%}
               {%- liquid
-                if limit != blank and shown >= limit
+                if limit != blank and limit > 0 and shown >= limit
                   break
                 endif
 
@@ -114,31 +122,46 @@
                   continue
                 endif
 
-                assign sport_obj = team_obj.sport.value
-                assign division_obj = team_obj.division.value
-                assign grade_obj = team_obj.grade.value
+                comment
+                  Shopify Liquid cannot reliably resolve nested metaobject references
+                  (player → team → sport). Instead, filter by team handle which encodes
+                  division-sport-grade, e.g. "men-football-seniors", "women-netball-u19".
+                  We split the handle to compare exact segments and avoid substring
+                  false matches (e.g. "men" in "women").
+                endcomment
 
-                assign sport_h = ''
-                assign division_h = ''
-                assign grade_h = ''
+                assign team_h = team_obj.system.handle | default: ''
+                assign handle_parts = team_h | split: '-'
 
-                if sport_obj != blank
-                  assign sport_h = sport_obj.handle
-                endif
-                if division_obj != blank
-                  assign division_h = division_obj.handle
-                endif
-                if grade_obj != blank
-                  assign grade_h = grade_obj.handle
-                endif
+                comment
+                  Handle format: {division}-{sport}-{grade} or {division}-{sport}-{grade1}-{grade2}
+                  Examples: men-football-seniors, women-netball-u19, men-football-under-19
+                  Part 0 = division, Part 1 = sport, Part 2+ = grade
+                endcomment
 
-                if sport_h != sport_handle
+                assign h_division = handle_parts[0] | default: ''
+                assign h_sport = handle_parts[1] | default: ''
+
+                comment
+                  Build grade from remaining parts (handles "under-19" as two segments)
+                endcomment
+                assign h_grade = ''
+                for part in handle_parts
+                  if forloop.index0 >= 2
+                    if h_grade != ''
+                      assign h_grade = h_grade | append: '-'
+                    endif
+                    assign h_grade = h_grade | append: part
+                  endif
+                endfor
+
+                if h_sport != sport_handle
                   continue
                 endif
-                if division_h != division_handle
+                if h_division != division_handle
                   continue
                 endif
-                if grade_handle != blank and grade_h != grade_handle
+                if grade_handle != blank and h_grade != grade_handle
                   continue
                 endif
 
@@ -222,21 +245,10 @@
     }
 
     .po-players-tabs--{{ section.id }} .po-players-tabs__grid{
-      display:grid;
+      display:flex;
+      flex-wrap:wrap;
       gap: 14px;
-      grid-template-columns: repeat(var(--po-cols-mobile), minmax(0, 1fr));
-    }
-
-    @media (min-width: 750px){
-      .po-players-tabs--{{ section.id }} .po-players-tabs__grid{
-        grid-template-columns: repeat(var(--po-cols-tablet), minmax(0, 1fr));
-      }
-    }
-
-    @media (min-width: 990px){
-      .po-players-tabs--{{ section.id }} .po-players-tabs__grid{
-        grid-template-columns: repeat(var(--po-cols-desktop), minmax(0, 1fr));
-      }
+      justify-content: center;
     }
 
     .po-players-tabs--{{ section.id }} .po-player-card{
@@ -248,6 +260,19 @@
       border: 1px solid rgba(0,0,0,.08);
       overflow:hidden;
       aspect-ratio: 3 / 4;
+      width: calc((100% - 14px * (var(--po-cols-mobile) - 1)) / var(--po-cols-mobile));
+    }
+
+    @media (min-width: 750px){
+      .po-players-tabs--{{ section.id }} .po-player-card{
+        width: calc((100% - 14px * (var(--po-cols-tablet) - 1)) / var(--po-cols-tablet));
+      }
+    }
+
+    @media (min-width: 990px){
+      .po-players-tabs--{{ section.id }} .po-player-card{
+        width: calc((100% - 14px * (var(--po-cols-desktop) - 1)) / var(--po-cols-desktop));
+      }
     }
 
     .po-players-tabs--{{ section.id }} .po-player-card__media{
@@ -548,8 +573,7 @@
           {
             "type": "text",
             "id": "heading_override",
-            "label": "Heading override (optional)",
-            "default": "<p>&nbsp;</p>"
+            "label": "Heading override (optional)"
           },
           {
             "type": "text",
