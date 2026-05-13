@@ -60,15 +60,22 @@
   aria-label="{{ display_name | escape }}"
 >
   <div class="po-player-card__media">
-    {% if show_number and jersey_display != blank %}
-      <div class="po-player-card__number" aria-hidden="true">{{ jersey_display }}</div>
-    {% endif %}
+    <div class="po-player-card__bg-texture">
+      <div class="po-player-card__jersey-info" aria-hidden="true">
+        {% if show_number and jersey_display != blank %}
+          <span class="po-player-card__jersey-number">{{ jersey_display }}</span>
+        {% endif %}
+        {% if preferred != blank %}
+          <span class="po-player-card__jersey-nickname">"{{ preferred }}"</span>
+        {% endif %}
+      </div>
+    </div>
 
     {% if photo != blank %}
       <img
         class="po-player-card__img"
         src="{{ photo | image_url: width: 900 }}"
-        alt="{{ display_name | escape }}"
+        alt="{{ full_name | escape }}"
         loading="lazy"
         width="900"
         height="1200"
@@ -77,7 +84,7 @@
       <img
         class="po-player-card__img"
         src="{{ placeholder_image | image_url: width: 900 }}"
-        alt="{{ display_name | escape }}"
+        alt="{{ full_name | escape }}"
         loading="lazy"
         width="900"
         height="1200"
@@ -93,7 +100,7 @@
         <div class="po-player-card__team">{{ team_name }}</div>
       {% endif %}
 
-      <div class="po-player-card__name">{{ display_name }}</div>
+      <div class="po-player-card__name">{{ full_name }}</div>
 
       {% if show_pos and role_position != blank %}
         <div class="po-player-card__pos">{{ role_position }}</div>

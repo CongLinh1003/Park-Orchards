@@ -122,7 +122,7 @@ Các metaobject dùng như taxonomy/terms — được reference bởi các meta
 | website_url | `url` | — |
 | **scope** | `metaobject_reference` | → **`sponsor_scope`** |
 | **tier** | `metaobject_reference` | → **`sponsor_tier`** |
-| **sponsored_player** | `metaobject_reference` | → **`player_profile`** *(optional)* |
+| **sponsored_player** | `list.metaobject_reference` | → **`player_profile`** *(optional, multiple players)* |
 | short_description | `multi_line_text_field` | — |
 | cta_label | `single_line_text_field` | — |
 | sponsor_since | `date` | — |
@@ -209,7 +209,7 @@ Bảng tổng hợp mọi relationship trong hệ thống:
 | `player_profile` | team | → `club_team` | metaobject_reference |
 | `club_sponsor` | scope | → `sponsor_scope` | metaobject_reference |
 | `club_sponsor` | tier | → `sponsor_tier` | metaobject_reference |
-| `club_sponsor` | sponsored_player | → `player_profile` | metaobject_reference |
+| `club_sponsor` | sponsored_player | → `player_profile` | list.metaobject_reference |
 | `club_person` | group | → `club_people_group` | metaobject_reference |
 | `membership_type` | category | → `membership_category` | metaobject_reference |
 | `membership_type` | linked_product | → **Product** | product_reference |

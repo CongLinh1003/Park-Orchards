@@ -1,0 +1,810 @@
+{% comment %}
+  CUSTOM HEADER - Park Orchards Football Netball Club
+  - Always transparent background
+  - Sticky on scroll
+  - Dropdown boxes on hover (desktop)
+  - Full hamburger menu (mobile)
+{% endcomment %}
+
+{% liquid
+  assign menu_handle = section.settings.menu | default: 'main-menu'
+  assign main_menu = linklists[menu_handle]
+%}
+
+<style>
+  /* =============================================
+     CUSTOM HEADER STYLES
+     ============================================= */
+
+  :root {
+    --custom-header-height: 80px;
+    --custom-header-font: var(--font-accent--family, 'Inter', sans-serif);
+  }
+
+  /* Reset: hide old header components if any leak through */
+  header-component,
+  .header__underlay-open,
+  .header__underlay-closed {
+    display: none !important;
+  }
+
+  /* Main header wrapper */
+  .custom-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    height: var(--custom-header-height);
+    background: transparent;
+    font-family: var(--custom-header-font);
+  }
+
+  /* Dark background slides down via pseudo-element */
+  .custom-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+    transform: translateY(-100%);
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: -1;
+  }
+
+  .custom-header.scrolled::before {
+    transform: translateY(0);
+  }
+
+  /* Nav & actions hidden at top, fade in on scroll */
+  .custom-header__nav,
+  .custom-header__actions {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease 0.05s;
+  }
+
+  .custom-header.scrolled .custom-header__nav,
+  .custom-header.scrolled .custom-header__actions {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .custom-header__inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* Logo */
+  .custom-header__logo {
+    flex-shrink: 0;
+  }
+
+  .custom-header__logo img {
+    height: 60px;
+    width: auto;
+    display: block;
+  }
+
+  /* Desktop Nav */
+  .custom-header__nav {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .custom-header__nav-item {
+    position: relative;
+  }
+
+  .custom-header__nav-link {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: opacity 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .custom-header__nav-link:hover {
+    opacity: 0.75;
+  }
+
+  /* Dropdown arrow */
+  .custom-header__arrow {
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid currentColor;
+    opacity: 0.5;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+
+  .custom-header__nav-item:hover .custom-header__arrow {
+    opacity: 1;
+    transform: rotate(180deg);
+  }
+
+  /* Dropdown box */
+  .custom-header__dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.18);
+    padding: 0.5rem 0;
+    min-width: 220px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) translateY(8px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+    z-index: 10000;
+  }
+
+  .custom-header__nav-item:hover .custom-header__dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .custom-header__dropdown-link {
+    display: block;
+    padding: 0.6rem 1.5rem;
+    color: #1a1a1a;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background-color 0.15s ease;
+  }
+
+  .custom-header__dropdown-link:hover {
+    background-color: #f5f5f5;
+    color: #000000;
+  }
+
+  /* Right actions: search, cart, contact */
+  .custom-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .custom-header__icon-btn {
+    color: #ffffff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s ease;
+    position: relative;
+  }
+
+  .custom-header__icon-btn:hover {
+    opacity: 0.7;
+  }
+
+  .custom-header__icon-btn svg {
+    width: 22px;
+    height: 22px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.5;
+  }
+
+  /* Cart count badge */
+  .custom-header__cart-count {
+    position: absolute;
+    top: -4px;
+    right: -6px;
+    background: #e53935;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 1;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    pointer-events: none;
+    font-family: var(--custom-header-font);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease, opacity 0.15s ease;
+  }
+
+  .custom-header__cart-count:empty,
+  .custom-header__cart-count[data-count="0"] {
+    display: none;
+  }
+
+  .custom-header__cart-count.bump {
+    transform: scale(1.35);
+  }
+
+  .custom-header__contact-btn {
+    color: #ffffff;
+    border: 1.5px solid #ffffff;
+    background: transparent;
+    padding: 0.5rem 1.2rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: var(--custom-header-font);
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .custom-header__contact-btn:hover {
+    background: #ffffff;
+    color: #1a1a1a;
+  }
+
+  /* Mobile hamburger */
+  .custom-header__hamburger {
+    display: none;
+    color: #ffffff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    z-index: 10002;
+  }
+
+  .custom-header__hamburger svg {
+    width: 28px;
+    height: 28px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+  }
+
+  /* Mobile menu overlay */
+  .custom-header__mobile-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .custom-header__mobile-overlay.active {
+    display: block;
+    opacity: 1;
+  }
+
+  /* Mobile menu panel */
+  .custom-header__mobile-menu {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 320px;
+    max-width: 85vw;
+    height: 100vh;
+    background: #1a1a1a;
+    z-index: 10001;
+    overflow-y: auto;
+    transition: right 0.3s ease;
+    padding: 5rem 1.5rem 2rem;
+  }
+
+  .custom-header__mobile-menu.active {
+    right: 0;
+  }
+
+  .custom-header__mobile-close {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.2rem;
+    color: #ffffff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+  }
+
+  .custom-header__mobile-close svg {
+    width: 24px;
+    height: 24px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+  }
+
+  .custom-header__mobile-nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .custom-header__mobile-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .custom-header__mobile-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 1.05rem;
+    font-weight: 600;
+    padding: 1rem 0;
+  }
+
+  .custom-header__mobile-link:hover {
+    opacity: 0.7;
+  }
+
+  .custom-header__mobile-toggle {
+    background: none;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    padding: 1rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 1.05rem;
+    font-weight: 600;
+    font-family: var(--custom-header-font);
+    text-align: left;
+  }
+
+  .custom-header__mobile-toggle svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    transition: transform 0.2s ease;
+  }
+
+  .custom-header__mobile-toggle.open svg {
+    transform: rotate(180deg);
+  }
+
+  .custom-header__mobile-sub {
+    list-style: none;
+    padding: 0 0 0.5rem 1rem;
+    margin: 0;
+    display: none;
+  }
+
+  .custom-header__mobile-sub.open {
+    display: block;
+  }
+
+  .custom-header__mobile-sub a {
+    display: block;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: 0.95rem;
+    padding: 0.5rem 0;
+    transition: color 0.15s ease;
+  }
+
+  .custom-header__mobile-sub a:hover {
+    color: #ffffff;
+  }
+
+  .custom-header__mobile-actions {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .custom-header__mobile-contact {
+    display: block;
+    text-align: center;
+    color: #ffffff;
+    border: 1.5px solid #ffffff;
+    padding: 0.75rem;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .custom-header__mobile-contact:hover {
+    background: #ffffff;
+    color: #1a1a1a;
+  }
+
+  /* Body padding to account for fixed header */
+  body {
+    padding-top: 0 !important;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .custom-header__nav,
+    .custom-header__actions .custom-header__contact-btn {
+      display: none;
+    }
+
+    .custom-header__hamburger,
+    .custom-header__mobile-menu {
+      display: block;
+    }
+
+    .custom-header__mobile-menu {
+      display: block;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .custom-header__inner {
+      padding: 0 1rem;
+    }
+
+    .custom-header__logo img {
+      height: 45px;
+    }
+  }
+</style>
+
+<!-- CUSTOM HEADER HTML -->
+<div class="custom-header" id="customHeader">
+  <div class="custom-header__inner">
+    <!-- Logo -->
+    <a href="/" class="custom-header__logo">
+      {% if section.settings.logo != blank %}
+        {{ section.settings.logo | image_url: height: 160 | image_tag: loading: 'eager' }}
+      {% else %}
+        <img src="https://park-orchards-football-netball-club.myshopify.com/cdn/shop/files/pofnc_logo_1.png?height=160&v=1771899313" alt="{{ shop.name }}" loading="eager">
+      {% endif %}
+    </a>
+
+    <!-- Desktop Navigation -->
+    <nav>
+      <ul class="custom-header__nav" id="desktopNav">
+        {% for link in main_menu.links %}
+          <li class="custom-header__nav-item">
+            {% if link.links.size > 0 %}
+              <a href="{{ link.url }}" class="custom-header__nav-link" aria-haspopup="true">
+                {{ link.title }}
+                <span class="custom-header__arrow"></span>
+              </a>
+              <div class="custom-header__dropdown">
+                {% for child in link.links %}
+                  <a href="{{ child.url }}" class="custom-header__dropdown-link">{{ child.title }}</a>
+                {% endfor %}
+              </div>
+            {% else %}
+              <a href="{{ link.url }}" class="custom-header__nav-link">{{ link.title }}</a>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
+
+    <!-- Right Actions -->
+    <div class="custom-header__actions">
+      <!-- Search -->
+      {% if section.settings.show_search %}
+        <button class="custom-header__icon-btn" aria-label="Search" onclick="document.querySelector('search-modal')?.open?.() || document.querySelector('[data-search-modal]')?.click?.()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+      {% endif %}
+
+      <!-- Cart -->
+      <a href="/cart" class="custom-header__icon-btn" id="headerCartBtn" aria-label="Cart">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <span class="custom-header__cart-count" id="headerCartCount" data-count="{{ cart.item_count }}">{% if cart.item_count > 0 %}{{ cart.item_count }}{% endif %}</span>
+      </a>
+
+      <!-- Contact Button -->
+      <a href="/pages/contact" class="custom-header__contact-btn">Contact Us</a>
+
+      <!-- Hamburger (mobile) -->
+      <button class="custom-header__hamburger" id="hamburgerBtn" aria-label="Open menu">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile Menu Overlay -->
+<div class="custom-header__mobile-overlay" id="mobileOverlay"></div>
+
+<!-- Mobile Menu Panel -->
+<div class="custom-header__mobile-menu" id="mobileMenu">
+  <button class="custom-header__mobile-close" id="mobileClose" aria-label="Close menu">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+
+  <ul class="custom-header__mobile-nav">
+    {% for link in main_menu.links %}
+      <li class="custom-header__mobile-item">
+        {% if link.links.size > 0 %}
+          <button class="custom-header__mobile-toggle" data-toggle="mobile-sub-{{ forloop.index }}">
+            {{ link.title }}
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul class="custom-header__mobile-sub" id="mobile-sub-{{ forloop.index }}">
+            {% for child in link.links %}
+              <li><a href="{{ child.url }}">{{ child.title }}</a></li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <a href="{{ link.url }}" class="custom-header__mobile-link">{{ link.title }}</a>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+
+  <div class="custom-header__mobile-actions">
+    <a href="/pages/contact" class="custom-header__mobile-contact">Contact Us</a>
+    <a href="/cart" class="custom-header__mobile-contact">Cart</a>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var header = document.getElementById('customHeader');
+    var hamburger = document.getElementById('hamburgerBtn');
+    var mobileMenu = document.getElementById('mobileMenu');
+    var mobileOverlay = document.getElementById('mobileOverlay');
+    var mobileClose = document.getElementById('mobileClose');
+
+    // Scroll: slide dark bg down + reveal nav
+    var forceScrolled = false;
+
+    function checkPageHeight() {
+      // If page is too short to scroll, always show nav
+      forceScrolled = document.documentElement.scrollHeight <= window.innerHeight + 50;
+      handleScroll();
+    }
+
+    function handleScroll() {
+      if (forceScrolled || window.scrollY > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', checkPageHeight, { passive: true });
+    checkPageHeight();
+
+    // Mobile menu
+    function openMobile() {
+      mobileMenu.classList.add('active');
+      mobileOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMobile() {
+      mobileMenu.classList.remove('active');
+      mobileOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    if (hamburger) hamburger.addEventListener('click', openMobile);
+    if (mobileClose) mobileClose.addEventListener('click', closeMobile);
+    if (mobileOverlay) mobileOverlay.addEventListener('click', closeMobile);
+
+    // Mobile accordion toggles
+    var toggles = document.querySelectorAll('.custom-header__mobile-toggle');
+    toggles.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var targetId = btn.getAttribute('data-toggle');
+        var sub = document.getElementById(targetId);
+        if (sub) {
+          var isOpen = sub.classList.contains('open');
+          // Close all
+          document.querySelectorAll('.custom-header__mobile-sub').forEach(function(s) { s.classList.remove('open'); });
+          document.querySelectorAll('.custom-header__mobile-toggle').forEach(function(b) { b.classList.remove('open'); });
+          // Toggle current
+          if (!isOpen) {
+            sub.classList.add('open');
+            btn.classList.add('open');
+          }
+        }
+      });
+    });
+
+    // ===== Cart count badge auto-update =====
+    var cartBadge = document.getElementById('headerCartCount');
+    var lastCartCount = parseInt(cartBadge?.getAttribute('data-count') || '0', 10);
+
+    function updateCartBadge(count) {
+      if (!cartBadge) return;
+      cartBadge.setAttribute('data-count', count);
+      cartBadge.textContent = count > 0 ? count : '';
+      // Bump animation
+      if (count !== lastCartCount && count > 0) {
+        cartBadge.classList.add('bump');
+        setTimeout(function() { cartBadge.classList.remove('bump'); }, 220);
+      }
+      lastCartCount = count;
+    }
+
+    function fetchCartCount() {
+      fetch('/cart.js', { credentials: 'same-origin' })
+        .then(function(r) { return r.json(); })
+        .then(function(cart) { updateCartBadge(cart.item_count); })
+        .catch(function() {});
+    }
+
+    // Intercept fetch to detect cart changes (add-to-cart, update, change)
+    var originalFetch = window.fetch;
+    window.fetch = function() {
+      var args = arguments;
+      var url = typeof args[0] === 'string' ? args[0] : (args[0]?.url || '');
+      return originalFetch.apply(this, args).then(function(response) {
+        if (/\/cart\/(add|update|change|clear)\.js/i.test(url)) {
+          // Small delay to let Shopify process
+          setTimeout(fetchCartCount, 300);
+        }
+        return response;
+      });
+    };
+
+    // Also intercept XMLHttpRequest for themes using XHR
+    var origXHROpen = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function(method, url) {
+      this._cartUrl = url;
+      return origXHROpen.apply(this, arguments);
+    };
+    var origXHRSend = XMLHttpRequest.prototype.send;
+    XMLHttpRequest.prototype.send = function() {
+      var xhr = this;
+      var url = xhr._cartUrl || '';
+      if (/\/cart\/(add|update|change|clear)\.js/i.test(url)) {
+        xhr.addEventListener('load', function() {
+          setTimeout(fetchCartCount, 300);
+        });
+      }
+      return origXHRSend.apply(this, arguments);
+    };
+
+    // Also listen for Shopify's custom cart events (some themes dispatch these)
+    document.addEventListener('cart:updated', fetchCartCount);
+    document.addEventListener('cart:refresh', fetchCartCount);
+
+    // Poll every 5s as fallback (in case add-to-cart is via form submit / page nav)
+    setInterval(fetchCartCount, 5000);
+  });
+</script>
+
+{% schema %}
+{
+  "name": "t:names.header",
+  "tag": "header",
+  "class": "header-section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo image"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Navigation menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show search icon",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "t:content.home_page"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_transparent_header_home",
+      "label": "t:settings.transparent_background",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "home_color_scheme",
+      "label": "t:settings.color_scheme",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:options.default"
+        },
+        {
+          "value": "inverse",
+          "label": "t:options.inverse"
+        }
+      ],
+      "default": "default",
+      "visible_if": "{{ section.settings.enable_transparent_header_home }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.product_page"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_transparent_header_product",
+      "label": "t:settings.transparent_background",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "product_color_scheme",
+      "label": "t:settings.color_scheme",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:options.default"
+        },
+        {
+          "value": "inverse",
+          "label": "t:options.inverse"
+        }
+      ],
+      "default": "default",
+      "visible_if": "{{ section.settings.enable_transparent_header_product }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.collection_page"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_transparent_header_collection",
+      "label": "t:settings.transparent_background",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "collection_color_scheme",
+      "label": "t:settings.color_scheme",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:options.default"
+        },
+        {
+          "value": "inverse",
+          "label": "t:options.inverse"
+        }
+      ],
+      "default": "default",
+      "visible_if": "{{ section.settings.enable_transparent_header_collection }}"
+    }
+  ],
+  "presets": []
+}
+{% endschema %}

@@ -1,0 +1,215 @@
+{%- liquid
+  assign show_fb   = block.settings.show_facebook
+  assign fb_url    = block.settings.facebook_url
+  assign show_ig   = block.settings.show_instagram
+  assign ig_url    = block.settings.instagram_url
+  assign s_color   = block.settings.icon_color | default: '#000000'
+  assign s_size    = block.settings.icon_size | default: 36
+  assign margin_val = block.settings.margin | default: '0'
+  assign pos       = block.settings.position | default: 'static'
+  assign pos_top   = block.settings.pos_top
+  assign pos_right = block.settings.pos_right
+  assign pos_bottom = block.settings.pos_bottom
+  assign pos_left  = block.settings.pos_left
+  assign z         = block.settings.z_index
+  assign custom_css = block.settings.custom_css
+-%}
+
+{%- if show_fb or show_ig -%}
+  {%- capture inline_style -%}
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: {{ margin_val }};
+    {%- if pos != 'static' -%}position: {{ pos }};{%- endif -%}
+    {%- if pos_top != blank -%}top: {{ pos_top }};{%- endif -%}
+    {%- if pos_right != blank -%}right: {{ pos_right }};{%- endif -%}
+    {%- if pos_bottom != blank -%}bottom: {{ pos_bottom }};{%- endif -%}
+    {%- if pos_left != blank -%}left: {{ pos_left }};{%- endif -%}
+    {%- if z != blank and z != 0 -%}z-index: {{ z }};{%- endif -%}
+  {%- endcapture -%}
+
+  <div
+    class="pb-socials pb-socials-{{ block.id }}"
+    style="{{ inline_style | strip_newlines | strip }}"
+    {{ block.shopify_attributes }}
+  >
+    {%- if show_fb -%}
+      <a
+        href="{{ fb_url | default: '#' }}"
+        class="pb-social-link{% if fb_url == blank %} pb-social-link--placeholder{% endif %}"
+        style="color: {{ s_color }};"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Facebook"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="{{ s_size }}" height="{{ s_size }}" aria-hidden="true">
+          <path d="M12 2.04C6.5 2.04 2 6.53 2 12.06c0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v7a10 10 0 0 0 8.44-9.9c0-5.53-4.5-10.02-10-10.02z"/>
+        </svg>
+      </a>
+    {%- endif -%}
+
+    {%- if show_ig -%}
+      <a
+        href="{{ ig_url | default: '#' }}"
+        class="pb-social-link{% if ig_url == blank %} pb-social-link--placeholder{% endif %}"
+        style="color: {{ s_color }};"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Instagram"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="{{ s_size }}" height="{{ s_size }}" aria-hidden="true">
+          <path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/>
+        </svg>
+      </a>
+    {%- endif -%}
+  </div>
+
+  <style>
+    .pb-socials-{{ block.id }} .pb-social-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.9;
+      text-decoration: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .pb-socials-{{ block.id }} .pb-social-link:hover {
+      opacity: 1;
+      transform: scale(1.15);
+    }
+    .pb-socials-{{ block.id }} .pb-social-link--placeholder {
+      cursor: default;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+  </style>
+
+  {%- if custom_css != blank -%}
+    <style>
+      .pb-socials-{{ block.id }} { {{ custom_css }} }
+    </style>
+  {%- endif -%}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "PB Social Icons",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "── Social Links ──"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_facebook",
+      "label": "Show Facebook",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "facebook_url",
+      "label": "Facebook URL"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_instagram",
+      "label": "Show Instagram",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram URL"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icon Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "Icon Size",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+
+    {
+      "type": "header",
+      "content": "── Spacing ──"
+    },
+    {
+      "type": "text",
+      "id": "margin",
+      "label": "Margin",
+      "default": "0",
+      "info": "CSS shorthand"
+    },
+
+    {
+      "type": "header",
+      "content": "── Position ──"
+    },
+    {
+      "type": "select",
+      "id": "position",
+      "label": "Position",
+      "default": "static",
+      "options": [
+        { "value": "static", "label": "Static" },
+        { "value": "relative", "label": "Relative" },
+        { "value": "absolute", "label": "Absolute" },
+        { "value": "fixed", "label": "Fixed" },
+        { "value": "sticky", "label": "Sticky" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "pos_top",
+      "label": "Top"
+    },
+    {
+      "type": "text",
+      "id": "pos_right",
+      "label": "Right"
+    },
+    {
+      "type": "text",
+      "id": "pos_bottom",
+      "label": "Bottom"
+    },
+    {
+      "type": "text",
+      "id": "pos_left",
+      "label": "Left"
+    },
+    {
+      "type": "number",
+      "id": "z_index",
+      "label": "Z-Index",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "── Custom CSS ──"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Social Icons"
+    }
+  ]
+}
+{% endschema %}

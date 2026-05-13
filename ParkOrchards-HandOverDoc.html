@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handover Document - Park Orchards FC & NC</title>
+    <style>
+        :root {
+            --primary-color: #0b1c2c; /* POFNC Navy */
+            --secondary-color: #c90b0b; /* POFNC Red */
+            --bg-color: #f8f9fa;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            display: flex;
+            gap: 40px;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 250px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 40px;
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .sidebar h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: #555;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+            display: block;
+            padding: 5px 0;
+        }
+
+        .sidebar a:hover {
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+
+        .sidebar ul ul {
+            padding-left: 15px;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        /* Main Content */
+        .content {
+            flex-grow: 1;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        h1, h2, h3, h4 {
+            color: var(--primary-color);
+            margin-top: 2em;
+            margin-bottom: 0.5em;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-top: 0;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 1.2em;
+        }
+
+        .highlight {
+            background-color: #fef0f0;
+            border-left: 4px solid var(--secondary-color);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .tip {
+            background-color: #e8f4fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        code {
+            background-color: #f1f3f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        pre {
+            background-color: #f1f3f5;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .image-placeholder {
+            background-color: #e9ecef;
+            border: 2px dashed #ced4da;
+            padding: 40px;
+            text-align: center;
+            color: #6c757d;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                margin-bottom: 20px;
+            }
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h3>Table of Contents</h3>
+        <ul>
+            <li><a href="#intro">1. Introduction</a></li>
+            <li><a href="#theme-editor">2. Theme Editor Management</a>
+                <ul>
+                    <li><a href="#how-to-edit">How to edit Sections</a></li>
+                    <li><a href="#custom-sections">Key Custom Sections</a></li>
+                </ul>
+            </li>
+            <li><a href="#data-structure">3. Metaobjects & Metafields Structure</a>
+                <ul>
+                    <li><a href="#terms">Term Metaobjects (Taxonomy)</a></li>
+                    <li><a href="#main-metaobjects">Main Metaobjects (Data)</a></li>
+                </ul>
+            </li>
+            <li><a href="#how-to-manage">4. Content Entry Guide</a>
+                <ul>
+                    <li><a href="#add-player">Add a Player</a></li>
+                    <li><a href="#add-sponsor">Add a Sponsor</a></li>
+                    <li><a href="#add-policy">Add a Policy</a></li>
+                </ul>
+            </li>
+            <li><a href="#news-events">5. News & Events Management</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+        <h1 id="intro">Admin & Interface Handover Document</h1>
+        <p>Welcome to the administration guide for the Park Orchards Football & Netball Club (POFNC) website. This document will help you understand how to customize page content, edit the layout using <strong>Custom Sections</strong>, and manage the data system (Players, Sponsors, Teams, Policies...) easily and consistently.</p>
+
+        <hr>
+
+        <h2 id="theme-editor">2. Theme Management via Theme Editor</h2>
+        <p>The website interface is modular. This means you can easily add, remove, or move sections on a page visually without knowing how to code.</p>
+
+        <h3 id="how-to-edit">How to access and edit</h3>
+        <ol>
+            <li>Log in to Shopify Admin.</li>
+            <li>Navigate to <strong>Online Store > Themes</strong>.</li>
+            <li>Click the <strong>Customize</strong> button on the current "Live" theme.</li>
+            <li>Use the top dropdown menu to navigate between pages (e.g., Home page, Sponsor page, Players page...).</li>
+            <li>The left column lists the <strong>Sections</strong>. Click on a Section to open its settings in the right column.</li>
+        </ol>
+
+        <div class="image-placeholder">
+            [SCREENSHOT: Insert image of Shopify Theme Editor, highlighting the left column (Theme blocks) and right column (Settings)]
+        </div>
+
+        <h3 id="custom-sections">Key Custom Sections in the System</h3>
+        <p>The system provides a variety of sections specifically designed for POFNC. You can add them to any page by clicking <strong>Add section</strong>.</p>
+        
+        <ul>
+            <li><strong>Hero Banner / Netball Hero:</strong> Large top-of-page banner, capable of containing images, video (optional), main title, description, and Call to Action buttons. Supports text alignment and overlays to improve text readability.</li>
+            <li><strong>Players Tabs Directory:</strong> A list of players automatically pulled from Metaobjects data, categorized by tabs, with built-in filters (Team, Grade, Sport).</li>
+            <li><strong>Sponsors Page & Sponsor Slider:</strong> Area displaying sponsor logos. Designed as an auto-slider or a grid categorized by sponsorship tier (Gold, Silver...).</li>
+            <li><strong>Club People / Committee Personnel:</strong> Dedicated section displaying the coaching staff and club committee members.</li>
+            <li><strong>Sponsorship Packages:</strong> Displays sponsorship packages as stacked cards. Content is dynamically fetched from the <code>sponsorship_package</code> metaobject.</li>
+            <li><strong>Policies Tabs:</strong> Displays club rules and policies automatically split into readable horizontal or vertical tabs.</li>
+        </ul>
+
+        <div class="tip">
+            <strong>Tip:</strong> Most data in these Sections (Players, Sponsors, Policies, Packages) is <strong>Dynamic</strong>. You don't add each person/item individually in the Theme Editor. You just drop the section onto the page, and the content is automatically pulled from the <strong>Content > Metaobjects</strong> section in the Admin.
+        </div>
+
+        <hr>
+
+        <h2 id="data-structure">3. Metaobjects & Metafields Data Structure</h2>
+        <p>For the website to function smartly, avoiding rigid data entry, we utilized Shopify's <strong>Metaobjects</strong>. Think of Metaobjects as database tables used to store structured information.</p>
+        <p>Access <strong>Shopify Admin > Content > Metaobjects</strong> to manage all this data.</p>
+
+        <div class="image-placeholder">
+            [SCREENSHOT: Insert image of the Content > Metaobjects area in Shopify Admin]
+        </div>
+
+        <h3 id="terms">3.1. Term Metaobjects (Categorization)</h3>
+        <p>These are categories used to classify main data. You should create these categories first.</p>
+        <table>
+            <tr>
+                <th>Metaobject Type</th>
+                <th>Description & Examples</th>
+            </tr>
+            <tr>
+                <td><strong>Club Sport</strong></td>
+                <td>Sport type: <code>Football</code>, <code>Netball</code>...</td>
+            </tr>
+            <tr>
+                <td><strong>Club Division</strong></td>
+                <td>Division: <code>Men</code>, <code>Women</code>...</td>
+            </tr>
+            <tr>
+                <td><strong>Club Grade</strong></td>
+                <td>Competition Grade: <code>Under 19</code>, <code>Seniors</code>, <code>Reserves</code>...</td>
+            </tr>
+            <tr>
+                <td><strong>Sponsor Tier</strong></td>
+                <td>Sponsorship Tier: <code>Gold</code>, <code>Silver</code>, <code>Community Partner</code>...</td>
+            </tr>
+            <tr>
+                <td><strong>Club People Group</strong></td>
+                <td>Committee group: <code>Committee</code>, <code>Coaches</code>, <code>Volunteers</code>...</td>
+            </tr>
+        </table>
+
+        <h3 id="main-metaobjects">3.2. Main Metaobjects (Core Data)</h3>
+        <p>These are the primary entities on the site. When you add data here, it will automatically reflect on the front-end interface.</p>
+        <ul>
+            <li><strong>Club Teams:</strong> The backbone of the system. <em>Example: Men Football Seniors.</em> Each team contains sport info, grade, PlayHQ link, and the team cover image.</li>
+            <li><strong>Player Profiles:</strong> Contains full name, jersey number, photo, and specifically a REFERENCE pointing to a "Club Team".</li>
+            <li><strong>Club Sponsors:</strong> Contains Logo, website, and a reference pointing to a "Sponsor Tier" (to know their ranking). It also includes a feature to link a Sponsor to one or more Player entries (Player Sponsor).</li>
+            <li><strong>Club Policy:</strong> Storage for organization rules. Contains Title and Rich Text content.</li>
+            <li><strong>Sponsorship Packages:</strong> Where sponsorship package benefits are created. Changing prices or updating benefits will instantly reflect on the sponsorship page.</li>
+        </ul>
+
+        <hr>
+
+        <h2 id="how-to-manage">4. Daily Content Entry Guide</h2>
+
+        <h3 id="add-player">4.1. How to Add a New Player</h3>
+        <p>The exact process for entering a player to avoid display issues:</p>
+        <ol>
+            <li><strong>Step 1:</strong> Ensure the <strong>Club Team</strong> already exists. If a player belongs to "Women Netball Seniors" but this Team hasn't been created, go to <code>Content > Metaobjects > Club Teams</code> to create the team first.</li>
+            <li><strong>Step 2:</strong> Go to <code>Content > Metaobjects > Player Profiles</code> and click <strong>Add entry</strong>.</li>
+            <li><strong>Step 3:</strong> Enter information: Full name, Jersey number, Profile photo.</li>
+            <li><strong>Step 4 (CRUCIAL):</strong> In the <strong>Team</strong> section, click "Select" and choose the corresponding Team. The system uses this Team info to intelligently categorize them on the player directory page.</li>
+            <li><strong>Step 5:</strong> Ensure you toggle the Status switch to <strong>Active</strong> right next to the save button. (If left as Draft, the player won't appear on the website). Click Save.</li>
+        </ol>
+
+        <div class="image-placeholder">
+            [SCREENSHOT: Editing a Player, highlight the "Team" selection area and the Active status button]
+        </div>
+
+        <h3 id="add-sponsor">4.2. How to Add a Sponsor</h3>
+        <p>A sponsor can be a Club sponsor or a Player sponsor.</p>
+        <ol>
+            <li>Go to <code>Content > Metaobjects > Club Sponsors</code> > Add entry.</li>
+            <li>Enter Sponsor name and upload the Logo.</li>
+            <li>Select <strong>Scope</strong> (Is it a "Club Sponsor" or "Player Sponsor").</li>
+            <li>Select <strong>Tier</strong> (Level: Gold, Silver...).</li>
+            <li><strong>Player Sponsorship:</strong> If this is a "Player Sponsor", scroll down to the <em>Sponsored player</em> field and select one or more players that sponsor is supporting. The system will automatically link them as a list.</li>
+            <li>Select Status: Active and click save.</li>
+        </ol>
+        <p><strong>Important:</strong> Before doing any large sponsor/player cleanup, run the audit backup script first so you have a JSON snapshot of the current relationships.</p>
+
+        <h3 id="add-policy">4.3. Editing Policies and Sponsorship Packages</h3>
+        <p>This is very simple; navigate to <code>Content > Metaobjects > Club Policy</code> (or Sponsorship Packages). Click edit on the text. You can insert links, bold text, or upload PDF files directly into the Rich text editor box. Everything will automatically appear on the site in the order of the <strong>Sort Order</strong> field.</p>
+        
+        <div class="highlight">
+            <strong>General Rule for Sorting (Sort Order):</strong> Most Metaobjects have a <code>Sort order</code> field (number input). The website prioritizes display from smallest to largest number (0, 1, 2, 3...). You can adjust this to push specific players or sponsors to the top.
+        </div>
+
+        <hr>
+
+        <h2 id="news-events">5. News & Events Management</h2>
+        <p>We have configured a separated setup into 2 distinct Shopify Blogs for easy organization.</p>
+        
+        <p>Access <strong>Online Store > Blog posts</strong></p>
+        <ul>
+            <li><strong>Posting News:</strong> When creating a post (Article), carefully look at the right sidebar under the <em>Blog</em> section, and select <strong>News</strong>. Write your title, body content, and upload a Featured Cover image normally.</li>
+            <li><strong>Posting Events:</strong> Select the Blog as <strong>Events</strong>.
+                <br>For events, alongside regular text content, scroll down to the bottom of the screen where you'll find the <strong>Metafields</strong> section. Here you input the exact Start datetime, End datetime, Venue, Button Label for ticket purchasing, and the External link to the event registration.
+            </li>
+        </ul>
+
+        <div class="image-placeholder">
+            [SCREENSHOT: Event article scrolled down to the bottom showing input boxes for time, venue, and attached links]
+        </div>
+
+        <p>The system automatically uses a separate Template for Events to highlight the time and registration button on the interface without you needing to edit any code.</p>
+
+        <hr>
+
+        <p><em>This document is compiled for the system features handover process. If you encounter any queries during operation, please carefully review the notes in the highlight boxes.</em></p>
+
+    </main>
+</div>
+
+</body>
+</html>

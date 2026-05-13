@@ -1,0 +1,447 @@
+{%- comment -%}
+  Sponsors Page Section
+  Displays sponsors grouped by tier, pulling from club_sponsor metaobjects.
+  Each tier heading is rendered with its sponsors in a responsive grid.
+
+  Tiers extracted from old website:
+  1. Major Sponsor      — 1 sponsor
+  2. Jumper Sponsors    — 2 sponsors
+  3. Gold Sponsors      — 9 sponsors
+  4. Silver Sponsors    — 6 sponsors
+  5. Community Partners — 2 sponsors
+  6. Product Supply Partners — 3 sponsors
+  7. Domenerians Sponsor — 1 sponsor
+  8. Bronze Partners    — 2 sponsors
+{%- endcomment -%}
+
+{%- liquid
+  assign bg_color    = section.settings.bg_color
+  assign text_color  = section.settings.text_color
+  assign accent      = section.settings.accent_color
+  assign intro_text  = section.settings.intro_text
+-%}
+
+<section
+  id="sponsors-page-{{ section.id }}"
+  class="sponsors-page"
+  style="
+    --sp-bg: {{ bg_color }};
+    --sp-text: {{ text_color }};
+    --sp-accent: {{ accent }};
+  "
+>
+  {%- if intro_text != blank -%}
+    <div class="sponsors-page__intro page-width">
+      <p>{{ intro_text }}</p>
+    </div>
+  {%- endif -%}
+
+  <div class="sponsors-page__content page-width">
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'tier' -%}
+        {%- assign tier_name   = block.settings.tier_name -%}
+        {%- assign tier_handle = block.settings.tier_handle -%}
+        {%- assign cols        = block.settings.columns -%}
+        {%- assign logo_height = block.settings.logo_height -%}
+
+        <div class="sponsors-page__tier" {{ block.shopify_attributes }}>
+          <h2 class="sponsors-page__tier-heading">{{ tier_name }}</h2>
+
+          <div class="sponsors-page__grid sponsors-page__grid--cols-{{ cols }}" style="--sp-logo-h: {{ logo_height }}px;">
+            {%- comment -%} Pull sponsors from metaobjects filtered by tier_handle {%- endcomment -%}
+            {%- assign all_sponsors = shop.metaobjects.club_sponsor.values -%}
+            {%- assign found = 0 -%}
+
+            {%- for sponsor in all_sponsors -%}
+              {%- assign sponsor_tier_obj = sponsor.tier.value -%}
+              {%- assign sponsor_tier_handle = sponsor_tier_obj.handle | default: sponsor_tier_obj.system.handle -%}
+              {%- if sponsor_tier_handle == tier_handle -%}
+                {%- assign found = found | plus: 1 -%}
+                {%- assign s_name = sponsor.sponsor_name.value | default: sponsor.display_name -%}
+                {%- assign s_logo = sponsor.logo.value -%}
+                {%- assign s_url  = sponsor.website_url.value -%}
+
+                <div class="sponsors-page__item">
+                  {%- if s_url != blank -%}
+                    <a href="{{ s_url }}" target="_blank" rel="noopener" aria-label="{{ s_name }}">
+                  {%- endif -%}
+
+                  {%- if s_logo != blank -%}
+                    <img
+                      src="{{ s_logo | image_url }}"
+                      alt="{{ s_name | escape }}"
+                      width="{{ s_logo.width }}"
+                      height="{{ s_logo.height }}"
+                      loading="lazy"
+                      class="sponsors-page__logo"
+                    >
+                  {%- else -%}
+                    <div class="sponsors-page__placeholder">
+                      <span>{{ s_name }}</span>
+                    </div>
+                  {%- endif -%}
+
+                  {%- if s_url != blank -%}
+                    </a>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+
+            {%- if found == 0 -%}
+              <p class="sponsors-page__empty">No sponsors assigned to this tier yet.</p>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</section>
+
+{% style %}
+  /* ═══════════════════════════════════════════
+     SPONSORS PAGE — Modern card layout
+  ═══════════════════════════════════════════ */
+
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  #sponsors-page-{{ section.id }} {
+    background: var(--sp-bg);
+    color: var(--sp-text);
+    padding: clamp(3rem, 6vw, 5rem) 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  /* ─── Intro ─── */
+  #sponsors-page-{{ section.id }} .sponsors-page__intro {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto 3rem;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: var(--sp-text);
+    opacity: 0.7;
+  }
+
+  /* ─── Tier Block ─── */
+  #sponsors-page-{{ section.id }} .sponsors-page__tier {
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  #sponsors-page-{{ section.id }} .sponsors-page__tier:last-child {
+    margin-bottom: 0;
+  }
+
+  /* ─── Tier Heading ─── */
+  #sponsors-page-{{ section.id }} .sponsors-page__tier-heading {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: clamp(0.8rem, 1.2vw, 0.95rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    text-align: center;
+    color: var(--sp-text);
+    margin: 0 0 1.75rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  #sponsors-page-{{ section.id }} .sponsors-page__tier-heading::before,
+  #sponsors-page-{{ section.id }} .sponsors-page__tier-heading::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to var(--dir), var(--sp-accent), transparent);
+    max-width: 120px;
+    opacity: 0.4;
+  }
+
+  #sponsors-page-{{ section.id }} .sponsors-page__tier-heading::before {
+    --dir: right;
+  }
+
+  #sponsors-page-{{ section.id }} .sponsors-page__tier-heading::after {
+    --dir: left;
+  }
+
+  /* ─── Grid ─── */
+  #sponsors-page-{{ section.id }} .sponsors-page__grid {
+    display: grid;
+    gap: clamp(1rem, 2vw, 1.5rem);
+    justify-items: center;
+    align-items: stretch;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  #sponsors-page-{{ section.id }} .sponsors-page__grid--cols-1 {
+    grid-template-columns: 1fr;
+    max-width: 380px;
+  }
+
+  #sponsors-page-{{ section.id }} .sponsors-page__grid--cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 760px;
+  }
+
+  #sponsors-page-{{ section.id }} .sponsors-page__grid--cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  #sponsors-page-{{ section.id }} .sponsors-page__grid--cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* ─── Sponsor Card Container ─── */
+  #sponsors-page-{{ section.id }} .sponsors-page__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    padding: clamp(1.25rem, 2.5vw, 2rem);
+    background: #f4f7f9;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04),
+                0 4px 16px rgba(0, 0, 0, 0.03);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.35s ease;
+  }
+
+  #sponsors-page-{{ section.id }} .sponsors-page__item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06),
+                0 10px 30px rgba(0, 0, 0, 0.04);
+  }
+
+  #sponsors-page-{{ section.id }} .sponsors-page__item a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+  }
+
+  /* ─── Logo ─── */
+  #sponsors-page-{{ section.id }} .sponsors-page__logo {
+    max-height: var(--sp-logo-h, 120px);
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    display: block;
+    transition: opacity 0.3s ease;
+  }
+
+  #sponsors-page-{{ section.id }} .sponsors-page__item:hover .sponsors-page__logo {
+    opacity: 0.85;
+  }
+
+  /* ─── Placeholder ─── */
+  #sponsors-page-{{ section.id }} .sponsors-page__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #aaa;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    text-align: center;
+    padding: 1rem;
+  }
+
+  /* ─── Empty message ─── */
+  #sponsors-page-{{ section.id }} .sponsors-page__empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    opacity: 0.5;
+    font-style: italic;
+  }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 768px) {
+    #sponsors-page-{{ section.id }} .sponsors-page__grid--cols-3,
+    #sponsors-page-{{ section.id }} .sponsors-page__grid--cols-4 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    #sponsors-page-{{ section.id }} .sponsors-page__tier {
+      margin-bottom: 2.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #sponsors-page-{{ section.id }} .sponsors-page__grid--cols-2,
+    #sponsors-page-{{ section.id }} .sponsors-page__grid--cols-3,
+    #sponsors-page-{{ section.id }} .sponsors-page__grid--cols-4 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    #sponsors-page-{{ section.id }} .sponsors-page__item {
+      aspect-ratio: 1 / 1;
+      padding: 1rem;
+    }
+  }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Sponsors Page",
+  "tag": "section",
+  "class": "sponsors-page-section",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "intro_text",
+      "label": "Intro Text",
+      "default": "The support and generosity of sponsors is vital to the viability and strength of any volunteer-based community group or organisation, and the Park Orchards Football club is certainly reliant on the support of its sponsors."
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color (heading underline)",
+      "default": "#d4a843"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tier",
+      "name": "Sponsor Tier",
+      "settings": [
+        {
+          "type": "text",
+          "id": "tier_name",
+          "label": "Tier Heading",
+          "default": "Sponsor Tier"
+        },
+        {
+          "type": "text",
+          "id": "tier_handle",
+          "label": "Tier Handle (metaobject handle)",
+          "info": "Must match the handle of the sponsor_tier metaobject entry, e.g. major-sponsor, gold, silver, jumper, etc."
+        },
+        {
+          "type": "range",
+          "id": "columns",
+          "label": "Columns",
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "default": 2
+        },
+        {
+          "type": "range",
+          "id": "logo_height",
+          "label": "Logo Max Height (px)",
+          "min": 60,
+          "max": 300,
+          "step": 10,
+          "default": 120,
+          "unit": "px"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Sponsors Page",
+      "blocks": [
+        {
+          "type": "tier",
+          "settings": {
+            "tier_name": "2025 MAJOR SPONSOR",
+            "tier_handle": "major-sponsor",
+            "columns": 1,
+            "logo_height": 200
+          }
+        },
+        {
+          "type": "tier",
+          "settings": {
+            "tier_name": "JUMPER SPONSORS",
+            "tier_handle": "jumper",
+            "columns": 2,
+            "logo_height": 150
+          }
+        },
+        {
+          "type": "tier",
+          "settings": {
+            "tier_name": "GOLD SPONSORS",
+            "tier_handle": "gold",
+            "columns": 2,
+            "logo_height": 120
+          }
+        },
+        {
+          "type": "tier",
+          "settings": {
+            "tier_name": "SILVER SPONSORS",
+            "tier_handle": "silver",
+            "columns": 2,
+            "logo_height": 100
+          }
+        },
+        {
+          "type": "tier",
+          "settings": {
+            "tier_name": "COMMUNITY PARTNERS",
+            "tier_handle": "community-partner",
+            "columns": 3,
+            "logo_height": 100
+          }
+        },
+        {
+          "type": "tier",
+          "settings": {
+            "tier_name": "PRODUCT SUPPLY PARTNERS",
+            "tier_handle": "product-supply-partners",
+            "columns": 3,
+            "logo_height": 100
+          }
+        },
+        {
+          "type": "tier",
+          "settings": {
+            "tier_name": "DOMENERIANS SPONSOR",
+            "tier_handle": "domenerians-sponsor",
+            "columns": 1,
+            "logo_height": 120
+          }
+        },
+        {
+          "type": "tier",
+          "settings": {
+            "tier_name": "BRONZE PARTNERS",
+            "tier_handle": "bronze-partners",
+            "columns": 3,
+            "logo_height": 100
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

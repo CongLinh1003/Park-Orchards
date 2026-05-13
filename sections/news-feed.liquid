@@ -1,0 +1,653 @@
+{%- comment -%}
+  News Feed Section — Multi-Blog, No Filter
+
+  NOTE: In Shopify Liquid, `blogs` is NOT iterable — it is a hash accessed only
+  by handle. Blog handles must be provided via schema "type": "blog" pickers.
+  We concat up to 5 blogs, then sort everything newest-first.
+
+  - Left: Featured (latest) article — large card with glassmorphism overlay
+  - Right: List of remaining articles newest-first
+  - Optional "View All" link
+  - Theme: Light or Dark
+{%- endcomment -%}
+
+{%- assign heading        = section.settings.heading -%}
+{%- assign subheading     = section.settings.subheading -%}
+{%- assign theme_mode     = section.settings.theme_mode -%}
+{%- assign accent_color   = section.settings.accent_color -%}
+{%- assign article_count  = section.settings.article_count -%}
+{%- assign view_all_label = section.settings.view_all_label -%}
+{%- assign show_view_all  = section.settings.show_view_all -%}
+{%- assign view_all_url   = section.settings.view_all_url -%}
+
+{%- comment -%}
+  Merge articles from each configured blog into a single array.
+  blogs[handle] returns the blog object; .articles returns its article array.
+  concat merges arrays; sort + reverse gives newest-first order.
+{%- endcomment -%}
+{%- assign all_articles = "" | split: "" -%}
+
+{%- if section.settings.blog_1 != blank -%}
+  {%- assign all_articles = all_articles | concat: blogs[section.settings.blog_1].articles -%}
+{%- endif -%}
+{%- if section.settings.blog_2 != blank -%}
+  {%- assign all_articles = all_articles | concat: blogs[section.settings.blog_2].articles -%}
+{%- endif -%}
+{%- if section.settings.blog_3 != blank -%}
+  {%- assign all_articles = all_articles | concat: blogs[section.settings.blog_3].articles -%}
+{%- endif -%}
+{%- if section.settings.blog_4 != blank -%}
+  {%- assign all_articles = all_articles | concat: blogs[section.settings.blog_4].articles -%}
+{%- endif -%}
+{%- if section.settings.blog_5 != blank -%}
+  {%- assign all_articles = all_articles | concat: blogs[section.settings.blog_5].articles -%}
+{%- endif -%}
+
+{%- assign all_articles = all_articles | sort: 'published_at' | reverse -%}
+
+<section
+  id="news-feed-{{ section.id }}"
+  class="nf nf--{{ theme_mode }}"
+  style="--nf-accent: {{ accent_color }};"
+>
+
+<!-- ═══ DEBUG START (remove after fix) ═══
+  blogs.size = {{ blogs.size }}
+  all_articles.size = {{ all_articles.size }}
+  {% for blog in blogs %}
+  blog[{{ forloop.index }}]: title="{{ blog.title }}" handle="{{ blog.handle }}" articles.size={{ blog.articles.size }} first="{{ blog.articles.first.title }}"
+  {% endfor %}
+  all_articles.first.title = "{{ all_articles.first.title }}"
+═══ DEBUG END ═══ -->
+
+  {%- comment -%} Background logo watermark {%- endcomment -%}
+  <div class="nf__bg-logo" aria-hidden="true">
+    <img src="{{ 'pofnc-logo-opacity.png' | asset_url }}" alt="" width="400" height="400" loading="lazy">
+  </div>
+
+  {%- comment -%} Header block {%- endcomment -%}
+  <div class="nf__header">
+    {%- if heading != blank -%}
+      <h2 class="nf__heading">{{ heading }}</h2>
+    {%- endif -%}
+    {%- if subheading != blank -%}
+      <p class="nf__subheading">{{ subheading }}</p>
+    {%- endif -%}
+    <div class="nf__divider"></div>
+  </div>
+
+  {%- comment -%} Content — all blogs merged, sorted newest-first {%- endcomment -%}
+  {%- if all_articles.size > 0 -%}
+
+
+    {%- assign feat = all_articles.first -%}
+
+    <div class="nf__grid">
+
+      {%- comment -%} Featured article — left {%- endcomment -%}
+      <a href="{{ feat.url }}" class="nf__featured">
+        <div class="nf__featured-img-wrap">
+          {%- if feat.image != blank -%}
+            <img
+              src="{{ feat.image | image_url: width: 1200 }}"
+              alt="{{ feat.title | escape }}"
+              width="1200" height="800"
+              loading="lazy"
+              class="nf__featured-img"
+            >
+          {%- endif -%}
+        </div>
+        <div class="nf__featured-overlay">
+          {%- if feat.tags.size > 0 -%}
+            <span class="nf__tag">{{ feat.tags.first }}</span>
+          {%- endif -%}
+          <span class="nf__date">{{ feat.published_at | date: '%d %B %Y' }}</span>
+          <h3 class="nf__featured-title">{{ feat.title | truncate: 70 }}</h3>
+          <span class="nf__read-more">
+            Read more
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </span>
+        </div>
+      </a>
+
+      {%- comment -%} Article list — right {%- endcomment -%}
+      <div class="nf__list">
+        {%- for article in all_articles limit: article_count offset: 1 -%}
+          <a href="{{ article.url }}" class="nf__item">
+            <div class="nf__item-img-wrap">
+              {%- if article.image != blank -%}
+                <img
+                  src="{{ article.image | image_url: width: 480 }}"
+                  alt="{{ article.title | escape }}"
+                  width="480" height="320"
+                  loading="lazy"
+                  class="nf__item-img"
+                >
+              {%- else -%}
+                <div class="nf__item-img-placeholder"></div>
+              {%- endif -%}
+            </div>
+            <div class="nf__item-body">
+              {%- if article.tags.size > 0 -%}
+                <span class="nf__item-tag">{{ article.tags.first }}</span>
+              {%- endif -%}
+              <h4 class="nf__item-title">{{ article.title | truncate: 55 }}</h4>
+              <span class="nf__item-date">{{ article.published_at | date: '%d %B %Y' }}</span>
+            </div>
+            <span class="nf__item-arrow" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </span>
+          </a>
+        {%- endfor -%}
+      </div>
+
+    </div>
+
+    {%- if show_view_all and view_all_url != blank -%}
+      <div class="nf__footer">
+        <a href="{{ view_all_url }}" class="nf__view-all">
+          {{ view_all_label | default: 'View All' }}
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </a>
+      </div>
+    {%- endif -%}
+
+  {%- endif -%}
+
+</section>
+
+{% style %}
+  /* ═══════════════════════════════════════════
+     NEWS FEED — No Filter / Clean
+  ═══════════════════════════════════════════ */
+
+  #news-feed-{{ section.id }} {
+    padding: clamp(3rem, 6vw, 5rem) clamp(1rem, 4vw, 4rem);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ─── Theme: Dark ─── */
+  #news-feed-{{ section.id }}.nf--dark {
+    background: linear-gradient(160deg, #0d0d0d 0%, #1a0808 40%, #0d0d0d 100%);
+    color: #fff;
+  }
+
+  /* ─── Theme: Light ─── */
+  #news-feed-{{ section.id }}.nf--light {
+    background: linear-gradient(160deg, #f8f6f4 0%, #f0e8e6 50%, #f8f6f4 100%);
+    color: #1a1a1a;
+  }
+
+  /* ─── Background watermark ─── */
+  #news-feed-{{ section.id }} .nf__bg-logo {
+    position: absolute;
+    bottom: -4%;
+    right: -3%;
+    width: clamp(180px, 28vw, 380px);
+    height: auto;
+    opacity: 1;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  #news-feed-{{ section.id }} .nf__bg-logo img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* ─── z-index stack ─── */
+  #news-feed-{{ section.id }} .nf__header,
+  #news-feed-{{ section.id }} .nf__grid,
+  #news-feed-{{ section.id }} .nf__footer {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ═══════════════════════════════════════════
+     HEADER
+  ═══════════════════════════════════════════ */
+
+  #news-feed-{{ section.id }} .nf__header {
+    margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  #news-feed-{{ section.id }} .nf__heading {
+    font-family: 'Antonio', 'Oswald', 'Impact', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.8rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 0.4rem 0;
+    line-height: 1;
+  }
+
+  #news-feed-{{ section.id }}.nf--dark .nf__heading  { color: #fff; }
+  #news-feed-{{ section.id }}.nf--light .nf__heading { color: #111; }
+
+  #news-feed-{{ section.id }} .nf__subheading {
+    font-size: clamp(0.85rem, 1.4vw, 1rem);
+    letter-spacing: 0.04em;
+    margin: 0 0 1rem 0;
+    opacity: 0.65;
+  }
+
+  #news-feed-{{ section.id }} .nf__divider {
+    width: 5rem;
+    height: 3px;
+    background: var(--nf-accent, #8b1a1a);
+    border-radius: 2px;
+  }
+
+  /* ═══════════════════════════════════════════
+     GRID
+  ═══════════════════════════════════════════ */
+
+  #news-feed-{{ section.id }} .nf__grid {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: clamp(1rem, 2vw, 1.5rem);
+    align-items: start;
+  }
+
+  /* ═══════════════════════════════════════════
+     FEATURED — LEFT
+  ═══════════════════════════════════════════ */
+
+  #news-feed-{{ section.id }} .nf__featured {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    text-decoration: none;
+    color: #fff;
+    min-height: 380px;
+    max-height: 560px;
+  }
+
+  #news-feed-{{ section.id }} .nf__featured-img-wrap {
+    width: 100%;
+    height: 100%;
+    min-height: 380px;
+    max-height: 560px;
+  }
+
+  #news-feed-{{ section.id }} .nf__featured-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s ease;
+  }
+
+  #news-feed-{{ section.id }} .nf__featured:hover .nf__featured-img {
+    transform: scale(1.04);
+  }
+
+  /* Overlay */
+  #news-feed-{{ section.id }} .nf__featured-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: clamp(1.2rem, 2.5vw, 2rem);
+    background: linear-gradient(to top, rgba(10,0,0,0.85) 0%, rgba(10,0,0,0.4) 60%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  #news-feed-{{ section.id }} .nf__tag {
+    display: inline-block;
+    font-family: 'Antonio', 'Oswald', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    background: var(--nf-accent, #8b1a1a);
+    color: #fff;
+    padding: 0.2rem 0.6rem;
+    align-self: flex-start;
+    border-radius: 2px;
+  }
+
+  #news-feed-{{ section.id }} .nf__date {
+    font-family: 'Antonio', 'Oswald', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    color: rgba(255,255,255,0.7);
+    text-transform: uppercase;
+  }
+
+  #news-feed-{{ section.id }} .nf__featured-title {
+    font-family: 'Antonio', 'AnekGurmukhi', 'Oswald', sans-serif;
+    font-size: clamp(1.3rem, 2.5vw, 2rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: #fff;
+    margin: 0;
+    line-height: 1.15;
+  }
+
+  #news-feed-{{ section.id }} .nf__read-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'Antonio', 'Oswald', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.8);
+    margin-top: 0.3rem;
+    transition: color 0.3s ease, gap 0.3s ease;
+  }
+
+  #news-feed-{{ section.id }} .nf__featured:hover .nf__read-more {
+    color: #fff;
+    gap: 0.6rem;
+  }
+
+  /* ═══════════════════════════════════════════
+     LIST — RIGHT
+  ═══════════════════════════════════════════ */
+
+  #news-feed-{{ section.id }} .nf__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-height: 560px;
+    overflow-y: auto;
+  }
+
+  /* ─── Scrollbar ─── */
+  #news-feed-{{ section.id }} .nf__list::-webkit-scrollbar { width: 3px; }
+  #news-feed-{{ section.id }} .nf__list::-webkit-scrollbar-track { background: transparent; }
+  #news-feed-{{ section.id }} .nf__list::-webkit-scrollbar-thumb { background: var(--nf-accent, #8b1a1a); border-radius: 3px; }
+
+  /* ─── Item ─── */
+  #news-feed-{{ section.id }} .nf__item {
+    display: grid;
+    grid-template-columns: 90px 1fr auto;
+    align-items: center;
+    gap: 0;
+    text-decoration: none;
+    color: inherit;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    transition: background 0.25s ease;
+    position: relative;
+  }
+
+  #news-feed-{{ section.id }}.nf--light .nf__item {
+    border-bottom-color: rgba(0,0,0,0.08);
+  }
+
+  #news-feed-{{ section.id }} .nf__item:first-child {
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+
+  #news-feed-{{ section.id }}.nf--light .nf__item:first-child {
+    border-top-color: rgba(0,0,0,0.08);
+  }
+
+  #news-feed-{{ section.id }}.nf--dark .nf__item:hover  { background: rgba(255,255,255,0.04); }
+  #news-feed-{{ section.id }}.nf--light .nf__item:hover { background: rgba(0,0,0,0.04); }
+
+  /* Item image */
+  #news-feed-{{ section.id }} .nf__item-img-wrap {
+    width: 90px;
+    height: 70px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  #news-feed-{{ section.id }} .nf__item-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+
+  #news-feed-{{ section.id }} .nf__item:hover .nf__item-img {
+    transform: scale(1.08);
+  }
+
+  #news-feed-{{ section.id }} .nf__item-img-placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--nf-accent, #8b1a1a);
+    opacity: 0.25;
+  }
+
+  /* Item body */
+  #news-feed-{{ section.id }} .nf__item-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.7rem 0.8rem;
+  }
+
+  #news-feed-{{ section.id }} .nf__item-tag {
+    font-family: 'Antonio', 'Oswald', sans-serif;
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--nf-accent, #8b1a1a);
+  }
+
+  #news-feed-{{ section.id }} .nf__item-title {
+    font-family: 'Antonio', 'AnekGurmukhi', 'Oswald', sans-serif;
+    font-size: clamp(0.78rem, 1.2vw, 0.92rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin: 0;
+    line-height: 1.25;
+  }
+
+  #news-feed-{{ section.id }}.nf--dark  .nf__item-title { color: #fff; }
+  #news-feed-{{ section.id }}.nf--light .nf__item-title { color: #111; }
+
+  #news-feed-{{ section.id }} .nf__item-date {
+    font-family: 'Antonio', 'Oswald', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  #news-feed-{{ section.id }}.nf--dark  .nf__item-date { color: rgba(255,255,255,0.45); }
+  #news-feed-{{ section.id }}.nf--light .nf__item-date { color: rgba(0,0,0,0.4); }
+
+  /* Arrow */
+  #news-feed-{{ section.id }} .nf__item-arrow {
+    display: flex;
+    align-items: center;
+    padding: 0 0.8rem;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0.35;
+  }
+
+  #news-feed-{{ section.id }}.nf--dark  .nf__item-arrow { color: #fff; }
+  #news-feed-{{ section.id }}.nf--light .nf__item-arrow { color: #111; }
+
+  #news-feed-{{ section.id }} .nf__item:hover .nf__item-arrow {
+    transform: translateX(4px);
+    opacity: 1;
+    color: var(--nf-accent, #8b1a1a);
+  }
+
+  /* ═══════════════════════════════════════════
+     FOOTER — VIEW ALL
+  ═══════════════════════════════════════════ */
+
+  #news-feed-{{ section.id }} .nf__footer {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  #news-feed-{{ section.id }} .nf__view-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Antonio', 'Oswald', sans-serif;
+    font-size: clamp(0.8rem, 1.2vw, 0.95rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    padding: 0.65rem 1.8rem;
+    border: 2px solid var(--nf-accent, #8b1a1a);
+    color: var(--nf-accent, #8b1a1a);
+    background: transparent;
+    transition: background 0.3s ease, color 0.3s ease, gap 0.3s ease;
+    border-radius: 2px;
+  }
+
+  #news-feed-{{ section.id }} .nf__view-all:hover {
+    background: var(--nf-accent, #8b1a1a);
+    color: #fff;
+    gap: 0.75rem;
+  }
+
+  /* ═══════════════════════════════════════════
+     RESPONSIVE
+  ═══════════════════════════════════════════ */
+
+  @media (max-width: 900px) {
+    #news-feed-{{ section.id }} .nf__grid {
+      grid-template-columns: 1fr;
+    }
+
+    #news-feed-{{ section.id }} .nf__featured-img-wrap {
+      min-height: 260px;
+      max-height: 360px;
+    }
+
+    #news-feed-{{ section.id }} .nf__list {
+      max-height: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #news-feed-{{ section.id }} .nf__item {
+      grid-template-columns: 70px 1fr auto;
+    }
+
+    #news-feed-{{ section.id }} .nf__item-img-wrap {
+      width: 70px;
+      height: 60px;
+    }
+  }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "News Feed",
+  "tag": "section",
+  "class": "news-feed-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "LATEST NEWS"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "News, events, updates & more"
+    },
+    {
+      "type": "select",
+      "id": "theme_mode",
+      "label": "Theme",
+      "options": [
+        { "value": "dark",  "label": "Dark (Black → Red)" },
+        { "value": "light", "label": "Light (White → Red)" }
+      ],
+      "default": "dark"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#8b1a1a"
+    },
+    {
+      "type": "header",
+      "content": "Blog Sources"
+    },
+    {
+      "type": "paragraph",
+      "content": "Add up to 5 blogs. All articles are merged and shown newest-first — no tabs or filters."
+    },
+    {
+      "type": "blog",
+      "id": "blog_1",
+      "label": "Blog 1"
+    },
+    {
+      "type": "blog",
+      "id": "blog_2",
+      "label": "Blog 2"
+    },
+    {
+      "type": "blog",
+      "id": "blog_3",
+      "label": "Blog 3"
+    },
+    {
+      "type": "blog",
+      "id": "blog_4",
+      "label": "Blog 4"
+    },
+    {
+      "type": "blog",
+      "id": "blog_5",
+      "label": "Blog 5"
+    },
+    {
+      "type": "range",
+      "id": "article_count",
+      "label": "Articles in list (right side)",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 5,
+      "info": "Excludes the featured article on the left."
+    },
+    {
+      "type": "header",
+      "content": "View All Button"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "Button label",
+      "default": "View All News"
+    },
+    {
+      "type": "url",
+      "id": "view_all_url",
+      "label": "Button URL",
+      "info": "Link to a blog, page, or any URL."
+    }
+  ],
+  "presets": [
+    {
+      "name": "News Feed"
+    }
+  ]
+}
+{% endschema %}

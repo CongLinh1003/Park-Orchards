@@ -712,3 +712,52 @@ Products plus Collections cho phần bán hàng
 Blogs plus Articles plus article metafields cho News và Events
 
 Cấu trúc này rất hợp với site câu lạc bộ vì dữ liệu có nhiều nhóm nhưng mỗi nhóm lại có logic hiển thị riêng.
+
+─────────────────────────────────────────────────────────
+
+9) Sponsorship Packages (bổ sung)
+sponsorship_package metaobject
+
+Dùng cho section "Sponsorship Packages" trên trang Sponsor.
+Mỗi entry là một gói tài trợ (Executive Partner, Gold, Silver, Bronze...).
+Section Liquid query dynamic từ metaobject, không cần hardcode vào theme.
+
+Field nên có
+
+Package Name
+text — tên badge hiển thị trên banner, ví dụ #EXECUTIVE_PARTNER
+
+Price
+text — ví dụ $30,000+GST
+
+Minimum Term
+text — ví dụ 2 YEAR MINIMUM
+
+Inclusions
+rich_text_field — danh sách quyền lợi (ordered/unordered list)
+
+Sort Order
+number_integer — số thứ tự hiển thị, số nhỏ lên trước
+
+Active
+boolean — false = ẩn gói mà không cần xóa
+
+Capabilities
+publishable — bật để client draft trước rồi publish sau
+
+Data source trong Liquid
+shop.metaobjects.sponsorship_package.values
+Loop và filter by active == true
+Sort theo sort_order field (ascending)
+
+Section file tương ứng
+sections/sponsorship-packages.liquid
+
+Setup script
+setup-sponsorship-packages.js
+Chạy một lần để tạo definition + 4 sample entries (Executive, Gold, Silver, Bronze)
+
+Ghi chú quản trị
+Vào Admin > Content > Metaobjects > Sponsorship Packages để nhập/sửa gói
+Nhập Inclusions bằng rich text editor trong admin
+Thay đổi Sort Order để đổi thứ tự slide trên frontend

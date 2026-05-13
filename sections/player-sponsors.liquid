@@ -1,0 +1,496 @@
+{%- comment -%}
+  Player Sponsors Section
+  Displays all sponsors from club_sponsor metaobjects filtered by scope "player-sponsor".
+  No tabs or category filter.
+{%- endcomment -%}
+
+{%- liquid
+  assign bg_start    = section.settings.bg_gradient_start
+  assign bg_end      = section.settings.bg_gradient_end
+  assign text_color  = section.settings.text_color
+  assign accent      = section.settings.accent_color
+  assign button_text = section.settings.button_text
+  assign button_link = section.settings.button_link
+
+  assign show_subtitle = section.settings.show_subtitle
+  assign show_heading  = section.settings.show_heading
+  assign show_intro    = section.settings.show_intro
+  assign subtitle_text = section.settings.subtitle_text
+  assign heading_text  = section.settings.heading_text
+  assign intro_text    = section.settings.intro_text
+
+  assign bg_texture = 'https://cdn.shopify.com/s/files/1/0898/4759/5307/files/3807.jpg?v=1741767664'
+  assign player_placeholder = 'https://cdn.shopify.com/s/files/1/0898/4759/5307/files/player-hero.png?v=1741767664'
+-%}
+
+<section
+  id="player-sponsors-{{ section.id }}"
+  class="player-sponsors-section"
+  style="
+    --ps-bg-start: {{ bg_start }};
+    --ps-bg-end: {{ bg_end }};
+    --ps-text: {{ text_color }};
+    --ps-accent: {{ accent }};
+  "
+>
+  <div class="ps__inner">
+    {%- if show_subtitle or show_heading or show_intro -%}
+      <div class="ps__header">
+        {%- if show_subtitle and subtitle_text != blank -%}
+          <span class="ps__subtitle">{{ subtitle_text }}</span>
+        {%- endif -%}
+        {%- if show_heading and heading_text != blank -%}
+          <h2 class="ps__heading">{{ heading_text }}</h2>
+        {%- endif -%}
+        {%- if show_intro and intro_text != blank -%}
+          <p class="ps__intro">{{ intro_text }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="ps__list-container">
+      <div class="ps__grid">
+        {%- assign all_sponsors = shop.metaobjects.club_sponsor.values -%}
+        {%- assign scope_handle_target = 'player-sponsor' -%}
+        {%- assign found_count = 0 -%}
+
+        {%- for sponsor in all_sponsors -%}
+          {%- assign s_scope = sponsor.scope.value -%}
+          {%- assign s_scope_handle = s_scope.handle | default: s_scope.system.handle -%}
+
+          {%- if s_scope_handle == scope_handle_target and sponsor.sponsored_player != blank -%}
+            {%- assign player = sponsor.sponsored_player.value -%}
+            {%- assign s_name = sponsor.sponsor_name.value | default: sponsor.display_name -%}
+            {%- assign p_name = player.full_name.value | default: player.display_name -%}
+            {%- assign p_number = player.jersey_number.value | default: '00' -%}
+            {%- assign p_photo = player.profile_photo.value -%}
+
+            <div class="ps__card">
+              <div class="ps__card-media">
+
+                <div class="ps__card-bg-texture" style="loading="lazy"><div style="position:relative; width: 100%; height: 100%;">
+                    {% comment %} <h2 style="
+    font-size: 1.2rem;
+    color: white;
+    position: absolute;
+    top: 20%;
+    text-transform: uppercase;
+    left: 51%;
+    transform: translateX(-50%);
+    text-align: center;
+    width: 45%;
+">{{ sponsor.sponsor_name.value }}</h2> {% endcomment %}
+<span style="
+    font-family: 'Antonio', sans-serif;
+    font-weight: 800;
+    line-height: 0.9;
+    font-size: 3rem;
+    color: white;
+    position: absolute;
+    top: 25%;
+    text-transform: uppercase;
+    left: 51%;
+    transform: translateX(-50%);
+    text-align: center;
+    width: 45%;
+">{{ sponsor.sponsored_player.value.jersey_number.value }}</span>
+
+</div></div>
+
+                <div class="ps__card-player-photo">
+                  {%- if p_photo != blank -%}
+                    <img src="{{ p_photo | image_url: width: 600 }}" alt="{{ p_name | escape }}" loading="lazy">
+                  {%- endif -%}
+                </div>
+
+                {% comment %} <img src="{{ bg_texture }}" alt="" class="ps__card-bg-texture" loading="lazy">
+
+                <div class="ps__card-player-photo">
+                  {%- if p_photo != blank -%}
+                    <img src="{{ p_photo | image_url: width: 600 }}" alt="{{ p_name | escape }}" loading="lazy">
+                  {%- else -%}
+                    <img src="{{ player_placeholder }}" alt="Placeholder Player" loading="lazy" class="ps__placeholder-player">
+                  {%- endif -%}
+                </div> {% endcomment %}
+
+                <div class="ps__card-player-info">
+                  <span class="ps__card-number">#{{ p_number }}</span>
+                  <span class="ps__card-pname">{{ p_name }}</span>
+                </div>
+              </div>
+
+              <div class="ps__card-content">
+                {%- if sponsor.logo.value != blank -%}
+  <img
+    src="{{ sponsor.logo.value | image_url: width: 400 }}"
+    alt="{{ sponsor.sponsor_name.value | escape }}"
+    loading="lazy"
+    style="
+    width: 100%;
+    background: white;
+    padding: 0.5rem;
+    max-height: 5rem;
+    object-fit: contain;
+"
+  >
+{%- endif -%}
+                <h3 class="ps__card-sname">{{ s_name }}</h3>
+              </div>
+            </div>
+
+            {%- assign found_count = found_count | plus: 1 -%}
+          {%- endif -%}
+        {%- endfor -%}
+
+        {%- if found_count == 0 -%}
+          <p class="ps__empty">No player sponsors found. Run the setup script to generate data.</p>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- if button_text != blank -%}
+      <div class="ps__footer">
+        <a href="{{ button_link | default: '#' }}" class="ps__btn">{{ button_text }}</a>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% style %}
+  @import url('https://fonts.googleapis.com/css2?family=Anek+Gurmukhi:wght@400;600;700;800&display=swap');
+
+  #player-sponsors-{{ section.id }} {
+    background: linear-gradient(180deg, var(--ps-bg-start) 0%, var(--ps-bg-end) 100%);
+    color: var(--ps-text);
+    padding: clamp(3rem, 6vw, 5rem) 0;
+    font-family: 'Anek Gurmukhi', system-ui, sans-serif;
+  }
+
+  #player-sponsors-{{ section.id }} .ps__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 clamp(1.5rem, 3vw, 3rem);
+  }
+
+  #player-sponsors-{{ section.id }} .ps__header {
+    text-align: center;
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+  }
+
+  #player-sponsors-{{ section.id }} .ps__subtitle {
+    display: block;
+    font-family: 'Antonio', 'Impact', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #1a1a1a;
+  }
+
+  #player-sponsors-{{ section.id }} .ps__heading {
+    font-family: 'Antonio', 'Impact', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin: 0 0 1rem;
+    color: var(--ps-accent);
+    line-height: 1.1;
+  }
+
+  #player-sponsors-{{ section.id }} .ps__intro {
+    max-width: 700px;
+    margin: 0 auto;
+    font-weight: 600;
+    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+    color: #333;
+    line-height: 1.6;
+  }
+
+  #player-sponsors-{{ section.id }} .ps__list-container {
+    margin-bottom: 3rem;
+  }
+
+  #player-sponsors-{{ section.id }} .ps__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 990px) {
+    #player-sponsors-{{ section.id }} .ps__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+  }
+
+  #player-sponsors-{{ section.id }} .ps__card {
+    display: flex;
+    background: #fff;
+    border: 2px solid var(--ps-accent);
+    height: 320px;
+    overflow: hidden;
+  }
+
+  @media (max-width: 600px) {
+    #player-sponsors-{{ section.id }} .ps__card {
+      height: 280px;
+    }
+  }
+
+  #player-sponsors-{{ section.id }} .ps__card-media {
+    flex: 0 0 45%;
+    position: relative;
+    background: #333;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    overflow: hidden;
+  }
+
+  #player-sponsors-{{ section.id }} .ps__card-bg-texture {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.6;
+    z-index: 1;
+    background-image:url('https://cdn.shopify.com/s/files/1/0970/7290/6603/files/Player_Jersey.jpg?v=1776758413');
+                      opacity: 1;
+    background-repeat: no-repeat;
+    background-position: 50% 20%;
+    background-size: 60%;
+    mix-blend-mode: normal;
+    background-color: white;
+    border-right: solid 1px #e9e9e9;
+  }
+  #player-sponsors-{{ section.id }} .ps__card-player-photo:after {
+     content: "";
+  position: absolute;
+  display: block;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  background: linear-gradient(to top, #42242457 0%, transparent 50%);
+}
+
+  #player-sponsors-{{ section.id }} .ps__card-player-photo {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+  }
+
+  #player-sponsors-{{ section.id }} .ps__card-player-photo img {
+    height: 100%;
+    width: auto;
+    object-fit: cover;
+    object-position: bottom center;
+  }
+
+  #player-sponsors-{{ section.id }} .ps__placeholder-player {
+    filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+  }
+
+  #player-sponsors-{{ section.id }} .ps__card-player-info {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 1rem;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+    gap: 0.2rem;
+  }
+
+  #player-sponsors-{{ section.id }} .ps__card-number {
+    font-family: 'Antonio', sans-serif;
+    font-weight: 800;
+    font-size: 2.5rem;
+    line-height: 0.9;
+  }
+
+  #player-sponsors-{{ section.id }} .ps__card-pname {
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  #player-sponsors-{{ section.id }} .ps__card-content {
+    flex: 1;
+    position: relative;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    background: #fff;
+    overflow: hidden;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+  }
+
+  #player-sponsors-{{ section.id }} .ps__card-watermark {
+    position: absolute;
+    left: -0.5rem;
+    top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    font-family: 'Antonio', 'Impact', sans-serif;
+    font-weight: 800;
+    font-size: 5rem;
+    color: rgba(0,0,0,0.06);
+    letter-spacing: 0.05em;
+    pointer-events: none;
+    transform-origin: left center;
+    white-space: nowrap;
+  }
+
+  #player-sponsors-{{ section.id }} .ps__card-sname {
+    font-family: 'Anek Gurmukhi', sans-serif;
+    font-weight: 900;
+    font-size: clamp(1.3rem, 2.2vw, 1.5rem);
+    text-transform: uppercase;
+    line-height: 1.2;
+    color: #1a1a1a;
+    margin: 0;
+    position: relative;
+    z-index: 2;
+    text-align: center;
+  }
+
+  #player-sponsors-{{ section.id }} .ps__empty {
+    text-align: center;
+    font-weight: 700;
+    color: #333;
+    grid-column: 1 / -1;
+  }
+
+  #player-sponsors-{{ section.id }} .ps__footer {
+    text-align: center;
+    margin-top: 3rem;
+  }
+
+  #player-sponsors-{{ section.id }} .ps__btn {
+    display: inline-block;
+    border: 2px solid #fff;
+    background: transparent;
+    color: #fff;
+    padding: 0.8rem 2.5rem;
+    font-weight: 800;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  #player-sponsors-{{ section.id }} .ps__btn:hover {
+    background: #fff;
+    color: var(--ps-accent);
+  }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Player Sponsors",
+  "tag": "section",
+  "class": "player-sponsors-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Header Area"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_subtitle",
+      "label": "Show Subtitle",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "subtitle_text",
+      "label": "Subtitle Text",
+      "default": "PLAYER SPONSORS"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_heading",
+      "label": "Show Heading",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "heading_text",
+      "label": "Heading Text",
+      "default": "PLAYER SPONSORS"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_intro",
+      "label": "Show Intro Text",
+      "default": true
+    },
+    {
+      "type": "textarea",
+      "id": "intro_text",
+      "label": "Intro Text",
+      "default": "We thank the following sponsors for their generous support of our players and encourage all Sharks members, supporters and players to support these businesses wherever possible."
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Learn More"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_gradient_start",
+      "label": "Background Start",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "bg_gradient_end",
+      "label": "Background End",
+      "default": "#b12025"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color (Red)",
+      "default": "#b12025"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#1a1a1a"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Player Sponsors"
+    }
+  ]
+}
+{% endschema %}

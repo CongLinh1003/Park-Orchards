@@ -1,0 +1,492 @@
+{%- liquid
+  assign cta_subtitle    = block.settings.subtitle
+  assign cta_title       = block.settings.title
+  assign cta_price       = block.settings.price
+  assign cta_price_label = block.settings.price_label
+  assign cta_desc        = block.settings.description
+  assign cta_btn_text    = block.settings.button_text
+  assign cta_btn_url     = block.settings.button_url
+  assign cta_icon        = block.settings.icon
+  assign cta_featured    = block.settings.featured
+  assign cta_accent      = block.settings.accent_color    | default: '#c0182d'
+  assign cta_card_bg     = block.settings.card_bg          | default: '#ffffff'
+  assign cta_title_color = block.settings.title_color      | default: '#1a1a1a'
+  assign cta_text_color  = block.settings.text_color       | default: '#555555'
+  assign cta_border_color = block.settings.border_color    | default: '#e5e5e5'
+  assign cta_btn_text_c  = block.settings.button_text_color | default: '#ffffff'
+  assign cta_max_w       = block.settings.max_width        | default: 420
+  assign cta_shadow      = block.settings.card_shadow
+  assign cta_title_size  = block.settings.title_font_size   | default: 1.75
+  assign cta_card_radius = block.settings.card_radius       | default: 20
+  assign cta_btn_radius  = block.settings.button_radius     | default: 12
+  assign cta_show_sub    = block.settings.show_subtitle
+-%}
+
+<div
+  class="pb-spc pb-spc-{{ block.id }}{% if cta_featured %} pb-spc--featured{% endif %}"
+  style="
+    --spc-accent: {{ cta_accent }};
+    --spc-accent-rgb: {{ cta_accent | color_to_rgb | remove: 'rgb(' | remove: ')' }};
+    --spc-card-bg: {{ cta_card_bg }};
+    --spc-title: {{ cta_title_color }};
+    --spc-text: {{ cta_text_color }};
+    --spc-border: {{ cta_border_color }};
+    --spc-btn-text: {{ cta_btn_text_c }};
+    --spc-max-w: {{ cta_max_w }}px;
+    --spc-title-size: {{ cta_title_size }}rem;
+    --spc-card-radius: {{ cta_card_radius }}px;
+    --spc-btn-radius: {{ cta_btn_radius }}px;
+  "
+  {{ block.shopify_attributes }}
+>
+  {%- comment -%} Accent top bar {%- endcomment -%}
+  <div class="pb-spc__bar"></div>
+
+  {%- comment -%} Background glow {%- endcomment -%}
+  <div class="pb-spc__glow"></div>
+
+  {%- comment -%} Content {%- endcomment -%}
+  <div class="pb-spc__body">
+
+    {%- comment -%} Icon {%- endcomment -%}
+    {%- if block.settings.show_icon -%}
+      {%- if cta_icon != blank -%}
+        <div class="pb-spc__icon">
+          <img src="{{ cta_icon | image_url: width: 64 }}" alt="" width="64" height="64" loading="lazy">
+        </div>
+      {%- else -%}
+        <div class="pb-spc__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+
+    {%- comment -%} Subtitle pill {%- endcomment -%}
+    {%- if cta_show_sub and cta_subtitle != blank -%}
+      <span class="pb-spc__sub">{{ cta_subtitle }}</span>
+    {%- endif -%}
+
+    {%- comment -%} Title {%- endcomment -%}
+    {%- if cta_title != blank -%}
+      <h3 class="pb-spc__title">{{ cta_title }}</h3>
+    {%- endif -%}
+
+    {%- comment -%} Divider {%- endcomment -%}
+    <div class="pb-spc__divider"></div>
+
+    {%- comment -%} Price {%- endcomment -%}
+    {%- if cta_price != blank -%}
+      <div class="pb-spc__price-wrap">
+        <span class="pb-spc__price">{{ cta_price }}</span>
+        {%- if cta_price_label != blank -%}
+          <span class="pb-spc__price-lbl">{{ cta_price_label }}</span>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} Description {%- endcomment -%}
+    {%- if cta_desc != blank -%}
+      <p class="pb-spc__desc">{{ cta_desc }}</p>
+    {%- endif -%}
+
+    {%- comment -%} CTA Button {%- endcomment -%}
+    {%- if cta_btn_text != blank -%}
+      <a href="{{ cta_btn_url | default: '#' }}" class="pb-spc__btn">
+        {{ cta_btn_text }}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+          <polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </a>
+    {%- endif -%}
+
+  </div>
+</div>
+
+<style>
+  /* ═══════════════════════════════════════════
+     PB SPONSORSHIP CTA — Theme block
+  ═══════════════════════════════════════════ */
+
+  .pb-spc-{{ block.id }} {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    position: relative;
+    width: 100%;
+    max-width: var(--spc-max-w, 420px);
+    margin: 0 auto;
+    background: var(--spc-card-bg, #ffffff);
+    border: 1px solid var(--spc-border, #e5e5e5);
+    border-radius: var(--spc-card-radius, 20px);
+    overflow: hidden;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.3s ease,
+                box-shadow 0.4s ease;
+    {%- if cta_shadow -%}
+    box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.08);
+    {%- endif -%}
+  }
+
+  .pb-spc-{{ block.id }}:hover {
+    transform: translateY(-6px);
+    border-color: rgba(var(--spc-accent-rgb), 0.4);
+    box-shadow:
+      0 24px 64px -16px rgba(0, 0, 0, 0.12),
+      0 0 48px -12px rgba(var(--spc-accent-rgb), 0.1);
+  }
+
+  /* Featured */
+  .pb-spc-{{ block.id }}.pb-spc--featured {
+    border-color: rgba(var(--spc-accent-rgb), 0.3);
+  }
+  .pb-spc-{{ block.id }}.pb-spc--featured .pb-spc__bar {
+    height: 4px;
+  }
+
+  /* ─── Accent bar ─── */
+  .pb-spc-{{ block.id }} .pb-spc__bar {
+    height: 3px;
+    background: linear-gradient(90deg, var(--spc-accent), transparent);
+  }
+
+  /* ─── Glow ─── */
+  .pb-spc-{{ block.id }} .pb-spc__glow {
+    position: absolute;
+    top: -40%;
+    left: -20%;
+    width: 140%;
+    height: 100%;
+    background: radial-gradient(ellipse at center, rgba(var(--spc-accent-rgb), 0.04) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  /* ─── Body ─── */
+  .pb-spc-{{ block.id }} .pb-spc__body {
+    position: relative;
+    z-index: 1;
+    padding: clamp(2rem, 4vw, 3rem) clamp(1.5rem, 3vw, 2.5rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  /* ─── Icon ─── */
+  .pb-spc-{{ block.id }} .pb-spc__icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: rgba(var(--spc-accent-rgb), 0.1);
+    border: 1px solid rgba(var(--spc-accent-rgb), 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--spc-accent);
+    margin-bottom: 1.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .pb-spc-{{ block.id }}:hover .pb-spc__icon {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px -4px rgba(var(--spc-accent-rgb), 0.2);
+  }
+  .pb-spc-{{ block.id }} .pb-spc__icon img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+  }
+
+  /* ─── Subtitle pill ─── */
+  .pb-spc-{{ block.id }} .pb-spc__sub {
+    display: inline-block;
+    font-weight: 600;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--spc-accent);
+    padding: 0.3rem 0.9rem;
+    border: 1px solid rgba(var(--spc-accent-rgb), 0.25);
+    border-radius: 100px;
+    background: rgba(var(--spc-accent-rgb), 0.06);
+    margin-bottom: 1rem;
+  }
+
+  /* ─── Title ─── */
+  .pb-spc-{{ block.id }} .pb-spc__title {
+    font-size: var(--spc-title-size, 1.75rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    color: var(--spc-title, #1a1a1a);
+    margin: 0 0 1.25rem;
+    line-height: 1.15;
+  }
+
+  /* ─── Divider ─── */
+  .pb-spc-{{ block.id }} .pb-spc__divider {
+    width: 48px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(var(--spc-accent-rgb), 0.4), transparent);
+    margin-bottom: 1.5rem;
+  }
+
+  /* ─── Price ─── */
+  .pb-spc-{{ block.id }} .pb-spc__price-wrap {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .pb-spc-{{ block.id }} .pb-spc__price {
+    font-size: clamp(2.75rem, 6vw, 3.5rem);
+    font-weight: 900;
+    color: var(--spc-accent);
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  .pb-spc-{{ block.id }} .pb-spc__price-lbl {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--spc-text, #555555);
+    text-transform: lowercase;
+  }
+
+  /* ─── Description ─── */
+  .pb-spc-{{ block.id }} .pb-spc__desc {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--spc-text, #555555);
+    margin: 0 0 1.5rem;
+    max-width: 280px;
+  }
+
+  /* ─── CTA Button ─── */
+  .pb-spc-{{ block.id }} .pb-spc__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 2rem;
+    background: var(--spc-accent);
+    color: var(--spc-btn-text, #fff);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    border-radius: var(--spc-btn-radius, 12px);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
+  }
+  .pb-spc-{{ block.id }} .pb-spc__btn:hover {
+    filter: brightness(1.15);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px -4px rgba(var(--spc-accent-rgb), 0.45);
+  }
+  .pb-spc-{{ block.id }} .pb-spc__btn svg {
+    transition: transform 0.3s ease;
+  }
+  .pb-spc-{{ block.id }} .pb-spc__btn:hover svg {
+    transform: translateX(3px);
+  }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 480px) {
+    .pb-spc-{{ block.id }} {
+      max-width: 100%;
+      border-radius: 16px;
+    }
+    .pb-spc-{{ block.id }} .pb-spc__body {
+      padding: 2rem 1.5rem;
+    }
+    .pb-spc-{{ block.id }} .pb-spc__price {
+      font-size: 2.75rem;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "PB Sponsorship CTA",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "── Content ──"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle tag",
+      "default": "Support the club"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Player Sponsorship"
+    },
+    {
+      "type": "text",
+      "id": "price",
+      "label": "Price",
+      "default": "$198"
+    },
+    {
+      "type": "text",
+      "id": "price_label",
+      "label": "Price label",
+      "default": "per player",
+      "info": "Shown beside the price (e.g. 'per player', 'per season')"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "Short description",
+      "info": "Optional supporting text below the price"
+    },
+
+    {
+      "type": "header",
+      "content": "── Button ──"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "Become A Player Sponsor"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "Button link"
+    },
+
+    {
+      "type": "header",
+      "content": "── Colors ──"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#c0182d",
+      "info": "Used for price, icon, subtitle pill, button, and divider"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#555555",
+      "info": "Price label, description text"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#e5e5e5"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text color",
+      "default": "#ffffff"
+    },
+
+    {
+      "type": "header",
+      "content": "── Appearance ──"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_icon",
+      "label": "Show icon",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "icon",
+      "label": "Custom icon (optional)",
+      "info": "If empty, a default heart icon is used."
+    },
+    {
+      "type": "checkbox",
+      "id": "featured",
+      "label": "Featured (wider accent bar)",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "card_shadow",
+      "label": "Card shadow",
+      "default": true,
+      "info": "Adds a subtle drop shadow to the card"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_subtitle",
+      "label": "Show subtitle tagline",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "title_font_size",
+      "label": "Title font size",
+      "min": 1,
+      "max": 4,
+      "step": 0.5,
+      "unit": "rem",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Card border radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "button_radius",
+      "label": "Button border radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Card max width",
+      "min": 280,
+      "max": 600,
+      "step": 10,
+      "unit": "px",
+      "default": 420
+    }
+  ],
+  "presets": [
+    {
+      "name": "Sponsorship CTA"
+    }
+  ]
+}
+{% endschema %}

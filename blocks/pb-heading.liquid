@@ -1,0 +1,271 @@
+{%- liquid
+  assign text        = block.settings.text | default: 'Heading'
+  assign level       = block.settings.level | default: 'h2'
+  assign size_d      = block.settings.font_size_desktop | default: 3
+  assign size_m      = block.settings.font_size_mobile | default: 2
+  assign weight      = block.settings.font_weight | default: '900'
+  assign color       = block.settings.color | default: '#000000'
+  assign transform   = block.settings.text_transform | default: 'none'
+  assign t_align     = block.settings.text_align | default: 'left'
+  assign lh          = block.settings.line_height | default: '1.1'
+  assign ls          = block.settings.letter_spacing | default: '0'
+  assign f_style     = block.settings.font_style | default: 'normal'
+  assign t_deco      = block.settings.text_decoration | default: 'none'
+  assign margin_val  = block.settings.margin | default: '0'
+  assign pos         = block.settings.position | default: 'static'
+  assign pos_top     = block.settings.pos_top
+  assign pos_right   = block.settings.pos_right
+  assign pos_bottom  = block.settings.pos_bottom
+  assign pos_left    = block.settings.pos_left
+  assign z           = block.settings.z_index
+  assign custom_css  = block.settings.custom_css
+-%}
+
+{%- capture inline_style -%}
+  font-size: {{ size_d }}rem;
+  font-weight: {{ weight }};
+  color: {{ color }};
+  text-transform: {{ transform }};
+  text-align: {{ t_align }};
+  line-height: {{ lh }};
+  letter-spacing: {{ ls }};
+  font-style: {{ f_style }};
+  text-decoration: {{ t_deco }};
+  margin: {{ margin_val }};
+  {%- if pos != 'static' -%}position: {{ pos }};{%- endif -%}
+  {%- if pos_top != blank -%}top: {{ pos_top }};{%- endif -%}
+  {%- if pos_right != blank -%}right: {{ pos_right }};{%- endif -%}
+  {%- if pos_bottom != blank -%}bottom: {{ pos_bottom }};{%- endif -%}
+  {%- if pos_left != blank -%}left: {{ pos_left }};{%- endif -%}
+  {%- if z != blank and z != 0 -%}z-index: {{ z }};{%- endif -%}
+{%- endcapture -%}
+
+<{{ level }}
+  class="pb-heading pb-heading-{{ block.id }}"
+  style="{{ inline_style | strip_newlines | strip }}"
+  {{ block.shopify_attributes }}
+>
+  {{ text }}
+</{{ level }}>
+
+{%- if custom_css != blank -%}
+  <style>
+    .pb-heading-{{ block.id }} { {{ custom_css }} }
+  </style>
+{%- endif -%}
+
+<style>
+  @media (max-width: 768px) {
+    .pb-heading-{{ block.id }} {
+      font-size: {{ size_m }}rem;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "PB Heading",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "── Content ──"
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "default": "Heading"
+    },
+    {
+      "type": "select",
+      "id": "level",
+      "label": "Heading Level",
+      "default": "h2",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "h5", "label": "H5" },
+        { "value": "h6", "label": "H6" }
+      ]
+    },
+
+    {
+      "type": "header",
+      "content": "── Typography ──"
+    },
+    {
+      "type": "range",
+      "id": "font_size_desktop",
+      "label": "Font Size — Desktop",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "unit": "rem",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "font_size_mobile",
+      "label": "Font Size — Mobile",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "unit": "rem",
+      "default": 2
+    },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "label": "Font Weight",
+      "default": "900",
+      "options": [
+        { "value": "400", "label": "400 — Regular" },
+        { "value": "500", "label": "500 — Medium" },
+        { "value": "600", "label": "600 — Semibold" },
+        { "value": "700", "label": "700 — Bold" },
+        { "value": "800", "label": "800 — Extrabold" },
+        { "value": "900", "label": "900 — Black" }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "color",
+      "label": "Color",
+      "default": "#000000"
+    },
+    {
+      "type": "select",
+      "id": "text_transform",
+      "label": "Text Transform",
+      "default": "none",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "uppercase", "label": "UPPERCASE" },
+        { "value": "lowercase", "label": "lowercase" },
+        { "value": "capitalize", "label": "Capitalize" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "font_style",
+      "label": "Font Style",
+      "default": "normal",
+      "options": [
+        { "value": "normal", "label": "Normal" },
+        { "value": "italic", "label": "Italic" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "text_decoration",
+      "label": "Text Decoration",
+      "default": "none",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "underline", "label": "Underline" },
+        { "value": "line-through", "label": "Line-through" },
+        { "value": "overline", "label": "Overline" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "line_height",
+      "label": "Line Height",
+      "default": "1.1",
+      "info": "e.g. 1.1, 1.5, 2"
+    },
+    {
+      "type": "text",
+      "id": "letter_spacing",
+      "label": "Letter Spacing",
+      "default": "0",
+      "info": "e.g. 0, 0.05em, 2px, -0.02em"
+    },
+    {
+      "type": "select",
+      "id": "text_align",
+      "label": "Text Align",
+      "default": "left",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+
+    {
+      "type": "header",
+      "content": "── Spacing ──"
+    },
+    {
+      "type": "text",
+      "id": "margin",
+      "label": "Margin",
+      "default": "0",
+      "info": "CSS shorthand, e.g. 0 0 16px 0"
+    },
+
+    {
+      "type": "header",
+      "content": "── Position ──"
+    },
+    {
+      "type": "select",
+      "id": "position",
+      "label": "Position",
+      "default": "static",
+      "options": [
+        { "value": "static", "label": "Static" },
+        { "value": "relative", "label": "Relative" },
+        { "value": "absolute", "label": "Absolute" },
+        { "value": "fixed", "label": "Fixed" },
+        { "value": "sticky", "label": "Sticky" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "pos_top",
+      "label": "Top"
+    },
+    {
+      "type": "text",
+      "id": "pos_right",
+      "label": "Right"
+    },
+    {
+      "type": "text",
+      "id": "pos_bottom",
+      "label": "Bottom"
+    },
+    {
+      "type": "text",
+      "id": "pos_left",
+      "label": "Left"
+    },
+    {
+      "type": "number",
+      "id": "z_index",
+      "label": "Z-Index",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "── Custom CSS ──"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Heading"
+    }
+  ]
+}
+{% endschema %}

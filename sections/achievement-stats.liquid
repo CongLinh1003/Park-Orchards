@@ -1,0 +1,284 @@
+{%- comment -%}
+  Achievement Stats — "A Rapid Rise in the EFNL"
+  Top:    Subtitle + Large heading (left) | Description (right)
+  Bottom: Stat cards as Shopify blocks (number + description)
+{%- endcomment -%}
+
+{%- liquid
+  assign bg_start   = section.settings.bg_start
+  assign bg_end     = section.settings.bg_end
+  assign text_col   = section.settings.text_color
+  assign accent     = section.settings.accent_color
+  assign subtitle   = section.settings.subtitle
+  assign heading    = section.settings.heading
+  assign description = section.settings.description
+-%}
+
+<section
+  class="po-stats po-stats--{{ section.id }}"
+  style="
+    --pos-bg-start: {{ bg_start }};
+    --pos-bg-end: {{ bg_end }};
+    --pos-text: {{ text_col }};
+    --pos-accent: {{ accent }};
+  "
+>
+  <div class="po-stats__inner{% if section.settings.content_width == 'page' %} page-width{% endif %}">
+
+    {%- comment -%} ═══ TOP AREA ═══ {%- endcomment -%}
+    <div class="po-stats__top">
+      <div class="po-stats__heading-col">
+        {%- if subtitle != blank -%}
+          <span class="po-stats__subtitle">{{ subtitle }}</span>
+        {%- endif -%}
+        {%- if heading != blank -%}
+          <h2 class="po-stats__heading">{{ heading }}</h2>
+        {%- endif -%}
+      </div>
+
+      {%- if description != blank -%}
+        <div class="po-stats__desc-col">
+          <div class="po-stats__desc">{{ description }}</div>
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} ═══ STAT CARDS (blocks) ═══ {%- endcomment -%}
+    {%- if section.blocks.size > 0 -%}
+      <div class="po-stats__cards">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'stat_card' -%}
+            <div class="po-stats__card" {{ block.shopify_attributes }}>
+              <span class="po-stats__card-number">{{ block.settings.number }}</span>
+              <span class="po-stats__card-text">{{ block.settings.text }}</span>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+</section>
+
+{% style %}
+  .po-stats--{{ section.id }} {
+    position: relative;
+    background: linear-gradient(135deg, var(--pos-bg-start) 0%, var(--pos-bg-end) 100%);
+    color: var(--pos-text);
+    padding: clamp(2.5rem, 5vw, 4rem) 0;
+    font-family: 'Antonio', 'Oswald', sans-serif;
+    overflow: hidden;
+  }
+
+  .po-stats--{{ section.id }} .po-stats__inner {
+    position: relative;
+    z-index: 1;
+    padding-left: clamp(1.5rem, 3vw, 3rem);
+    padding-right: clamp(1.5rem, 3vw, 3rem);
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* ─── Top area: heading left + description right ─── */
+  .po-stats--{{ section.id }} .po-stats__top {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(1.5rem, 3vw, 3rem);
+    align-items: start;
+    margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .po-stats--{{ section.id }} .po-stats__subtitle {
+    display: block;
+    font-weight: 800;
+    font-size: clamp(0.9rem, 1.4vw, 1.15rem);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.2rem;
+    color: var(--pos-text);
+  }
+
+  .po-stats--{{ section.id }} .po-stats__heading {
+    font-weight: 900;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.05;
+    margin: 0;
+    color: var(--pos-text);
+  }
+
+  .po-stats--{{ section.id }} .po-stats__desc-col {
+    display: flex;
+    align-items: center;
+    height: 100%;
+  }
+
+  .po-stats--{{ section.id }} .po-stats__desc {
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: clamp(0.85rem, 1.1vw, 1rem);
+    line-height: 1.6;
+    opacity: 0.9;
+    max-width: 500px;
+  }
+
+  /* ─── Stat cards ─── */
+  .po-stats--{{ section.id }} .po-stats__cards {
+    display: flex;
+    gap: 0;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .po-stats--{{ section.id }} .po-stats__card {
+    flex: 1 1 0;
+    min-width: 160px;
+    background: #fff;
+    color: var(--pos-accent);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: clamp(0.8rem, 1.5vw, 1.2rem) clamp(1rem, 2vw, 1.5rem);
+    border: 2px solid var(--pos-accent);
+  }
+
+
+  .po-stats--{{ section.id }} .po-stats__card-number {
+    font-weight: 900;
+    font-size: clamp(2.2rem, 4vw, 3.5rem);
+    line-height: 1;
+    flex-shrink: 0;
+    color: var(--pos-accent);
+  }
+
+  .po-stats--{{ section.id }} .po-stats__card-text {
+    font-weight: 700;
+    font-size: clamp(0.72rem, 0.95vw, 0.88rem);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    line-height: 1.25;
+    color: var(--pos-accent);
+  }
+
+  /* ═══ RESPONSIVE ═══ */
+  @media (max-width: 768px) {
+    .po-stats--{{ section.id }} .po-stats__top {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .po-stats--{{ section.id }} .po-stats__cards {
+      flex-direction: column;
+    }
+
+    .po-stats--{{ section.id }} .po-stats__card {
+      border-right: none;
+      border-bottom: none;
+    }
+    .po-stats--{{ section.id }} .po-stats__card:last-child {
+      border-bottom: none;
+    }
+  }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Achievement Stats",
+  "tag": "section",
+  "class": "po-stats-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "A Rapid Rise"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "In The EFNL"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Despite being only 14 years old, the Sharks have climbed from Division 4 to Division 1 in the Eastern Football Netball League. Along the way, the club has built a proud record of success.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "select",
+      "id": "content_width",
+      "label": "Content width",
+      "default": "page",
+      "options": [
+        { "value": "page", "label": "Page width" },
+        { "value": "full", "label": "Full width" }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "bg_start",
+      "label": "Background start",
+      "default": "#0a0000"
+    },
+    {
+      "type": "color",
+      "id": "bg_end",
+      "label": "Background end",
+      "default": "#9b0000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color (card number & text)",
+      "default": "#b0121b"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "stat_card",
+      "name": "Stat Card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "number",
+          "label": "Number",
+          "default": "1"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Description",
+          "default": "Achievement"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Achievement Stats",
+      "blocks": [
+        { "type": "stat_card", "settings": { "number": "1", "text": "Senior Men's Premiership plus a Minor Premiership in 2021" } },
+        { "type": "stat_card", "settings": { "number": "3", "text": "Reserves Premierships plus a Minor Premiership in 2021" } },
+        { "type": "stat_card", "settings": { "number": "8", "text": "Under 19 Premierships" } },
+        { "type": "stat_card", "settings": { "number": "1", "text": "2024 Senior Women's Division Premiers" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

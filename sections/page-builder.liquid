@@ -1,0 +1,113 @@
+{%- liquid
+  assign bg_color    = section.settings.bg_color
+  assign pt          = section.settings.padding_top | default: 0
+  assign pb          = section.settings.padding_bottom | default: 0
+  assign full_width  = section.settings.full_width
+  assign max_w       = section.settings.max_width | default: 1200
+  assign custom_css  = section.settings.custom_css
+-%}
+
+<section
+  id="page-builder-{{ section.id }}"
+  class="pb-section"
+  style="
+    padding-top: {{ pt }}px;
+    padding-bottom: {{ pb }}px;
+    {%- if bg_color != blank and bg_color != 'rgba(0,0,0,0)' -%}background-color: {{ bg_color }};{%- endif -%}
+  "
+>
+  <div
+    class="pb-section__inner"
+    style="
+      {%- unless full_width -%}max-width: {{ max_w }}px; margin: 0 auto;{%- endunless -%}
+      padding: 0 2rem;
+    "
+  >
+    {% content_for 'blocks' %}
+  </div>
+
+  {%- if custom_css != blank -%}
+    <style>
+      #page-builder-{{ section.id }} { {{ custom_css }} }
+    </style>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Page Builder",
+  "tag": "section",
+  "class": "page-builder-section",
+  "blocks": [{ "type": "@theme" }],
+  "settings": [
+    {
+      "type": "header",
+      "content": "── Background ──"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color"
+    },
+
+    {
+      "type": "header",
+      "content": "── Layout ──"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full Width",
+      "default": true,
+      "info": "When unchecked, content is constrained by Max Width."
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Max Width",
+      "min": 600,
+      "max": 1600,
+      "step": 20,
+      "unit": "px",
+      "default": 1200,
+      "info": "Only applies when Full Width is unchecked."
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding Top",
+      "min": 0,
+      "max": 200,
+      "step": 8,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding Bottom",
+      "min": 0,
+      "max": 200,
+      "step": 8,
+      "unit": "px",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "── Custom CSS ──"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS",
+      "info": "CSS rules applied to this section."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Page Builder"
+    }
+  ]
+}
+{% endschema %}

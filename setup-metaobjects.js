@@ -6,28 +6,18 @@
  * Chạy: node setup-metaobjects.js
  */
 
-const STORE_URL = 'park-orchards-football-netball-club.myshopify.com';
-const API_VERSION = '2024-10';
+const {
+  getShopifyConfig,
+  graphqlRequest: adminGraphqlRequest,
+} = require('./shopify-admin-utils');
 
-const GRAPHQL_URL = `https://${STORE_URL}/admin/api/${API_VERSION}/graphql.json`;
+const config = getShopifyConfig({
+  defaultStoreUrl: 'park-orchards-football-netball-club.myshopify.com',
+  defaultApiVersion: '2024-10',
+});
 
 async function graphqlRequest(query, variables = {}) {
-  const response = await fetch(GRAPHQL_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Shopify-Access-Token': ACCESS_TOKEN,
-    },
-    body: JSON.stringify({ query, variables }),
-  });
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`HTTP ${response.status}: ${text}`);
-  }
-
-  const json = await response.json();
-  return json;
+  return adminGraphqlRequest(config, query, variables);
 }
 
 const CREATE_DEFINITION_MUTATION = `
@@ -272,7 +262,7 @@ const definitions = [
       {
         name: 'Sponsored Player',
         key: 'sponsored_player',
-        type: 'metaobject_reference',
+        type: 'list.metaobject_reference',
         validations: [
           {
             name: 'metaobject_definition_id',

@@ -1,0 +1,221 @@
+{%- liquid
+  assign el_tag      = block.settings.tag | default: 'div'
+  assign direction   = block.settings.direction | default: 'column'
+  assign justify     = block.settings.justify | default: 'flex-start'
+  assign align_items = block.settings.align | default: 'stretch'
+  assign gap         = block.settings.gap | default: 16
+  assign padding_val = block.settings.padding | default: '0'
+  assign bg_color    = block.settings.bg_color
+  assign bg_image    = block.settings.bg_image
+  assign max_w       = block.settings.max_width
+  assign pos         = block.settings.position | default: 'static'
+  assign pos_top     = block.settings.pos_top
+  assign pos_right   = block.settings.pos_right
+  assign pos_bottom  = block.settings.pos_bottom
+  assign pos_left    = block.settings.pos_left
+  assign z           = block.settings.z_index
+  assign custom_css  = block.settings.custom_css
+-%}
+
+{%- capture inline_style -%}
+  display: flex;
+  flex-direction: {{ direction }};
+  justify-content: {{ justify }};
+  align-items: {{ align_items }};
+  gap: {{ gap }}px;
+  padding: {{ padding_val }};
+  {%- if bg_color != blank and bg_color != 'rgba(0,0,0,0)' -%}background-color: {{ bg_color }};{%- endif -%}
+  {%- if bg_image != blank -%}background-image: url('{{ bg_image | image_url: width: 1920 }}'); background-size: cover; background-position: center;{%- endif -%}
+  {%- if max_w > 0 -%}max-width: {{ max_w }}px;{%- endif -%}
+  {%- if pos != 'static' -%}position: {{ pos }};{%- endif -%}
+  {%- if pos_top != blank -%}top: {{ pos_top }};{%- endif -%}
+  {%- if pos_right != blank -%}right: {{ pos_right }};{%- endif -%}
+  {%- if pos_bottom != blank -%}bottom: {{ pos_bottom }};{%- endif -%}
+  {%- if pos_left != blank -%}left: {{ pos_left }};{%- endif -%}
+  {%- if z != blank and z != 0 -%}z-index: {{ z }};{%- endif -%}
+{%- endcapture -%}
+
+<{{ el_tag }}
+  class="pb-wrapper pb-wrapper-{{ block.id }}"
+  style="{{ inline_style | strip_newlines | strip }}"
+  {{ block.shopify_attributes }}
+>
+  {%- if custom_css != blank -%}
+    <style>
+      .pb-wrapper-{{ block.id }} { {{ custom_css }} }
+    </style>
+  {%- endif -%}
+
+  {% content_for 'blocks' %}
+</{{ el_tag }}>
+
+{% schema %}
+{
+  "name": "PB Wrapper",
+  "tag": null,
+  "blocks": [{ "type": "@theme" }],
+  "settings": [
+    {
+      "type": "header",
+      "content": "── Layout ──"
+    },
+    {
+      "type": "select",
+      "id": "tag",
+      "label": "HTML Tag",
+      "default": "div",
+      "options": [
+        { "value": "div", "label": "div" },
+        { "value": "section", "label": "section" },
+        { "value": "article", "label": "article" },
+        { "value": "aside", "label": "aside" },
+        { "value": "header", "label": "header" },
+        { "value": "footer", "label": "footer" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Direction",
+      "default": "column",
+      "options": [
+        { "value": "row", "label": "Row (horizontal)" },
+        { "value": "column", "label": "Column (vertical)" },
+        { "value": "row-reverse", "label": "Row Reverse" },
+        { "value": "column-reverse", "label": "Column Reverse" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "justify",
+      "label": "Justify Content",
+      "default": "flex-start",
+      "options": [
+        { "value": "flex-start", "label": "Start" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "End" },
+        { "value": "space-between", "label": "Space Between" },
+        { "value": "space-around", "label": "Space Around" },
+        { "value": "space-evenly", "label": "Space Evenly" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "align",
+      "label": "Align Items",
+      "default": "stretch",
+      "options": [
+        { "value": "stretch", "label": "Stretch" },
+        { "value": "flex-start", "label": "Start" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "End" },
+        { "value": "baseline", "label": "Baseline" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Gap",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "text",
+      "id": "padding",
+      "label": "Padding",
+      "default": "0",
+      "info": "CSS shorthand, e.g. 20px 40px"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Max Width",
+      "min": 0,
+      "max": 1600,
+      "step": 20,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = no limit"
+    },
+
+    {
+      "type": "header",
+      "content": "── Background ──"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Background Image"
+    },
+
+    {
+      "type": "header",
+      "content": "── Position ──"
+    },
+    {
+      "type": "select",
+      "id": "position",
+      "label": "Position",
+      "default": "static",
+      "options": [
+        { "value": "static", "label": "Static" },
+        { "value": "relative", "label": "Relative" },
+        { "value": "absolute", "label": "Absolute" },
+        { "value": "fixed", "label": "Fixed" },
+        { "value": "sticky", "label": "Sticky" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "pos_top",
+      "label": "Top",
+      "info": "e.g. 0, 20px, 50%"
+    },
+    {
+      "type": "text",
+      "id": "pos_right",
+      "label": "Right"
+    },
+    {
+      "type": "text",
+      "id": "pos_bottom",
+      "label": "Bottom"
+    },
+    {
+      "type": "text",
+      "id": "pos_left",
+      "label": "Left"
+    },
+    {
+      "type": "number",
+      "id": "z_index",
+      "label": "Z-Index",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "── Custom CSS ──"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS",
+      "info": "CSS rules applied to this block."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Wrapper"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,222 @@
+{%- liquid
+  assign label       = block.settings.label | default: 'Button'
+  assign url         = block.settings.url
+  assign style       = block.settings.style | default: 'outline'
+  assign color       = block.settings.color | default: '#000000'
+  assign bg_color    = block.settings.bg_color | default: '#000000'
+  assign size        = block.settings.font_size | default: 1
+  assign radius      = block.settings.border_radius | default: 4
+  assign padding_val = block.settings.padding | default: '0.75rem 2rem'
+  assign margin_val  = block.settings.margin | default: '0'
+  assign pos         = block.settings.position | default: 'static'
+  assign pos_top     = block.settings.pos_top
+  assign pos_right   = block.settings.pos_right
+  assign pos_bottom  = block.settings.pos_bottom
+  assign pos_left    = block.settings.pos_left
+  assign z           = block.settings.z_index
+  assign custom_css  = block.settings.custom_css
+-%}
+
+{%- capture inline_style -%}
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: {{ padding_val }};
+  font-size: {{ size }}rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  border-radius: {{ radius }}px;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  margin: {{ margin_val }};
+  {%- if style == 'outline' -%}
+    background: transparent;
+    color: {{ color }};
+    border: 2px solid {{ color }};
+  {%- else -%}
+    background: {{ bg_color }};
+    color: {{ color }};
+    border: 2px solid {{ bg_color }};
+  {%- endif -%}
+  {%- if pos != 'static' -%}position: {{ pos }};{%- endif -%}
+  {%- if pos_top != blank -%}top: {{ pos_top }};{%- endif -%}
+  {%- if pos_right != blank -%}right: {{ pos_right }};{%- endif -%}
+  {%- if pos_bottom != blank -%}bottom: {{ pos_bottom }};{%- endif -%}
+  {%- if pos_left != blank -%}left: {{ pos_left }};{%- endif -%}
+  {%- if z != blank and z != 0 -%}z-index: {{ z }};{%- endif -%}
+{%- endcapture -%}
+
+{%- if label != blank -%}
+  <a
+    href="{{ url | default: '#' }}"
+    class="pb-btn pb-btn-{{ block.id }}"
+    style="{{ inline_style | strip_newlines | strip }}"
+    {{ block.shopify_attributes }}
+  >
+    {{ label }}
+  </a>
+{%- endif -%}
+
+{%- if custom_css != blank -%}
+  <style>
+    .pb-btn-{{ block.id }} { {{ custom_css }} }
+  </style>
+{%- endif -%}
+
+<style>
+  .pb-btn-{{ block.id }}:hover {
+    opacity: 0.8;
+    transform: translateY(-1px);
+  }
+</style>
+
+{% schema %}
+{
+  "name": "PB Button",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "── Content ──"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Label",
+      "default": "Button"
+    },
+    {
+      "type": "url",
+      "id": "url",
+      "label": "URL"
+    },
+
+    {
+      "type": "header",
+      "content": "── Style ──"
+    },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "Style",
+      "default": "outline",
+      "options": [
+        { "value": "outline", "label": "Outline" },
+        { "value": "filled", "label": "Filled" }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "color",
+      "label": "Text / Border Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color (filled)",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Font Size",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "unit": "rem",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Border Radius",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "text",
+      "id": "padding",
+      "label": "Padding",
+      "default": "0.75rem 2rem",
+      "info": "CSS shorthand"
+    },
+
+    {
+      "type": "header",
+      "content": "── Spacing ──"
+    },
+    {
+      "type": "text",
+      "id": "margin",
+      "label": "Margin",
+      "default": "0",
+      "info": "CSS shorthand"
+    },
+
+    {
+      "type": "header",
+      "content": "── Position ──"
+    },
+    {
+      "type": "select",
+      "id": "position",
+      "label": "Position",
+      "default": "static",
+      "options": [
+        { "value": "static", "label": "Static" },
+        { "value": "relative", "label": "Relative" },
+        { "value": "absolute", "label": "Absolute" },
+        { "value": "fixed", "label": "Fixed" },
+        { "value": "sticky", "label": "Sticky" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "pos_top",
+      "label": "Top"
+    },
+    {
+      "type": "text",
+      "id": "pos_right",
+      "label": "Right"
+    },
+    {
+      "type": "text",
+      "id": "pos_bottom",
+      "label": "Bottom"
+    },
+    {
+      "type": "text",
+      "id": "pos_left",
+      "label": "Left"
+    },
+    {
+      "type": "number",
+      "id": "z_index",
+      "label": "Z-Index",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "── Custom CSS ──"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Button"
+    }
+  ]
+}
+{% endschema %}

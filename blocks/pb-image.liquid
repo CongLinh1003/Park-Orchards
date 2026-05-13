@@ -1,0 +1,184 @@
+{%- liquid
+  assign image       = block.settings.image
+  assign width_pct   = block.settings.width | default: 100
+  assign max_w       = block.settings.max_width
+  assign radius      = block.settings.border_radius | default: 0
+  assign fit         = block.settings.object_fit | default: 'cover'
+  assign margin_val  = block.settings.margin | default: '0'
+  assign pos         = block.settings.position | default: 'static'
+  assign pos_top     = block.settings.pos_top
+  assign pos_right   = block.settings.pos_right
+  assign pos_bottom  = block.settings.pos_bottom
+  assign pos_left    = block.settings.pos_left
+  assign z           = block.settings.z_index
+  assign custom_css  = block.settings.custom_css
+-%}
+
+{%- capture inline_style -%}
+  width: {{ width_pct }}%;
+  {%- if max_w > 0 -%}max-width: {{ max_w }}px;{%- endif -%}
+  border-radius: {{ radius }}px;
+  object-fit: {{ fit }};
+  margin: {{ margin_val }};
+  display: block;
+  height: auto;
+  {%- if pos != 'static' -%}position: {{ pos }};{%- endif -%}
+  {%- if pos_top != blank -%}top: {{ pos_top }};{%- endif -%}
+  {%- if pos_right != blank -%}right: {{ pos_right }};{%- endif -%}
+  {%- if pos_bottom != blank -%}bottom: {{ pos_bottom }};{%- endif -%}
+  {%- if pos_left != blank -%}left: {{ pos_left }};{%- endif -%}
+  {%- if z != blank and z != 0 -%}z-index: {{ z }};{%- endif -%}
+{%- endcapture -%}
+
+{%- if image != blank -%}
+  <img
+    class="pb-image pb-image-{{ block.id }}"
+    src="{{ image | image_url: width: 1920 }}"
+    alt="{{ image.alt | escape }}"
+    width="{{ image.width }}"
+    height="{{ image.height }}"
+    loading="lazy"
+    style="{{ inline_style | strip_newlines | strip }}"
+    {{ block.shopify_attributes }}
+  >
+{%- else -%}
+  {{ 'image' | placeholder_svg_tag: 'pb-image placeholder' }}
+{%- endif -%}
+
+{%- if custom_css != blank -%}
+  <style>
+    .pb-image-{{ block.id }} { {{ custom_css }} }
+  </style>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "PB Image",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "── Image ──"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "range",
+      "id": "width",
+      "label": "Width",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Max Width",
+      "min": 0,
+      "max": 1200,
+      "step": 20,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = no limit"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Border Radius",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "object_fit",
+      "label": "Object Fit",
+      "default": "cover",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "none", "label": "None" }
+      ]
+    },
+
+    {
+      "type": "header",
+      "content": "── Spacing ──"
+    },
+    {
+      "type": "text",
+      "id": "margin",
+      "label": "Margin",
+      "default": "0",
+      "info": "CSS shorthand"
+    },
+
+    {
+      "type": "header",
+      "content": "── Position ──"
+    },
+    {
+      "type": "select",
+      "id": "position",
+      "label": "Position",
+      "default": "static",
+      "options": [
+        { "value": "static", "label": "Static" },
+        { "value": "relative", "label": "Relative" },
+        { "value": "absolute", "label": "Absolute" },
+        { "value": "fixed", "label": "Fixed" },
+        { "value": "sticky", "label": "Sticky" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "pos_top",
+      "label": "Top"
+    },
+    {
+      "type": "text",
+      "id": "pos_right",
+      "label": "Right"
+    },
+    {
+      "type": "text",
+      "id": "pos_bottom",
+      "label": "Bottom"
+    },
+    {
+      "type": "text",
+      "id": "pos_left",
+      "label": "Left"
+    },
+    {
+      "type": "number",
+      "id": "z_index",
+      "label": "Z-Index",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "── Custom CSS ──"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_css",
+      "label": "Custom CSS"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image"
+    }
+  ]
+}
+{% endschema %}

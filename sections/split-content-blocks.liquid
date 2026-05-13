@@ -1,0 +1,1007 @@
+{%- comment -%}
+  Split Content Blocks — Contact & Enquiry
+  Left:  Address, email, phone, social links (info blocks)
+  Right: Enquiry / contact form
+  Modern minimal design — no heavy hero, clean lines
+{%- endcomment -%}
+
+{%- style -%}
+  @font-face {
+    font-family: 'Antonio';
+    src: url({{ 'Antonio-Bold.woff2' | asset_url }}) format('truetype');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Alexandria';
+    src: url({{ 'Alexandria-Regular.woff2' | asset_url }}) format('truetype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Alexandria';
+    src: url({{ 'Alexandria-ExtraBold.woff2' | asset_url }}) format('truetype');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* ── Section Root ── */
+  .scb-section-{{ section.id }} {
+    --scb-font-antonio: 'Antonio', impact, sans-serif;
+    --scb-font-alexandria: 'Alexandria', arial, sans-serif;
+    --scb-color-accent: {{ section.settings.primary_color | default: '#b92b2b' }};
+    --scb-color-text:   {{ section.settings.text_color | default: '#1a1a1a' }};
+    --scb-color-bg:     {{ section.settings.bg_color | default: '#f8f8f8' }};
+    --scb-color-card:   {{ section.settings.card_bg_color | default: '#ffffff' }};
+
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    background-color: var(--scb-color-bg);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* thin accent bar at the very top — replaces the hero */
+  .scb-accent-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--scb-color-accent) 0%, transparent 100%);
+  }
+
+  /* ── Grid ── */
+  .scb__inner {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: flex-start;
+  }
+
+  /* ── Section Title (optional, spans full width) ── */
+  .scb__section-title {
+    grid-column: 1 / -1;
+    font-family: var(--scb-font-antonio);
+    font-weight: 800;
+    font-size: clamp(2rem, 3.5vw, 3.2rem);
+    text-transform: uppercase;
+    color: var(--scb-color-text);
+    line-height: 1;
+    margin: 0 0 0.5rem;
+    position: relative;
+    padding-bottom: 1rem;
+  }
+  .scb__section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: var(--scb-color-accent);
+  }
+
+  /* ── LEFT COLUMN: Contact Info ── */
+  .scb__left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* ── Bottom Contact Bar ── */
+  .scb__contact-bar {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    margin-top: 3rem;
+  }
+  .scb__contact-bar-inner {
+    display: flex;
+    align-items: stretch;
+    border-top: 1px solid rgba(0,0,0,0.08);
+    padding-top: 2rem;
+  }
+
+  .scb-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+    padding: 0 1.5rem;
+    border-right: 1px solid rgba(0,0,0,0.08);
+    transition: transform 0.2s;
+  }
+  .scb-contact-item:first-child { padding-left: 0; }
+  .scb-contact-item:last-child { border-right: none; padding-right: 0; }
+  .scb-contact-item:hover { transform: translateY(-2px); }
+
+  .scb-contact-icon {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--scb-color-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    transition: transform 0.25s;
+  }
+  .scb-contact-item:hover .scb-contact-icon { transform: scale(1.08); }
+  .scb-contact-icon svg { width: 20px; height: 20px; fill: currentColor; }
+
+  .scb-contact-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+  }
+  .scb-contact-label {
+    font-family: var(--scb-font-antonio);
+    font-weight: 800;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--scb-color-accent);
+  }
+  .scb-contact-value {
+    font-family: var(--scb-font-alexandria);
+    font-weight: 300;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: var(--scb-color-text);
+    word-break: break-word;
+  }
+  .scb-contact-value a {
+    color: var(--scb-color-text);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0,0,0,0.15);
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .scb-contact-value a:hover {
+    color: var(--scb-color-accent);
+    border-color: var(--scb-color-accent);
+  }
+
+  /* ── Block typography (reused for both columns) ── */
+  .scb-block-heading {
+    font-family: var(--scb-font-antonio);
+    font-weight: 800;
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    text-transform: uppercase;
+    color: var(--scb-color-text);
+    line-height: 1;
+    margin: 2rem 0 0.4rem;
+  }
+  .scb-block-heading:first-child { margin-top: 0; }
+
+  .scb-block-subheading {
+    font-family: var(--scb-font-antonio);
+    font-weight: 800;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--scb-color-accent);
+    margin: 1.8rem 0 0.3rem;
+  }
+  .scb-block-subheading:first-child { margin-top: 0; }
+
+  .scb-block-text {
+    font-family: var(--scb-font-alexandria);
+    font-weight: 300;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--scb-color-text);
+    margin: 0 0 0.5rem;
+  }
+  .scb-block-text p { margin: 0; }
+  .scb-block-text strong, .scb-block-text b { font-weight: 800; }
+  .scb-block-text a {
+    color: var(--scb-color-accent);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s;
+  }
+  .scb-block-text a:hover { border-color: var(--scb-color-accent); }
+
+  /* ── Buttons ── */
+  .scb-block-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.8rem 2.2rem;
+    font-family: var(--scb-font-antonio);
+    font-weight: 800;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 2px solid;
+    width: fit-content;
+    margin-top: 1rem;
+    border-radius: 6px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .scb-block-button--primary {
+    background: var(--scb-color-accent);
+    border-color: var(--scb-color-accent);
+    color: #fff;
+  }
+  .scb-block-button--primary:hover {
+    background: transparent;
+    color: var(--scb-color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+  .scb-block-button--secondary {
+    background: transparent;
+    border-color: var(--scb-color-text);
+    color: var(--scb-color-text);
+  }
+  .scb-block-button--secondary:hover {
+    background: var(--scb-color-text);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  /* ── Social Icons ── */
+  .scb-block-socials {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(0,0,0,0.06);
+  }
+  .scb-social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--scb-color-text);
+    color: var(--scb-color-bg);
+    text-decoration: none;
+    transition: transform 0.25s, background 0.25s;
+  }
+  .scb-social-link:hover {
+    transform: translateY(-3px);
+    background: var(--scb-color-accent);
+  }
+  .scb-social-link svg { width: 20px; height: 20px; fill: currentColor; }
+
+  /* ── Divider ── */
+  .scb-block-divider {
+    border: none;
+    border-top: 1px solid rgba(0,0,0,0.08);
+    margin: 1.5rem 0;
+  }
+
+  /* ── RIGHT COLUMN: Enquiry Form Card ── */
+  .scb__right-column {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .scb-form-card {
+    background: var(--scb-color-card);
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow:
+      0 1px 3px rgba(0,0,0,0.04),
+      0 8px 30px rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.04);
+    position: relative;
+    overflow: hidden;
+  }
+  .scb-form-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--scb-color-accent);
+  }
+
+  .scb-form-card-title {
+    font-family: var(--scb-font-antonio);
+    font-weight: 800;
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    text-transform: uppercase;
+    color: var(--scb-color-text);
+    margin: 0 0 0.3rem;
+    line-height: 1.1;
+  }
+  .scb-form-card-subtitle {
+    font-family: var(--scb-font-alexandria);
+    font-weight: 300;
+    font-size: 0.95rem;
+    color: rgba(0,0,0,0.5);
+    margin: 0 0 2rem;
+    line-height: 1.5;
+  }
+
+  /* form styles */
+  .scb-native-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: 100%;
+  }
+  .scb-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .scb-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    width: 100%;
+  }
+  .scb-form-field label {
+    font-family: var(--scb-font-antonio);
+    font-weight: 800;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--scb-color-text);
+  }
+  .scb-form-field input,
+  .scb-form-field select,
+  .scb-form-field textarea {
+    width: 100%;
+    background: var(--scb-color-bg);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    font-family: var(--scb-font-alexandria);
+    font-size: 0.95rem;
+    color: var(--scb-color-text);
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .scb-form-field input:focus,
+  .scb-form-field select:focus,
+  .scb-form-field textarea:focus {
+    border-color: var(--scb-color-accent);
+    box-shadow: 0 0 0 3px rgba(185, 43, 43, 0.08);
+  }
+  .scb-form-field textarea {
+    min-height: 130px;
+    resize: vertical;
+  }
+  .scb-form-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.9rem 2.5rem;
+    font-family: var(--scb-font-antonio);
+    font-weight: 800;
+    font-size: 1.15rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--scb-color-accent);
+    border: 2px solid var(--scb-color-accent);
+    color: #ffffff;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+  .scb-form-submit:hover {
+    background: transparent;
+    color: var(--scb-color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(185, 43, 43, 0.15);
+  }
+
+  /* ── App Form: First & Last name on same row ── */
+  .scb-app-block form[data-testid="form"] {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  .scb-app-block form[data-testid="form"] > * {
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+  .scb-app-block form[data-testid="form"] > *:has(#first_name),
+  .scb-app-block form[data-testid="form"] > *:has(#last_name) {
+    flex: 1 !important;
+    width: auto !important;
+    min-width: 0 !important;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .scb__inner {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    .scb-form-card {
+      padding: 2rem 1.5rem;
+    }
+    .scb__contact-bar-inner {
+      flex-direction: column;
+      gap: 0;
+    }
+    .scb-contact-item {
+      border-right: none;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      padding: 1.25rem 0;
+    }
+    .scb-contact-item:first-child { padding-left: 0; }
+    .scb-contact-item:last-child { border-bottom: none; }
+  }
+  @media (max-width: 520px) {
+    .scb-form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+{%- endstyle -%}
+
+
+<section id="split-content-blocks-{{ section.id }}" class="scb-section-{{ section.id }}">
+  <div class="scb-accent-bar"></div>
+  <div class="scb__inner">
+
+    {%- if section.settings.section_title != blank -%}
+      <h2 class="scb__section-title">{{ section.settings.section_title }}</h2>
+    {%- endif -%}
+
+    {%- comment -%} ── LEFT COLUMN: Contact Details ── {%- endcomment -%}
+    <div class="scb__left-column">
+
+      {%- comment -%} Render left-column blocks (additional info, headings, text, etc.) {%- endcomment -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == '@app' -%}
+          {%- continue -%}
+        {%- elsif block.settings.column == 'left' -%}
+          {%- case block.type -%}
+            {%- when 'heading' -%}
+              <h2 class="scb-block-heading" style="{% if block.settings.heading_color != blank %}color: {{ block.settings.heading_color }};{% endif %}{% if block.settings.heading_size != blank %}font-size: {{ block.settings.heading_size }}px;{% endif %}" {{ block.shopify_attributes }}>{{ block.settings.title }}</h2>
+            {%- when 'subheading' -%}
+              <h3 class="scb-block-subheading" {{ block.shopify_attributes }}>{{ block.settings.title }}</h3>
+            {%- when 'text' -%}
+              <div class="scb-block-text" {{ block.shopify_attributes }}>{{ block.settings.text }}</div>
+            {%- when 'custom_html' -%}
+              <div class="scb-block-custom-html" {{ block.shopify_attributes }}>{{ block.settings.html }}</div>
+            {%- when 'button' -%}
+              {%- if block.settings.label != blank -%}
+                <a href="{{ block.settings.link | default: '#' }}" class="scb-block-button scb-block-button--{{ block.settings.style }}" {{ block.shopify_attributes }}>
+                  {{ block.settings.label }}
+                </a>
+              {%- endif -%}
+            {%- when 'social_icons' -%}
+              <div class="scb-block-socials" {{ block.shopify_attributes }}>
+                {%- if block.settings.facebook_link != blank -%}
+                  <a href="{{ block.settings.facebook_link }}" target="_blank" class="scb-social-link" aria-label="Facebook">
+                    <svg viewBox="0 0 24 24"><path d="M12 2.04c-5.5 0-10 4.48-10 10.02 0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v7a10 10 0 0 0 8.44-9.9c0-5.54-4.5-10.02-10-10.02Z"/></svg>
+                  </a>
+                {%- endif -%}
+                {%- if block.settings.instagram_link != blank -%}
+                  <a href="{{ block.settings.instagram_link }}" target="_blank" class="scb-social-link" aria-label="Instagram">
+                    <svg viewBox="0 0 24 24"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.4 5.6 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.6 18.4 4 16.4 4H7.6m8.4 1.5a1.5 1.5 0 0 1 1.5 1.5 1.5 1.5 0 0 1-1.5 1.5 1.5 1.5 0 0 1-1.5-1.5 1.5 1.5 0 0 1 1.5-1.5M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3Z"/></svg>
+                  </a>
+                {%- endif -%}
+                {%- if block.settings.twitter_link != blank -%}
+                  <a href="{{ block.settings.twitter_link }}" target="_blank" class="scb-social-link" aria-label="Twitter">
+                    <svg viewBox="0 0 24 24"><path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.39 3 4.8 2.63 5.43 2.43 6.16 2.43 6.94c0 1.49.76 2.8 1.9 3.57-.71-.02-1.37-.22-1.95-.54v.05c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.52 8.52 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.9 20.3 6.08 21 8.43 21c8.06 0 12.47-6.68 12.47-12.47 0-.19-.01-.38-.03-.57.85-.62 1.59-1.39 2.18-2.27Z"/></svg>
+                  </a>
+                {%- endif -%}
+              </div>
+            {%- when 'divider' -%}
+              <hr class="scb-block-divider" {{ block.shopify_attributes }}>
+          {%- endcase -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    {%- comment -%} ── RIGHT COLUMN: Enquiry Form ── {%- endcomment -%}
+    <div class="scb__right-column">
+      <div class="scb-form-card">
+        {%- if section.settings.form_title != blank -%}
+          <h3 class="scb-form-card-title">{{ section.settings.form_title }}</h3>
+        {%- endif -%}
+        {%- if section.settings.form_subtitle != blank -%}
+          <p class="scb-form-card-subtitle">{{ section.settings.form_subtitle }}</p>
+        {%- endif -%}
+
+        {%- comment -%} Render right-column blocks + @app blocks (form embeds, custom HTML, etc.) {%- endcomment -%}
+        {%- for block in section.blocks -%}
+          {%- if block.type == '@app' -%}
+            <div class="scb-app-block" {{ block.shopify_attributes }}>
+              {% render block %}
+            </div>
+          {%- elsif block.settings.column == 'right' -%}
+            {%- case block.type -%}
+              {%- when 'heading' -%}
+                <h2 class="scb-block-heading" style="{% if block.settings.heading_color != blank %}color: {{ block.settings.heading_color }};{% endif %}{% if block.settings.heading_size != blank %}font-size: {{ block.settings.heading_size }}px;{% endif %}" {{ block.shopify_attributes }}>{{ block.settings.title }}</h2>
+              {%- when 'subheading' -%}
+                <h3 class="scb-block-subheading" {{ block.shopify_attributes }}>{{ block.settings.title }}</h3>
+              {%- when 'text' -%}
+                <div class="scb-block-text" {{ block.shopify_attributes }}>{{ block.settings.text }}</div>
+              {%- when 'custom_html' -%}
+                <div class="scb-block-custom-html" {{ block.shopify_attributes }}>{{ block.settings.html }}</div>
+              {%- when 'button' -%}
+                {%- if block.settings.label != blank -%}
+                  <a href="{{ block.settings.link | default: '#' }}" class="scb-block-button scb-block-button--{{ block.settings.style }}" {{ block.shopify_attributes }}>
+                    {{ block.settings.label }}
+                  </a>
+                {%- endif -%}
+              {%- when 'social_icons' -%}
+                <div class="scb-block-socials" {{ block.shopify_attributes }}>
+                  {%- if block.settings.facebook_link != blank -%}
+                    <a href="{{ block.settings.facebook_link }}" target="_blank" class="scb-social-link" aria-label="Facebook">
+                      <svg viewBox="0 0 24 24"><path d="M12 2.04c-5.5 0-10 4.48-10 10.02 0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v7a10 10 0 0 0 8.44-9.9c0-5.54-4.5-10.02-10-10.02Z"/></svg>
+                    </a>
+                  {%- endif -%}
+                  {%- if block.settings.instagram_link != blank -%}
+                    <a href="{{ block.settings.instagram_link }}" target="_blank" class="scb-social-link" aria-label="Instagram">
+                      <svg viewBox="0 0 24 24"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.4 5.6 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.6 18.4 4 16.4 4H7.6m8.4 1.5a1.5 1.5 0 0 1 1.5 1.5 1.5 1.5 0 0 1-1.5 1.5 1.5 1.5 0 0 1-1.5-1.5 1.5 1.5 0 0 1 1.5-1.5M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3Z"/></svg>
+                    </a>
+                  {%- endif -%}
+                  {%- if block.settings.twitter_link != blank -%}
+                    <a href="{{ block.settings.twitter_link }}" target="_blank" class="scb-social-link" aria-label="Twitter">
+                      <svg viewBox="0 0 24 24"><path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.39 3 4.8 2.63 5.43 2.43 6.16 2.43 6.94c0 1.49.76 2.8 1.9 3.57-.71-.02-1.37-.22-1.95-.54v.05c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.52 8.52 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.9 20.3 6.08 21 8.43 21c8.06 0 12.47-6.68 12.47-12.47 0-.19-.01-.38-.03-.57.85-.62 1.59-1.39 2.18-2.27Z"/></svg>
+                    </a>
+                  {%- endif -%}
+                </div>
+              {%- when 'divider' -%}
+                <hr class="scb-block-divider" {{ block.shopify_attributes }}>
+            {%- endcase -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+
+  </div>
+
+  {%- comment -%} ── BOTTOM CONTACT BAR ── {%- endcomment -%}
+  {%- if section.settings.address != blank or section.settings.phone != blank or section.settings.email != blank or section.settings.hours != blank -%}
+    <div class="scb__contact-bar">
+      <div class="scb__contact-bar-inner">
+        {%- if section.settings.address != blank -%}
+          <div class="scb-contact-item">
+            <div class="scb-contact-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
+            </div>
+            <div class="scb-contact-body">
+              <span class="scb-contact-label">Address</span>
+              <span class="scb-contact-value">{{ section.settings.address }}</span>
+            </div>
+          </div>
+        {%- endif -%}
+        {%- if section.settings.phone != blank -%}
+          <div class="scb-contact-item">
+            <div class="scb-contact-icon">
+              <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+            </div>
+            <div class="scb-contact-body">
+              <span class="scb-contact-label">Phone</span>
+              <span class="scb-contact-value"><a href="tel:{{ section.settings.phone | remove: ' ' }}">{{ section.settings.phone }}</a></span>
+            </div>
+          </div>
+        {%- endif -%}
+        {%- if section.settings.email != blank -%}
+          <div class="scb-contact-item">
+            <div class="scb-contact-icon">
+              <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            </div>
+            <div class="scb-contact-body">
+              <span class="scb-contact-label">Email</span>
+              <span class="scb-contact-value"><a href="mailto:{{ section.settings.email }}">{{ section.settings.email }}</a></span>
+            </div>
+          </div>
+        {%- endif -%}
+        {%- if section.settings.hours != blank -%}
+          <div class="scb-contact-item">
+            <div class="scb-contact-icon">
+              <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
+            </div>
+            <div class="scb-contact-body">
+              <span class="scb-contact-label">Hours</span>
+              <span class="scb-contact-value">{{ section.settings.hours }}</span>
+            </div>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  {%- endif -%}
+
+</section>
+
+<script>
+(function() {
+  var css = [
+    'form[data-testid="form"]{display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;gap:8px!important;align-items:flex-start!important}',
+    'form[data-testid="form"]>*{width:100%!important;box-sizing:border-box!important;flex-shrink:0!important}',
+    'form[data-testid="form"]>*:has(#first_name),form[data-testid="form"]>*:has(#last_name){flex:1 1 calc(50% - 4px)!important;width:auto!important;min-width:0!important}'
+  ].join('');
+
+  function inject() {
+    var embed = document.querySelector('shopify-forms-embed');
+    if (!embed) return false;
+    var root = embed.shadowRoot;
+    if (!root) return false;
+    if (!root.querySelector('#scb-name-fix')) {
+      var s = document.createElement('style');
+      s.id = 'scb-name-fix';
+      s.textContent = css;
+      root.appendChild(s);
+    }
+    return true;
+  }
+
+  var n = 0, t = setInterval(function() {
+    if (inject() || ++n > 75) clearInterval(t);
+  }, 200);
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Split Content Blocks",
+  "tag": "section",
+  "class": "split-content-blocks",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Title"
+    },
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Section Title",
+      "default": "CONTACT US",
+      "info": "Optional title spanning both columns. Leave blank to hide."
+    },
+    {
+      "type": "header",
+      "content": "Contact Details (Bottom Bar)"
+    },
+    {
+      "type": "text",
+      "id": "address",
+      "label": "Address",
+      "default": "123 Park Orchards Road, Park Orchards VIC 3114"
+    },
+    {
+      "type": "text",
+      "id": "phone",
+      "label": "Phone",
+      "default": "0408 200 302"
+    },
+    {
+      "type": "text",
+      "id": "email",
+      "label": "Email",
+      "default": "info@parkorchards.com.au"
+    },
+    {
+      "type": "text",
+      "id": "hours",
+      "label": "Hours / Opening Times",
+      "info": "Leave blank to hide."
+    },
+    {
+      "type": "header",
+      "content": "Enquiry Form (Right Column)"
+    },
+    {
+      "type": "text",
+      "id": "form_title",
+      "label": "Form Card Title",
+      "default": "SUBMIT AN ENQUIRY"
+    },
+    {
+      "type": "text",
+      "id": "form_subtitle",
+      "label": "Form Card Subtitle",
+      "default": "We'd love to hear from you. Fill out the form and we'll get back to you as soon as possible.",
+      "info": "Brief intro text above the form."
+    },
+    {
+      "type": "header",
+      "content": "Section Style"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f8f8f8"
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "Form Card Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "primary_color",
+      "label": "Primary / Accent Color",
+      "default": "#b92b2b"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "number",
+      "id": "max_width",
+      "label": "Max Width (px)",
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding Top",
+      "min": 0, "max": 120, "step": 4, "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding Bottom",
+      "min": 0, "max": 120, "step": 4, "unit": "px",
+      "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "Heading",
+      "settings": [
+        {
+          "type": "select",
+          "id": "column",
+          "label": "Column",
+          "options": [
+            {"value": "left", "label": "Left (Contact Info)"},
+            {"value": "right", "label": "Right (Form Area)"}
+          ],
+          "default": "left"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading Text",
+          "default": "WOMEN'S FOOTBALL"
+        },
+        {
+          "type": "color",
+          "id": "heading_color",
+          "label": "Heading Color",
+          "info": "Leave blank to use the section default."
+        },
+        {
+          "type": "range",
+          "id": "heading_size",
+          "label": "Heading Size (px)",
+          "min": 16,
+          "max": 72,
+          "step": 2,
+          "unit": "px",
+          "default": 36,
+          "info": "Adjust the font size of this heading."
+        }
+      ]
+    },
+    {
+      "type": "subheading",
+      "name": "Subheading",
+      "settings": [
+        {
+          "type": "select",
+          "id": "column",
+          "label": "Column",
+          "options": [
+            {"value": "left", "label": "Left (Contact Info)"},
+            {"value": "right", "label": "Right (Form Area)"}
+          ],
+          "default": "left"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Subheading Text",
+          "default": "GET IN TOUCH"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text Content",
+      "settings": [
+        {
+          "type": "select",
+          "id": "column",
+          "label": "Column",
+          "options": [
+            {"value": "left", "label": "Left (Contact Info)"},
+            {"value": "right", "label": "Right (Form Area)"}
+          ],
+          "default": "left"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p><strong>Senior Coach:</strong> Dave Boell<br><strong>Phone:</strong> 0408 200 302<br><strong>Email:</strong> abc@example.com</p>"
+        }
+      ]
+    },
+    {
+      "type": "custom_html",
+      "name": "Custom HTML / Form",
+      "settings": [
+        {
+          "type": "select",
+          "id": "column",
+          "label": "Column",
+          "options": [
+            {"value": "left", "label": "Left (Contact Info)"},
+            {"value": "right", "label": "Right (Form Area)"}
+          ],
+          "default": "right"
+        },
+        {
+          "type": "html",
+          "id": "html",
+          "label": "Custom HTML",
+          "info": "Paste your form embed code or any custom HTML here."
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Button",
+      "settings": [
+        {
+          "type": "select",
+          "id": "column",
+          "label": "Column",
+          "options": [
+            {"value": "left", "label": "Left (Contact Info)"},
+            {"value": "right", "label": "Right (Form Area)"}
+          ],
+          "default": "left"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Button Label",
+          "default": "Learn More"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Button Link"
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Style",
+          "options": [
+            {"value": "primary", "label": "Primary (Solid)"},
+            {"value": "secondary", "label": "Secondary (Outline)"}
+          ],
+          "default": "primary"
+        }
+      ]
+    },
+    {
+      "type": "social_icons",
+      "name": "Social Icons",
+      "settings": [
+        {
+          "type": "select",
+          "id": "column",
+          "label": "Column",
+          "options": [
+            {"value": "left", "label": "Left (Contact Info)"},
+            {"value": "right", "label": "Right (Form Area)"}
+          ],
+          "default": "left"
+        },
+        {
+          "type": "url",
+          "id": "facebook_link",
+          "label": "Facebook URL"
+        },
+        {
+          "type": "url",
+          "id": "instagram_link",
+          "label": "Instagram URL"
+        },
+        {
+          "type": "url",
+          "id": "twitter_link",
+          "label": "Twitter URL"
+        }
+      ]
+    },
+    {
+      "type": "@app"
+    },
+    {
+      "type": "divider",
+      "name": "Divider",
+      "settings": [
+        {
+          "type": "select",
+          "id": "column",
+          "label": "Column",
+          "options": [
+            {"value": "left", "label": "Left (Contact Info)"},
+            {"value": "right", "label": "Right (Form Area)"}
+          ],
+          "default": "left"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Contact & Enquiry Split",
+      "settings": {
+        "section_title": "CONTACT US",
+        "address": "123 Park Orchards Road, Park Orchards VIC 3114",
+        "phone": "0408 200 302",
+        "email": "info@parkorchards.com.au",
+        "form_title": "SUBMIT AN ENQUIRY",
+        "form_subtitle": "We'd love to hear from you. Fill out the form and we'll get back to you as soon as possible."
+      },
+      "blocks": [
+        {
+          "type": "heading",
+          "settings": { "column": "left", "title": "WOMEN'S FOOTBALL" }
+        },
+        {
+          "type": "text",
+          "settings": {
+            "column": "left",
+            "text": "<p><strong>Senior Coach:</strong> Dave Boell<br><strong>Phone:</strong> 0408 200 302<br><strong>Email:</strong> seniorwomenscoach@example.com.au</p>"
+          }
+        },
+        {
+          "type": "heading",
+          "settings": { "column": "left", "title": "MEN'S FOOTBALL" }
+        },
+        {
+          "type": "text",
+          "settings": {
+            "column": "left",
+            "text": "<p><strong>Senior Coach:</strong> Paris Harvie<br><strong>Reserves Coach:</strong> Jarrod Morgan</p>"
+          }
+        },
+        {
+          "type": "heading",
+          "settings": { "column": "left", "title": "NETBALL" }
+        },
+        {
+          "type": "text",
+          "settings": {
+            "column": "left",
+            "text": "<p><strong>Netball Coordinator:</strong> Britney Purcell<br><strong>Phone:</strong> 0408 030 607</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

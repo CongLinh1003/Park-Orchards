@@ -1,0 +1,265 @@
+{%- liquid
+  assign accent       = section.settings.accent_color
+  assign policies_all = metaobjects.club_policy.values | sort: 'sort_order'
+  assign active_index = 0
+-%}
+
+<section
+  class="po-policies po-policies--{{ section.id }}"
+  id="PoliciesSection-{{ section.id }}"
+>
+  <div class="po-policies__inner page-width">
+
+    {%- if policies_all.size > 0 -%}
+
+      {%- comment %} ── Tab bar ── {%- endcomment %}
+      <div class="po-policies__tabs" role="tablist" aria-label="Club Policies">
+        {%- for policy in policies_all -%}
+          {%- liquid
+            assign tab_id   = 'PolTab-'   | append: section.id | append: '-' | append: forloop.index0
+            assign panel_id = 'PolPanel-' | append: section.id | append: '-' | append: forloop.index0
+            assign is_first = forloop.first
+          -%}
+          <button
+            class="po-policies__tab{% if is_first %} is-active{% endif %}"
+            type="button"
+            role="tab"
+            id="{{ tab_id }}"
+            aria-controls="{{ panel_id }}"
+            aria-selected="{{ is_first }}"
+            data-tab-index="{{ forloop.index0 }}"
+          >
+            {{ policy.name.value }}
+          </button>
+        {%- endfor -%}
+      </div>
+
+      {%- comment %} ── Panels ── {%- endcomment %}
+      <div class="po-policies__panels">
+        {%- for policy in policies_all -%}
+          {%- liquid
+            assign tab_id   = 'PolTab-'   | append: section.id | append: '-' | append: forloop.index0
+            assign panel_id = 'PolPanel-' | append: section.id | append: '-' | append: forloop.index0
+            assign is_first = forloop.first
+          -%}
+          <div
+            class="po-policies__panel{% if is_first %} is-active{% endif %}"
+            id="{{ panel_id }}"
+            role="tabpanel"
+            aria-labelledby="{{ tab_id }}"
+            {% unless is_first %}hidden{% endunless %}
+          >
+            {%- comment %} Large red heading banner {%- endcomment %}
+            <div class="po-policies__heading-wrap">
+              <h2 class="po-policies__heading">{{ policy.name.value }}</h2>
+            </div>
+
+            {%- comment %} Body content {%- endcomment %}
+            <div class="po-policies__body">
+              {{ policy.content.value | newline_to_br }}
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+
+    {%- else -%}
+      <p class="po-policies__empty">
+        No policies found. Please add <strong>Club Policy</strong> entries in
+        <em>Admin → Content → Metaobjects</em>.
+      </p>
+    {%- endif -%}
+
+  </div>
+
+  <style>
+    .po-policies--{{ section.id }} {
+      background: {{ section.settings.background_color }};
+      padding: clamp(32px, 5vw, 64px) 0;
+    }
+
+    /* ── Tab bar ── */
+    .po-policies--{{ section.id }} .po-policies__tabs {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 28px;
+    }
+
+    .po-policies--{{ section.id }} .po-policies__tab {
+      background: transparent;
+      color: {{ accent }};
+      border: 2px solid {{ accent }};
+      padding: 12px 18px;
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      line-height: 1.2;
+      text-align: center;
+      transition: background 0.18s ease, color 0.18s ease;
+    }
+
+    /* Collapse double-borders between sibling tabs */
+    .po-policies--{{ section.id }} .po-policies__tab + .po-policies__tab {
+      margin-left: -2px;
+    }
+
+    .po-policies--{{ section.id }} .po-policies__tab.is-active,
+    .po-policies--{{ section.id }} .po-policies__tab:hover {
+      background: {{ accent }};
+      color: #fff;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Heading banner ── */
+    .po-policies--{{ section.id }} .po-policies__heading-wrap {
+      background: {{ accent }};
+      padding: 20px 28px;
+      margin-bottom: 24px;
+    }
+
+    .po-policies--{{ section.id }} .po-policies__heading {
+      margin: 0;
+      color: #fff;
+      font-weight: 900;
+      font-size: clamp(28px, 5vw, 56px);
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      line-height: 1.05;
+      text-align: center;
+    }
+
+    /* ── Body text ── */
+    .po-policies--{{ section.id }} .po-policies__body {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #1a1a1a;
+      max-width: 860px;
+      padding: 0 4px;
+    }
+
+    /* style bullet lines that start with • */
+    .po-policies--{{ section.id }} .po-policies__body br + br {
+      display: block;
+      margin-top: 6px;
+    }
+
+    /* ── Empty state ── */
+    .po-policies--{{ section.id }} .po-policies__empty {
+      text-align: center;
+      opacity: 0.7;
+      padding: 40px 0;
+    }
+
+    /* ── Mobile ── */
+    @media screen and (max-width: 749px) {
+      .po-policies--{{ section.id }} .po-policies__tab {
+        font-size: 12px;
+        padding: 10px 12px;
+      }
+
+      .po-policies--{{ section.id }} .po-policies__heading {
+        font-size: clamp(22px, 7vw, 36px);
+      }
+
+      .po-policies--{{ section.id }} .po-policies__body {
+        font-size: 14px;
+      }
+    }
+  </style>
+
+  <script>
+    (function () {
+      function initPoliciesTabs(root) {
+        if (!root) return;
+        var tabs   = root.querySelectorAll('[role="tab"]');
+        var panels = root.querySelectorAll('[role="tabpanel"]');
+
+        function setActive(index) {
+          tabs.forEach(function (tab, i) {
+            var active = i === index;
+            tab.classList.toggle('is-active', active);
+            tab.setAttribute('aria-selected', active ? 'true' : 'false');
+          });
+          panels.forEach(function (panel, i) {
+            var active = i === index;
+            panel.classList.toggle('is-active', active);
+            if (active) {
+              panel.removeAttribute('hidden');
+            } else {
+              panel.setAttribute('hidden', 'hidden');
+            }
+          });
+        }
+
+        tabs.forEach(function (tab) {
+          tab.addEventListener('click', function () {
+            var idx = parseInt(tab.getAttribute('data-tab-index'), 10);
+            if (!isNaN(idx)) setActive(idx);
+          });
+        });
+      }
+
+      var root = document.getElementById('PoliciesSection-{{ section.id }}');
+      initPoliciesTabs(root);
+
+      document.addEventListener('shopify:section:load', function (e) {
+        var container = e.target && e.target.querySelector &&
+          e.target.querySelector('#PoliciesSection-{{ section.id }}');
+        initPoliciesTabs(container);
+      });
+    })();
+  </script>
+
+  {% schema %}
+  {
+    "name": "Policies Tabs",
+    "tag": "section",
+    "class": "section",
+    "settings": [
+      {
+        "type": "color",
+        "id": "accent_color",
+        "label": "Accent colour",
+        "default": "#b0121b"
+      },
+      {
+        "type": "color",
+        "id": "background_color",
+        "label": "Background colour",
+        "default": "#ffffff"
+      },
+      {
+        "type": "header",
+        "content": "Spacing"
+      },
+      {
+        "type": "range",
+        "id": "padding_top",
+        "label": "Padding top (px)",
+        "min": 0,
+        "max": 120,
+        "step": 4,
+        "default": 48
+      },
+      {
+        "type": "range",
+        "id": "padding_bottom",
+        "label": "Padding bottom (px)",
+        "min": 0,
+        "max": 120,
+        "step": 4,
+        "default": 48
+      }
+    ],
+    "presets": [
+      {
+        "name": "Policies Tabs"
+      }
+    ]
+  }
+  {% endschema %}
+</section>

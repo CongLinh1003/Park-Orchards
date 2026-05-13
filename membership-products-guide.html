@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Park Orchards FNC — Membership Products Setup Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #e0e0e0; line-height: 1.6; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+  h1 { font-size: 2rem; font-weight: 800; color: #fff; margin-bottom: 8px; }
+  .subtitle { color: #888; font-size: 0.95rem; margin-bottom: 40px; }
+  .overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 48px; }
+  .overview-card { background: #151515; border: 1px solid #252525; border-radius: 12px; padding: 24px; transition: border-color .2s; }
+  .overview-card:hover { border-color: #DB0202; }
+  .overview-card .price { font-size: 1.8rem; font-weight: 800; color: #DB0202; }
+  .overview-card .name { font-size: 0.95rem; font-weight: 600; color: #fff; margin-top: 8px; }
+  .overview-card .fields-count { font-size: 0.8rem; color: #888; margin-top: 4px; }
+  .product { background: #111; border: 1px solid #1e1e1e; border-radius: 16px; margin-bottom: 32px; overflow: hidden; }
+  .product-header { padding: 28px 32px; border-bottom: 1px solid #1e1e1e; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .product-header h2 { font-size: 1.3rem; font-weight: 700; color: #fff; }
+  .badge { background: #DB0202; color: #fff; font-size: 0.85rem; font-weight: 700; padding: 6px 16px; border-radius: 20px; }
+  .section-label { padding: 16px 32px 8px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #DB0202; background: #0d0d0d; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: 12px 32px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #666; border-bottom: 1px solid #1e1e1e; }
+  td { padding: 14px 32px; border-bottom: 1px solid #141414; font-size: 0.88rem; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .field-name { font-weight: 600; color: #fff; }
+  .type-badge { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
+  .type-text { background: #1a2a1a; color: #4ade80; }
+  .type-dropdown { background: #1a1a2e; color: #818cf8; }
+  .type-checkbox { background: #2a1a1a; color: #fb923c; }
+  .req { color: #DB0202; font-weight: 700; }
+  .opt { color: #555; }
+  .choices { color: #999; font-size: 0.82rem; }
+  .note-box { margin: 0 32px 24px; padding: 16px 20px; background: #1a1510; border-left: 3px solid #f59e0b; border-radius: 0 8px 8px 0; font-size: 0.85rem; color: #fbbf24; }
+  .comparison { margin-top: 48px; }
+  .comparison h2 { font-size: 1.3rem; font-weight: 700; color: #fff; margin-bottom: 16px; }
+  .comp-table { background: #111; border: 1px solid #1e1e1e; border-radius: 12px; overflow: auto; }
+  .comp-table th { background: #0d0d0d; }
+  .comp-table td { text-align: center; }
+  .comp-table td:first-child { text-align: left; font-weight: 600; color: #fff; }
+  .check { color: #4ade80; }
+  .cross { color: #555; }
+  .tips { margin-top: 48px; background: #111; border: 1px solid #1e1e1e; border-radius: 16px; padding: 32px; }
+  .tips h2 { font-size: 1.3rem; font-weight: 700; color: #fff; margin-bottom: 16px; }
+  .tips ol { padding-left: 20px; }
+  .tips li { margin-bottom: 12px; color: #ccc; }
+  .tips strong { color: #fff; }
+  @media (max-width: 600px) {
+    th, td { padding: 10px 16px; font-size: 0.8rem; }
+    .product-header { padding: 20px 16px; }
+    .section-label { padding: 12px 16px 6px; }
+    .note-box { margin: 0 16px 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>🦈 Park Orchards FNC — Membership Products</h1>
+<p class="subtitle">Shopify Products + Easify Product Options — Setup Guide</p>
+
+<!-- OVERVIEW CARDS -->
+<div class="overview">
+  <div class="overview-card">
+    <div class="price">$120</div>
+    <div class="name">General Membership — Single</div>
+    <div class="fields-count">9 custom fields</div>
+  </div>
+  <div class="overview-card">
+    <div class="price">$210</div>
+    <div class="name">General Membership — Couple</div>
+    <div class="fields-count">15 custom fields</div>
+  </div>
+  <div class="overview-card">
+    <div class="price">$330</div>
+    <div class="name">Domenerians Membership — Single</div>
+    <div class="fields-count">8 custom fields</div>
+  </div>
+  <div class="overview-card">
+    <div class="price">$550</div>
+    <div class="name">Domenerians Membership — Couple</div>
+    <div class="fields-count">13 custom fields</div>
+  </div>
+</div>
+
+<!-- PRODUCT 1 -->
+<div class="product">
+  <div class="product-header">
+    <h2>1. General Membership — Single</h2>
+    <span class="badge">$120 AUD</span>
+  </div>
+  <div class="section-label">👤 Your Details</div>
+  <table>
+    <tr><th>Field</th><th>Type</th><th>Req</th><th>Choices / Notes</th></tr>
+    <tr><td class="field-name">First Name</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">—</td></tr>
+    <tr><td class="field-name">Last Name</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">—</td></tr>
+    <tr><td class="field-name">Phone Number</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">—</td></tr>
+    <tr><td class="field-name">Email</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">Validate email</td></tr>
+    <tr><td class="field-name">Company</td><td><span class="type-badge type-text">Text</span></td><td class="opt">Optional</td><td class="choices">—</td></tr>
+  </table>
+  <div class="section-label">📋 Preferences</div>
+  <table>
+    <tr><th>Field</th><th>Type</th><th>Req</th><th>Choices / Notes</th></tr>
+    <tr><td class="field-name">Merchandise Preference</td><td><span class="type-badge type-dropdown">Dropdown</span></td><td class="opt">Optional</td><td class="choices">Beanie · Cap · Scarf</td></tr>
+    <tr><td class="field-name">Connection to Club</td><td><span class="type-badge type-checkbox">Checkbox</span></td><td class="req">Required</td><td class="choices">Past player · Current player · Volunteer · Supporter · New to the club · Other</td></tr>
+    <tr><td class="field-name">How Did You Hear About Us?</td><td><span class="type-badge type-checkbox">Checkbox</span></td><td class="req">Required</td><td class="choices">Social media · Word of mouth · At the club / game day · Website · Other</td></tr>
+    <tr><td class="field-name">Receive Club Updates?</td><td><span class="type-badge type-dropdown">Radio</span></td><td class="req">Required</td><td class="choices">Yes · No</td></tr>
+  </table>
+</div>
+
+<!-- PRODUCT 2 -->
+<div class="product">
+  <div class="product-header">
+    <h2>2. General Membership — Couple</h2>
+    <span class="badge">$210 AUD</span>
+  </div>
+  <div class="section-label">👤 Your Details</div>
+  <table>
+    <tr><th>Field</th><th>Type</th><th>Req</th><th>Choices / Notes</th></tr>
+    <tr><td class="field-name">Your First Name</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">—</td></tr>
+    <tr><td class="field-name">Your Last Name</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">—</td></tr>
+    <tr><td class="field-name">Your Phone Number</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">—</td></tr>
+    <tr><td class="field-name">Your Email</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">Validate email</td></tr>
+    <tr><td class="field-name">Your Company</td><td><span class="type-badge type-text">Text</span></td><td class="opt">Optional</td><td class="choices">—</td></tr>
+  </table>
+  <div class="section-label">👤 Partner's Details</div>
+  <table>
+    <tr><th>Field</th><th>Type</th><th>Req</th><th>Choices / Notes</th></tr>
+    <tr><td class="field-name">Partner's First Name</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">—</td></tr>
+    <tr><td class="field-name">Partner's Last Name</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">—</td></tr>
+    <tr><td class="field-name">Partner's Phone Number</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">—</td></tr>
+    <tr><td class="field-name">Partner's Email</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">Validate email</td></tr>
+    <tr><td class="field-name">Partner's Company</td><td><span class="type-badge type-text">Text</span></td><td class="opt">Optional</td><td class="choices">—</td></tr>
+  </table>
+  <div class="section-label">📋 Preferences</div>
+  <table>
+    <tr><th>Field</th><th>Type</th><th>Req</th><th>Choices / Notes</th></tr>
+    <tr><td class="field-name">Your Merchandise Preference</td><td><span class="type-badge type-dropdown">Dropdown</span></td><td class="opt">Optional</td><td class="choices">Beanie · Cap · Scarf</td></tr>
+    <tr><td class="field-name">Partner's Merchandise Preference</td><td><span class="type-badge type-dropdown">Dropdown</span></td><td class="opt">Optional</td><td class="choices">Beanie · Cap · Scarf</td></tr>
+    <tr><td class="field-name">Connection to Club</td><td><span class="type-badge type-checkbox">Checkbox</span></td><td class="req">Required</td><td class="choices">Past player · Current player · Volunteer · Supporter · New to the club · Other</td></tr>
+    <tr><td class="field-name">How Did You Hear About Us?</td><td><span class="type-badge type-checkbox">Checkbox</span></td><td class="req">Required</td><td class="choices">Social media · Word of mouth · At the club / game day · Website · Other</td></tr>
+    <tr><td class="field-name">Receive Club Updates?</td><td><span class="type-badge type-dropdown">Radio</span></td><td class="req">Required</td><td class="choices">Yes · No</td></tr>
+  </table>
+</div>
+
+<!-- PRODUCT 3 -->
+<div class="product">
+  <div class="product-header">
+    <h2>3. Domenerians Membership — Single</h2>
+    <span class="badge">$330 AUD</span>
+  </div>
+  <div class="section-label">👤 Your Details</div>
+  <table>
+    <tr><th>Field</th><th>Type</th><th>Req</th><th>Choices / Notes</th></tr>
+    <tr><td class="field-name">First Name</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">—</td></tr>
+    <tr><td class="field-name">Last Name</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">—</td></tr>
+    <tr><td class="field-name">Phone Number</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">—</td></tr>
+    <tr><td class="field-name">Email</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">Validate email</td></tr>
+    <tr><td class="field-name">Company</td><td><span class="type-badge type-text">Text</span></td><td class="opt">Optional</td><td class="choices">—</td></tr>
+  </table>
+  <div class="section-label">📋 Preferences</div>
+  <div class="note-box">⚠️ Domenerians Single KHÔNG có câu hỏi merchandise (khác với General Single)</div>
+  <table>
+    <tr><th>Field</th><th>Type</th><th>Req</th><th>Choices / Notes</th></tr>
+    <tr><td class="field-name">Connection to Club</td><td><span class="type-badge type-checkbox">Checkbox</span></td><td class="req">Required</td><td class="choices">Past player · Current player · Volunteer · Supporter · New to the club · Other</td></tr>
+    <tr><td class="field-name">How Did You Hear About Us?</td><td><span class="type-badge type-checkbox">Checkbox</span></td><td class="req">Required</td><td class="choices">Social media · Word of mouth · At the club / game day · Website · Other</td></tr>
+    <tr><td class="field-name">Receive Club Updates?</td><td><span class="type-badge type-dropdown">Radio</span></td><td class="req">Required</td><td class="choices">Yes · No</td></tr>
+  </table>
+</div>
+
+<!-- PRODUCT 4 -->
+<div class="product">
+  <div class="product-header">
+    <h2>4. Domenerians Membership — Couple</h2>
+    <span class="badge">$550 AUD</span>
+  </div>
+  <div class="section-label">👤 Your Details</div>
+  <table>
+    <tr><th>Field</th><th>Type</th><th>Req</th><th>Choices / Notes</th></tr>
+    <tr><td class="field-name">Your First Name</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">—</td></tr>
+    <tr><td class="field-name">Your Last Name</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">—</td></tr>
+    <tr><td class="field-name">Your Phone Number</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">—</td></tr>
+    <tr><td class="field-name">Your Email</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">Validate email</td></tr>
+    <tr><td class="field-name">Your Company</td><td><span class="type-badge type-text">Text</span></td><td class="opt">Optional</td><td class="choices">—</td></tr>
+  </table>
+  <div class="section-label">👤 Partner's Details</div>
+  <table>
+    <tr><th>Field</th><th>Type</th><th>Req</th><th>Choices / Notes</th></tr>
+    <tr><td class="field-name">Partner's First Name</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">—</td></tr>
+    <tr><td class="field-name">Partner's Last Name</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">—</td></tr>
+    <tr><td class="field-name">Partner's Phone Number</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">—</td></tr>
+    <tr><td class="field-name">Partner's Email</td><td><span class="type-badge type-text">Text</span></td><td class="req">Required</td><td class="choices">Validate email</td></tr>
+    <tr><td class="field-name">Partner's Company</td><td><span class="type-badge type-text">Text</span></td><td class="opt">Optional</td><td class="choices">—</td></tr>
+  </table>
+  <div class="section-label">📋 Preferences</div>
+  <div class="note-box">⚠️ Domenerians Couple KHÔNG có câu hỏi merchandise (khác với General Couple)</div>
+  <table>
+    <tr><th>Field</th><th>Type</th><th>Req</th><th>Choices / Notes</th></tr>
+    <tr><td class="field-name">Connection to Club</td><td><span class="type-badge type-checkbox">Checkbox</span></td><td class="req">Required</td><td class="choices">Past player · Current player · Volunteer · Supporter · New to the club · Other</td></tr>
+    <tr><td class="field-name">How Did You Hear About Us?</td><td><span class="type-badge type-checkbox">Checkbox</span></td><td class="req">Required</td><td class="choices">Social media · Word of mouth · At the club / game day · Website · Other</td></tr>
+    <tr><td class="field-name">Receive Club Updates?</td><td><span class="type-badge type-dropdown">Radio</span></td><td class="req">Required</td><td class="choices">Yes · No</td></tr>
+  </table>
+</div>
+
+<!-- COMPARISON -->
+<div class="comparison">
+  <h2>📊 So sánh nhanh giữa 4 sản phẩm</h2>
+  <div class="comp-table">
+    <table>
+      <tr><th style="text-align:left">Field</th><th>General Single</th><th>General Couple</th><th>Domen. Single</th><th>Domen. Couple</th></tr>
+      <tr><td>Contact Info (You)</td><td class="check">✅ 5 fields</td><td class="check">✅ 5 fields</td><td class="check">✅ 5 fields</td><td class="check">✅ 5 fields</td></tr>
+      <tr><td>Contact Info (Partner)</td><td class="cross">—</td><td class="check">✅ 5 fields</td><td class="cross">—</td><td class="check">✅ 5 fields</td></tr>
+      <tr><td>Your Merchandise</td><td class="check">✅</td><td class="check">✅</td><td class="cross">❌</td><td class="cross">❌</td></tr>
+      <tr><td>Partner's Merchandise</td><td class="cross">—</td><td class="check">✅</td><td class="cross">—</td><td class="cross">❌</td></tr>
+      <tr><td>Connection to Club</td><td class="check">✅</td><td class="check">✅</td><td class="check">✅</td><td class="check">✅</td></tr>
+      <tr><td>How Did You Hear?</td><td class="check">✅</td><td class="check">✅</td><td class="check">✅</td><td class="check">✅</td></tr>
+      <tr><td>Receive Updates?</td><td class="check">✅</td><td class="check">✅</td><td class="check">✅</td><td class="check">✅</td></tr>
+      <tr style="background:#0d0d0d"><td><strong>Total Fields</strong></td><td><strong>9</strong></td><td><strong>15</strong></td><td><strong>8</strong></td><td><strong>13</strong></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- TIPS -->
+<div class="tips">
+  <h2>💡 Easify Product Options — Setup Tips</h2>
+  <ol>
+    <li><strong>Tạo 4 Option Sets</strong> — mỗi set gán cho 1 sản phẩm membership tương ứng.</li>
+    <li><strong>Dùng Heading/Divider</strong> để chia sections: "Your Details", "Partner's Details" (Couple only), "Preferences".</li>
+    <li><strong>Field types:</strong> Text fields → <code>Text</code>, Single-select (Merchandise, Updates) → <code>Dropdown</code> hoặc <code>Radio</code>, Multi-select (Connection, How Heard) → <code>Checkbox</code>.</li>
+    <li><strong>Validation:</strong> Bật Required trong Easify để chặn Add to Cart khi chưa điền đủ.</li>
+    <li><strong>Email validation:</strong> Nếu Easify hỗ trợ regex, dùng pattern validate email format.</li>
+  </ol>
+</div>
+
+</div>
+</body>
+</html>

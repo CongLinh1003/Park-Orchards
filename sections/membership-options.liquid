@@ -1,0 +1,589 @@
+{%- comment -%}
+  Membership Options — Clean modern pricing cards
+  Each card = block with: title, price, type, Buy Now → product link, features list
+{%- endcomment -%}
+
+{%- liquid
+  assign subtitle    = section.settings.subtitle
+  assign heading     = section.settings.heading
+  assign description = section.settings.description
+  assign accent      = section.settings.accent_color
+  assign bg_start    = section.settings.bg_start
+  assign bg_end      = section.settings.bg_end
+  assign card_bg     = section.settings.card_bg
+  assign text_col    = section.settings.text_color
+  assign cols_d      = section.settings.columns_desktop
+  assign cols_t      = section.settings.columns_tablet
+  assign cols_m      = section.settings.columns_mobile
+-%}
+
+<section
+  class="po-pricing po-pricing--{{ section.id }}"
+  style="
+    --pop-accent: {{ accent }};
+    --pop-accent-rgb: {{ accent | color_to_rgb | remove: 'rgb(' | remove: ')' }};
+    --pop-bg-start: {{ bg_start }};
+    --pop-bg-end: {{ bg_end }};
+    --pop-card-bg: {{ card_bg }};
+    --pop-text: {{ text_col }};
+    --pop-heading-bg: {{ section.settings.heading_bg }};
+    --pop-heading-color: {{ section.settings.heading_color }};
+    --pop-cols-d: {{ cols_d }};
+    --pop-cols-t: {{ cols_t }};
+    --pop-cols-m: {{ cols_m }};
+  "
+>
+  <div class="po-pricing__inner">
+
+    {%- comment -%} ═══ HEADING ═══ {%- endcomment -%}
+    {%- if heading != blank -%}
+      <div class="po-pricing__header">
+        {%- if subtitle != blank -%}
+          <span class="po-pricing__subtitle">{{ subtitle }}</span>
+        {%- endif -%}
+        <h2 class="po-pricing__heading">{{ heading }}</h2>
+        {%- if description != blank -%}
+          <div class="po-pricing__desc">{{ description }}</div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} ═══ CARDS GRID ═══ {%- endcomment -%}
+    {%- if section.blocks.size > 0 -%}
+      <div class="po-pricing__grid">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'pricing_card' -%}
+            <div class="po-pricing__card{% if block.settings.featured %} po-pricing__card--featured{% endif %}" {{ block.shopify_attributes }}>
+
+              {%- comment -%} Badge for featured card {%- endcomment -%}
+              {%- if block.settings.featured -%}
+                <div class="po-pricing__badge">Popular</div>
+              {%- endif -%}
+
+              {%- comment -%} Card header {%- endcomment -%}
+              {%- if block.settings.card_title != blank -%}
+                <div class="po-pricing__card-header">
+                  <h3 class="po-pricing__card-title">{{ block.settings.card_title }}</h3>
+                </div>
+              {%- endif -%}
+
+              {%- comment -%} Price + type {%- endcomment -%}
+              <div class="po-pricing__card-body">
+                {%- if block.settings.price != blank -%}
+                  <div class="po-pricing__card-price">{{ block.settings.price }}</div>
+                {%- endif -%}
+                {%- if block.settings.price_type != blank -%}
+                  <div class="po-pricing__card-type">{{ block.settings.price_type }}</div>
+                {%- endif -%}
+
+                {%- comment -%} Features list {%- endcomment -%}
+                {%- if block.settings.features != blank -%}
+                  <div class="po-pricing__card-features">
+                    {{ block.settings.features }}
+                  </div>
+                {%- endif -%}
+
+                {%- comment -%} Buy Now button {%- endcomment -%}
+                {%- if block.settings.product != blank -%}
+                  <a href="{{ block.settings.product.url }}" class="po-pricing__card-btn">
+                    {{ block.settings.button_label | default: 'Buy Now' }}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                  </a>
+                {%- elsif block.settings.button_url != blank -%}
+                  <a href="{{ block.settings.button_url }}" class="po-pricing__card-btn">
+                    {{ block.settings.button_label | default: 'Buy Now' }}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                  </a>
+                {%- endif -%}
+              </div>
+
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+</section>
+
+{% style %}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  /* ═══ SECTION SHELL ═══ */
+  .po-pricing--{{ section.id }} {
+    background: linear-gradient(160deg, var(--pop-bg-start) 0%, var(--pop-bg-end) 100%);
+    color: var(--pop-text);
+    padding: clamp(3.5rem, 7vw, 6rem) 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Subtle noise overlay for depth */
+  .po-pricing--{{ section.id }}::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 20% 50%, rgba(255,255,255,0.03) 0%, transparent 70%),
+                radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.02) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .po-pricing--{{ section.id }} .po-pricing__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 clamp(1.25rem, 4vw, 3rem);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ═══ HEADER ═══ */
+  .po-pricing--{{ section.id }} .po-pricing__header {
+    text-align: center;
+    margin-bottom: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .po-pricing--{{ section.id }} .po-pricing__subtitle {
+    display: inline-block;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--pop-accent);
+    margin-bottom: 0.75rem;
+    padding: 0.35rem 1rem;
+    border: 1px solid rgba(var(--pop-accent-rgb), 0.3);
+    border-radius: 100px;
+    background: rgba(var(--pop-accent-rgb), 0.08);
+  }
+
+  .po-pricing--{{ section.id }} .po-pricing__heading {
+    font-weight: 900;
+    font-size: clamp(1.75rem, 4vw, 3rem);
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    margin: 0 0 1rem;
+    color: var(--pop-text);
+  }
+
+  .po-pricing--{{ section.id }} .po-pricing__desc {
+    font-size: clamp(0.9rem, 1.1vw, 1.05rem);
+    line-height: 1.7;
+    opacity: 0.7;
+    max-width: 560px;
+    margin: 0 auto;
+    font-weight: 400;
+  }
+
+  /* ═══ GRID ═══ */
+  .po-pricing--{{ section.id }} .po-pricing__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--pop-cols-m), 1fr);
+    gap: clamp(1rem, 2vw, 1.5rem);
+  }
+
+  @media (min-width: 750px) {
+    .po-pricing--{{ section.id }} .po-pricing__grid {
+      grid-template-columns: repeat(var(--pop-cols-t), 1fr);
+    }
+  }
+
+  @media (min-width: 990px) {
+    .po-pricing--{{ section.id }} .po-pricing__grid {
+      grid-template-columns: repeat(var(--pop-cols-d), 1fr);
+    }
+  }
+
+  /* ═══ CARD ═══ */
+  .po-pricing--{{ section.id }} .po-pricing__card {
+    background: rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.3s ease,
+                box-shadow 0.4s ease;
+  }
+
+  .po-pricing--{{ section.id }} .po-pricing__card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(var(--pop-accent-rgb), 0.35);
+    box-shadow: 0 20px 60px -15px rgba(0, 0, 0, 0.4),
+                0 0 40px -10px rgba(var(--pop-accent-rgb), 0.15);
+  }
+
+  /* Featured card */
+  .po-pricing--{{ section.id }} .po-pricing__card--featured {
+    border-color: rgba(var(--pop-accent-rgb), 0.4);
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .po-pricing--{{ section.id }} .po-pricing__card--featured::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--pop-accent);
+  }
+
+  /* Badge */
+  .po-pricing--{{ section.id }} .po-pricing__badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--pop-accent);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.3rem 0.75rem;
+    border-radius: 100px;
+    z-index: 2;
+  }
+
+  /* ─── Card header ─── */
+  .po-pricing--{{ section.id }} .po-pricing__card-header {
+    padding: clamp(1.25rem, 2vw, 1.75rem) clamp(1.25rem, 2.5vw, 2rem) 0;
+  }
+
+  .po-pricing--{{ section.id }} .po-pricing__card-title {
+    font-weight: 700;
+    font-size: clamp(0.85rem, 1.2vw, 1rem);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    line-height: 1.2;
+    margin: 0;
+    color: var(--pop-accent);
+  }
+
+  /* ─── Card body ─── */
+  .po-pricing--{{ section.id }} .po-pricing__card-body {
+    padding: 0.75rem clamp(1.25rem, 2.5vw, 2rem) clamp(1.5rem, 2.5vw, 2rem);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .po-pricing--{{ section.id }} .po-pricing__card-price {
+    font-weight: 900;
+    font-size: clamp(2.5rem, 4.5vw, 3.25rem);
+    line-height: 1;
+    color: #fff;
+    margin-bottom: 0.15rem;
+    letter-spacing: -0.02em;
+  }
+
+  .po-pricing--{{ section.id }} .po-pricing__card-type {
+    font-weight: 500;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 1.5rem;
+    text-transform: capitalize;
+  }
+
+  /* ─── Features ─── */
+  .po-pricing--{{ section.id }} .po-pricing__card-features {
+    width: 100%;
+    text-align: left;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 1.25rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+    font-weight: 400;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.75);
+    flex: 1;
+  }
+
+  .po-pricing--{{ section.id }} .po-pricing__card-features ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .po-pricing--{{ section.id }} .po-pricing__card-features li {
+    margin-bottom: 0.6rem;
+    padding-left: 1.5rem;
+    position: relative;
+  }
+
+  .po-pricing--{{ section.id }} .po-pricing__card-features li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.35em;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: rgba(var(--pop-accent-rgb), 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .po-pricing--{{ section.id }} .po-pricing__card-features li::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: calc(0.35em + 3px);
+    width: 6px;
+    height: 3px;
+    border-left: 1.5px solid var(--pop-accent);
+    border-bottom: 1.5px solid var(--pop-accent);
+    transform: rotate(-45deg);
+  }
+
+  /* ─── CTA Button ─── */
+  .po-pricing--{{ section.id }} .po-pricing__card-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    background: var(--pop-accent);
+    color: #fff;
+    border: none;
+    padding: 0.85rem 1.5rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    font-family: 'Inter', system-ui, sans-serif;
+    margin-top: auto;
+    cursor: pointer;
+  }
+
+  .po-pricing--{{ section.id }} .po-pricing__card-btn:hover {
+    filter: brightness(1.15);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px -4px rgba(var(--pop-accent-rgb), 0.5);
+  }
+
+  .po-pricing--{{ section.id }} .po-pricing__card-btn svg {
+    transition: transform 0.3s ease;
+  }
+
+  .po-pricing--{{ section.id }} .po-pricing__card-btn:hover svg {
+    transform: translateX(3px);
+  }
+
+  /* ═══ RESPONSIVE ═══ */
+  @media (max-width: 749px) {
+    .po-pricing--{{ section.id }} .po-pricing__card-price {
+      font-size: 2.5rem;
+    }
+  }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Membership Options",
+  "tag": "section",
+  "class": "po-pricing-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Membership Options"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>We offer several membership options to cater to individuals and families alike. Choose the one that's right for you!</p>"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Columns (desktop)",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "columns_tablet",
+      "label": "Columns (tablet)",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "columns_mobile",
+      "label": "Columns (mobile)",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 1
+    },
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color (button)",
+      "default": "#b0121b"
+    },
+    {
+      "type": "color",
+      "id": "heading_bg",
+      "label": "Heading background",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "bg_start",
+      "label": "Background start",
+      "default": "#0a0000"
+    },
+    {
+      "type": "color",
+      "id": "bg_end",
+      "label": "Background end",
+      "default": "#9b0000"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "pricing_card",
+      "name": "Pricing Card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "card_title",
+          "label": "Card title",
+          "default": "Sharks General"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Price",
+          "default": "$120"
+        },
+        {
+          "type": "text",
+          "id": "price_type",
+          "label": "Type (e.g. single, couple)",
+          "default": "single"
+        },
+        {
+          "type": "checkbox",
+          "id": "featured",
+          "label": "Featured / Popular",
+          "default": false
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product (Buy Now link)"
+        },
+        {
+          "type": "url",
+          "id": "button_url",
+          "label": "Button URL (fallback if no product)"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "Buy Now"
+        },
+        {
+          "type": "richtext",
+          "id": "features",
+          "label": "Features list",
+          "default": "<ul><li>Entry To 9 Home Games</li><li>Weekly Club Communications</li><li>Invitations To All Club Events</li><li>Membership Burger & Drink Card</li><li>Free Member Scarf, Beanie, Or Cap</li><li>Voting Rights At The AGM</li></ul>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Membership Options",
+      "blocks": [
+        {
+          "type": "pricing_card",
+          "settings": {
+            "card_title": "Sharks General",
+            "price": "$120",
+            "price_type": "single"
+          }
+        },
+        {
+          "type": "pricing_card",
+          "settings": {
+            "card_title": "Sharks General",
+            "price": "$210",
+            "price_type": "couple"
+          }
+        },
+        {
+          "type": "pricing_card",
+          "settings": {
+            "card_title": "Domenerians",
+            "price": "$330",
+            "price_type": "single"
+          }
+        },
+        {
+          "type": "pricing_card",
+          "settings": {
+            "card_title": "Domenerians",
+            "price": "$550",
+            "price_type": "couple"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -12,9 +12,22 @@ setup-metaobjects.js
 setup-metaobject-entries.js
 setup-article-metafields.js
 setup-remaining.js
+setup-sponsor-entries.js
+fix-team-handles.js
+debug-sponsors.js
+create-membership-products.js
+create-sponsorship-packages.js
+setup-sponsorship-packages.js
+setup-committee-personnel.js
+setup-player-sponsors.js
+setup-policy-metaobject.js
+setup-foundation-members.js
+query-foundation-members.js
+update-foundation-members.js
 
 # Node
 node_modules/
+shopify-relationship-backups/
 
 # OS
 .DS_Store
